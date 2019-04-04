@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+import ldap
+from django_auth_ldap.config import LDAPSearch 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -38,9 +40,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
     'corsheaders',
-    'api.apps.ApiConfig',
-    'authentication.apps.AuthenticationConfig',
+    'api',
+    'authentication',
     'rest_framework_swagger',
 ]
 
@@ -136,6 +139,13 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.FormParser',
         'rest_framework.parsers.MultiPartParser',
     ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    ),
+    'PAGINATE_BY': 10
 }
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -147,3 +157,43 @@ EMAIL_PORT = 25
 EMAIL_HOST_USER = 'mail@tuweizhong.com'
 EMAIL_HOST_PASSWORD = 'xxxx'
 DEFAULT_FROM_EMAIL = 'mail@tuweizhong.com'
+
+
+#LDAP认证
+AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend',]  
+
+# Auth LDAP settings
+AUTH_LDAP = True
+AUTH_LDAP_SERVER_URI = 'ldap://192.168.1.247:389'
+AUTH_LDAP_BIND_DN = 'cn=admin,ou=SystemUser,dc=iwubida,dc=com'
+AUTH_LDAP_BIND_PASSWORD = 'Wubida@123'
+AUTH_LDAP_SEARCH_OU = 'ou=Users,dc=iwubida,dc=com'
+# AUTH_LDAP_SEARCH_FILTER = '(uid=%(user)s)'
+AUTH_LDAP_START_TLS = False
+AUTH_LDAP_USER_ATTR_MAP = {"username": "cn", "name": "sn", "email": "mail","address":"sn"}
+# AUTH_LDAP_GROUP_SEARCH_OU = ""
+# AUTH_LDAP_GROUP_SEARCH_FILTER = ""
+AUTH_LDAP_USER_SEARCH = LDAPSearch(AUTH_LDAP_SEARCH_OU, ldap.SCOPE_SUBTREE, "(&(uid=%(user)s))")
+# AUTH_LDAP_CONNECTION_OPTIONS = {
+#     ldap.OPT_TIMEOUT: 5
+# }
+
+# AUTH_LDAP_MIRROR_GROUPS = True
+# AUTH_LDAP_GROUP_TYPE_STRING = ''
+# AUTH_LDAP_GROUP_TYPE_STRING_ATTR = 'cn'
+
+# AUTH_LDAP_GROUP_TYPE = GroupOfUniqueNamesType(name_attr="cn")
+# AUTH_LDAP_GROUP_SEARCH_OU = CONFIG.AUTH_LDAP_GROUP_SEARCH_OU
+# AUTH_LDAP_GROUP_SEARCH_FILTER = CONFIG.AUTH_LDAP_GROUP_SEARCH_FILTER
+# AUTH_LDAP_CONNECTION_OPTIONS = {
+#     ldap.OPT_TIMEOUT: 5
+# }
+# AUTH_LDAP_GROUP_CACHE_TIMEOUT = 1
+AUTH_LDAP_ALWAYS_UPDATE_USER = True
+# AUTH_LDAP_BACKEND = 'django_auth_ladp.backend.LDAPBackend' #配置为先使用LDAP认证，如通过认证则不再使用后面的认证方式
+AUTH_LDAP_BACKEND = 'authentication.ldap.backend.LDAPBackendAuthentication' #配置为先使用LDAP认证，如通过认证则不再使用后面的认证方式
+
+if AUTH_LDAP:
+    AUTHENTICATION_BACKENDS.insert(0, AUTH_LDAP_BACKEND)
+# AUTH_USER_MODEL = "authentication.UserProfile"
+AUTH_USER_MODEL="authentication.UserProfile"
