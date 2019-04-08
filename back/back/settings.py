@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
-import ldap
+import ldap,datetime
 from django_auth_ldap.config import LDAPSearch 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -40,10 +40,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'rest_framework.authtoken',
+    # 'rest_framework.authtoken',
     'corsheaders',
     'api',
-    'authentication',
+    'authentication.apps.AuthenticationConfig',
     'rest_framework_swagger',
 ]
 
@@ -143,11 +143,19 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
+        # 'rest_framework.authentication.TokenAuthentication',
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
     ),
     'PAGINATE_BY': 10
 }
 
+JWT_AUTH = {
+    'JWT_AUTH_HEADER_PREFIX': 'Token',
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=1),  # 生成的token有效期
+    'JWT_RESPONSE_PAYLOAD_HANDLER': 'authentication.ldap.backend.jwt_response_payload_handler', 
+}
+
+# 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
   
 EMAIL_USE_TLS = False
@@ -170,7 +178,7 @@ AUTH_LDAP_BIND_PASSWORD = 'Wubida@123'
 AUTH_LDAP_SEARCH_OU = 'ou=Users,dc=iwubida,dc=com'
 # AUTH_LDAP_SEARCH_FILTER = '(uid=%(user)s)'
 AUTH_LDAP_START_TLS = False
-AUTH_LDAP_USER_ATTR_MAP = {"username": "cn", "name": "sn", "email": "mail","address":"sn"}
+AUTH_LDAP_USER_ATTR_MAP = {"username": "cn", "name": "sn", "email": "mail","nickname":"sn"}
 # AUTH_LDAP_GROUP_SEARCH_OU = ""
 # AUTH_LDAP_GROUP_SEARCH_FILTER = ""
 AUTH_LDAP_USER_SEARCH = LDAPSearch(AUTH_LDAP_SEARCH_OU, ldap.SCOPE_SUBTREE, "(&(uid=%(user)s))")
@@ -196,4 +204,66 @@ AUTH_LDAP_BACKEND = 'authentication.ldap.backend.LDAPBackendAuthentication' #配
 if AUTH_LDAP:
     AUTHENTICATION_BACKENDS.insert(0, AUTH_LDAP_BACKEND)
 # AUTH_USER_MODEL = "authentication.UserProfile"
-AUTH_USER_MODEL="authentication.UserProfile"
+AUTH_USER_MODEL="authentication.Users"
+
+
+
+# 日志部分
+# Django的日志配置项
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        },
+        'main': {
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+            'format': '%(asctime)s [%(module)s %(levelname)s] %(message)s',
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
+    'handlers': {
+        'null': {
+            'level': 'DEBUG',
+            'class': 'logging.NullHandler',
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'main'
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['null'],
+            'propagate': False,
+            'level': 'DEBUG',
+        },
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'django.server': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'django_auth_ldap': {
+            'handlers': ['console'],
+            'level': "INFO",
+        },
+        'cmdb_ldap': {
+            'handlers': ['console'],
+            'level': "INFO",
+        },
+        # 'django.db': {
+        #     'handlers': ['console'],
+        #     'level': 'DEBUG'
+        # }
+    }
+}
