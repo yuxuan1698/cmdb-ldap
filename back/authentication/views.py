@@ -6,10 +6,10 @@ from authentication.ldap.ldapsearch import CmdbLDAP
 from common.utils import LDAPJSONEncoder
 from django.http import JsonResponse
 # from rest_framework_jwt.utils import jwt_decode_handler
-from rest_framework_jwt.views import RefreshJSONWebToken
-
+from django.contrib.auth import get_user_model
 
 from django.conf import settings
+Users = get_user_model()
 
 class UserViewSet(ModelViewSet):
   """
@@ -40,7 +40,6 @@ class UserViewSet(ModelViewSet):
       changeStatus=CmdbLDAP().change_self_password(request.data)
       if changeStatus==True:
         returnData={"status":"success"}
-        RefreshJSONWebToken()
         returnStatus=status.HTTP_200_OK
       else:
         # logger.info(changeStatus)

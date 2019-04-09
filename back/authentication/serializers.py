@@ -28,21 +28,21 @@ class ChangePasswordSerializer(serializers.Serializer):
     min_length     = 6,
     error_messages = {
         'min_length': '密码不能小于6个字符',
-        'required'  : '请填写名字'
+        'required'  : '请填写旧密码'
       })
   newpassword = serializers.CharField(
     required       = True, 
     min_length     = 6,
     error_messages = {
         'min_length': '密码不能小于6个字符',
-        'required'  : '请填写名字'
+        'required'  : '请填输入新密码'
       })
   repassword = serializers.CharField(
     required       = True, 
     min_length     = 6,
     error_messages = {
         'min_length': '密码确认不能小于6个字符',
-        'required'  : '请填写名字'
+        'required'  : '请输入确认密码'
       })
   def validate(self, data):
     # 传进来什么参数，就返回什么参数，一般情况下用attrs
