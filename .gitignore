@@ -1,4 +1,4 @@
 __pycache__
-*.pyc
-*.sqlite3
+.pyc
+.sqlite3
 front/node_modules
