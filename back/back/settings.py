@@ -42,8 +42,9 @@ INSTALLED_APPS = [
     'rest_framework',
     # 'rest_framework.authtoken',
     'corsheaders',
-    'api',
+    'api.apps.ApiConfig',
     'authentication.apps.AuthenticationConfig',
+    'common.apps.CommonConfig',
     'rest_framework_swagger',
 ]
 
@@ -145,14 +146,17 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         # 'rest_framework.authentication.TokenAuthentication',
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
     ),
-    'PAGINATE_BY': 10
+    'PAGINATE_BY': 5
 }
 
 JWT_AUTH = {
     'JWT_AUTH_HEADER_PREFIX': 'Token',
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=1),  # 生成的token有效期
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=1),  # 生成的token有效期
     'JWT_RESPONSE_PAYLOAD_HANDLER': 'authentication.ldap.backend.jwt_response_payload_handler', 
+    'JWT_GET_USER_SECRET_KEY': 'secretkey',
 }
 
 # 
@@ -172,7 +176,7 @@ AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend',]
 
 # Auth LDAP settings
 AUTH_LDAP = True
-AUTH_LDAP_SERVER_URI = 'ldap://192.168.1.247:389'
+AUTH_LDAP_SERVER_URI = 'ldap://172.18.207.237:389'
 AUTH_LDAP_BIND_DN = 'cn=admin,ou=SystemUser,dc=iwubida,dc=com'
 AUTH_LDAP_BIND_PASSWORD = 'Wubida@123'
 AUTH_LDAP_SEARCH_OU = 'ou=Users,dc=iwubida,dc=com'
@@ -261,9 +265,29 @@ LOGGING = {
             'handlers': ['console'],
             'level': "INFO",
         },
-        # 'django.db': {
-        #     'handlers': ['console'],
-        #     'level': 'DEBUG'
-        # }
     }
+}
+
+# swagger 配置项
+SWAGGER_SETTINGS = {
+    # 基础样式
+    'SECURITY_DEFINITIONS': {
+        "basic":{
+            'type': 'basic'
+        }
+    },
+    # 如果需要登录才能够查看接口文档, 登录的链接使用restframework自带的.
+    'LOGIN_URL': 'authentication:auth-login',
+    'LOGOUT_URL': 'authentication:logout',
+    # 'DOC_EXPANSION': None,
+    # 'SHOW_REQUEST_HEADERS':True,
+    # 'USE_SESSION_AUTH': True,
+    # 'DOC_EXPANSION': 'list',
+    # 接口文档中方法列表以首字母升序排列
+    'APIS_SORTER': 'alpha',
+    # 如果支持json提交, 则接口文档中包含json输入框
+    'JSON_EDITOR': True,
+    # 方法列表字母排序
+    'OPERATIONS_SORTER': 'alpha',
+    'VALIDATOR_URL': None,
 }

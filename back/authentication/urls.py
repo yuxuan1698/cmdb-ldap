@@ -8,5 +8,7 @@ from .views import UserViewSet,GroupViewSet
 urlpatterns = [
     path('login/', obtain_jwt_token,name='auth-login'),
     path('user-list/', UserViewSet.as_view({'get': 'userlist'}),name='user-list'),
+    path('user-attr/', UserViewSet.as_view({'get': 'userattrby'}),name='user-attr'),
+    path('user-changepassword/', UserViewSet.as_view({'post': 'changepassword'}),name='user-changepassword'),
     path('logout/', obtain_jwt_token,name='auth-logout'),
     ]
