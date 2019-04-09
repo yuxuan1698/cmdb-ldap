@@ -155,8 +155,8 @@ REST_FRAMEWORK = {
 JWT_AUTH = {
     'JWT_AUTH_HEADER_PREFIX': 'Token',
     'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=1),  # 生成的token有效期
-    'JWT_RESPONSE_PAYLOAD_HANDLER': 'authentication.ldap.backend.jwt_response_payload_handler', 
-    'JWT_GET_USER_SECRET_KEY': 'secretkey',
+    'JWT_RESPONSE_PAYLOAD_HANDLER': 'authentication.utils.jwt_response_payload_handler', 
+    'JWT_GET_USER_SECRET_KEY': 'authentication.utils.reflush_secretkey',
 }
 
 # 
