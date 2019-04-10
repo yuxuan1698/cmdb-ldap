@@ -4,6 +4,13 @@ from django.contrib.auth import get_user_model
  
 Users = get_user_model()
 
+class LdapUserSerializer(serializers.HyperlinkedModelSerializer):
+  """
+  LdapUserSerializer 
+  """
+  class Meta:
+        fields = ('username',)
+        
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model  = Users

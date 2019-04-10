@@ -132,8 +132,8 @@ STATIC_URL = '/static/'
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
-        'rest_framework.renderers.BrowsableAPIRenderer',
         'rest_framework.renderers.TemplateHTMLRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
     ),
     'DEFAULT_PARSER_CLASSES': (
         'rest_framework.parsers.JSONParser',
@@ -141,6 +141,7 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.MultiPartParser',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
+        # 'rest_framework.permissions.AllowAny',
         'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -154,9 +155,10 @@ REST_FRAMEWORK = {
 
 JWT_AUTH = {
     'JWT_AUTH_HEADER_PREFIX': 'Token',
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=1),  # 生成的token有效期
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=1800),  # 生成的token有效期
     'JWT_RESPONSE_PAYLOAD_HANDLER': 'authentication.utils.jwt_response_payload_handler', 
     'JWT_GET_USER_SECRET_KEY': 'authentication.utils.reflush_secretkey',
+    'JWT_AUTH_COOKIE': None,
 }
 
 # 
@@ -272,22 +274,25 @@ LOGGING = {
 SWAGGER_SETTINGS = {
     # 基础样式
     'SECURITY_DEFINITIONS': {
-        "basic":{
-            'type': 'basic'
+        'api_key': {
+            'type': 'apiKey',
+            'description': 'Personal API Key authorization',
+            'in': 'header',
+            'name': 'Authorization'
         }
     },
+    'USE_SESSION_AUTH': False,
     # 如果需要登录才能够查看接口文档, 登录的链接使用restframework自带的.
-    'LOGIN_URL': 'authentication:auth-login',
-    'LOGOUT_URL': 'authentication:logout',
+    # 'LOGIN_URL': 'authentication:auth-login',
+    # 'LOGOUT_URL': 'authentication:logout',
     # 'DOC_EXPANSION': None,
-    # 'SHOW_REQUEST_HEADERS':True,
-    # 'USE_SESSION_AUTH': True,
-    # 'DOC_EXPANSION': 'list',
+    'SHOW_REQUEST_HEADERS':True,
+    'DOC_EXPANSION': 'list',
     # 接口文档中方法列表以首字母升序排列
     'APIS_SORTER': 'alpha',
     # 如果支持json提交, 则接口文档中包含json输入框
     'JSON_EDITOR': True,
     # 方法列表字母排序
     'OPERATIONS_SORTER': 'alpha',
-    'VALIDATOR_URL': None,
+    # 'VALIDATOR_URL': None,
 }
