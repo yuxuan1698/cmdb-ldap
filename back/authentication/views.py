@@ -1,23 +1,23 @@
 from django.contrib.auth.models import Group
-from rest_framework.viewsets import GenericViewSet
-from rest_framework import status
+from django.http import JsonResponse
 from authentication.serializers import (
   LdapUserSerializer, 
   GroupSerializer,
+  LdapSerializer,
   ChangePasswordSerializer
 )
-
 from authentication.ldap.ldapsearch import CmdbLDAP
 from common.utils import LDAPJSONEncoder
-from django.http import JsonResponse
+
 # from rest_framework_jwt.utils import jwt_decode_handler
 from django.contrib.auth import get_user_model
-from rest_framework.serializers import HyperlinkedModelSerializer
 from django.conf import settings
-from rest_framework_jwt.views import ObtainJSONWebToken
-Users = get_user_model()
 
+from rest_framework_jwt.views import ObtainJSONWebToken
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.views import APIView
+from rest_framework import status
+Users = get_user_model()
 
 class LoginViewSet(ObtainJSONWebToken):
   """用户登陆接口"""
@@ -26,13 +26,16 @@ class UserListViewSet(APIView):
   """
   允许用户查看或编辑的API路径。
   """
-  # serializer_class=LdapUserSerializer
+  # serializer_class=LdapSerializer
   def get(self,request, *args, **kwargs):
     """ 
     获取所有用户的列表信息
     """
     user_list=CmdbLDAP().get_user_list()
-    return JsonResponse(user_list,encoder=LDAPJSONEncoder,safe=False)
+    page=PageNumberPagination()
+    page_roles=page.paginate_queryset(queryset=user_list,request=request,view=self)
+    return JsonResponse(page_roles,encoder=LDAPJSONEncoder,safe=False)
+
 class UserListByViewSet(APIView):
   """
   允许用户查看或编辑的API路径。
@@ -56,20 +59,20 @@ class UserChangerPasswordSet(APIView):
     serializer=ChangePasswordSerializer(data=request.data)
     if serializer.is_valid():
       # todo
-      changeStatus=CmdbLDAP().change_self_password(request.data)
+      changeStatus,errorMsg=CmdbLDAP().change_self_password(request.data)
       if changeStatus==True:
-        returnData={"status":"success"}
+        returnData={"status":"密码修改成功！"}
         returnStatus=status.HTTP_200_OK
       else:
         # logger.info(changeStatus)
-        returnData={"error":changeStatus}
+        returnData={"error":errorMsg}
         returnStatus=status.HTTP_400_BAD_REQUEST
     else:
       returnData={'error':serializer.errors}
       returnStatus=status.HTTP_400_BAD_REQUEST
     return JsonResponse(returnData,status=returnStatus,safe=False)
     
-class GroupViewSet(GenericViewSet):
+class GroupViewSet(APIView):
   """
   允许组查看或编辑的API路径。
   """

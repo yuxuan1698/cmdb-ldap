@@ -2,7 +2,8 @@ import ldap,uuid
 from django.conf import settings
 from common.utils import CmdbLDAPLogger
 from django.contrib.auth import get_user_model
- 
+
+
 logger=CmdbLDAPLogger().get_logger('cmdb_ldap')
 Users = get_user_model()
 
@@ -24,20 +25,23 @@ class CmdbLDAP(object):
     """ 返回所有LDAP用户列表 """
     try:
       self.conn.simple_bind_s(self.bindDN,self.bindDNPassword)
-    except Exception as identifier:
-      logger.info(identifier)
+    except ldap.INVALID_CREDENTIALS as e:
+      logger.info("LDAP Auth Error: %s"%e)
+      return None
+    except ldap.LDAPError as e:
+      logger.info("LDAP Error: %s"%e)
       return None
     searchFilter="(&(uid=%s))"%username
     retrieveAttributes=None
     result_id=self.conn.search(self.userDN, self.searchScope, searchFilter, retrieveAttributes)
-    result_set = {}
+    result_set = []
     while 1:
       result_type, result_data = self.conn.result(result_id, 0)
       if(result_data == []):
         break
       else:
         if result_type == ldap.RES_SEARCH_ENTRY:
-          result_set[result_data[0][0]]=result_data[0][1]
+          result_set.append(result_data[0][1])
     return result_set
 
   def change_self_password(self,data):
@@ -48,12 +52,16 @@ class CmdbLDAP(object):
       self.conn.simple_bind_s(userDN,data['oldpassword'])
       changeStatus=self.conn.passwd_s(userDN,data['oldpassword'],data['newpassword'])
       Users.objects.filter(username=data['username']).update(secretkey=uuid.uuid4())
-    except Exception as e:
-      logger.info(e)
-      logger.info(dir(e))
-      logger.info(type(e))
-      return "%s"%(e)
-    return True
+    except ldap.INVALID_CREDENTIALS as e:
+      logger.info("LDAP Auth Error: %s"%e)
+      return None,"用户原密码不正确！"
+    except ldap.CONSTRAINT_VIOLATION as e:
+      logger.info("LDAP Error: %s"%e)
+      return None,"用户原密码策略没有通过，可能是之前使用过的密码！"
+    except ldap.LDAPError as e:
+      logger.info("LDAP Error: %s"%e)
+      return None,"%s"%e
+    return True,None
 
   def change_password(self,args):
     """ 具有管理权限的修改用户的密码 """

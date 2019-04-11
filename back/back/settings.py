@@ -15,24 +15,24 @@ import ldap,datetime
 from django_auth_ldap.config import LDAPSearch 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR                            = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 # Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
+# See https                         : //docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'u_rom*ua&x304mcqwqgv-x5i@*fwnj&ip)algmf$_ozf23)te#'
+# SECURITY WARNING                  : keep the secret key used in production secret!
+SECRET_KEY                          = 'u_rom*ua&x304mcqwqgv-x5i@*fwnj&ip)algmf$_ozf23)te#'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# SECURITY WARNING                  : don't run with debug turned on in production!
+DEBUG                               = True
 
-ALLOWED_HOSTS = ['127.0.0.1']
+ALLOWED_HOSTS                       = ['127.0.0.1']
 
 
 # Application definition
 
-INSTALLED_APPS = [
+INSTALLED_APPS                      = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'rest_framework_swagger',
 ]
 
-MIDDLEWARE = [
+MIDDLEWARE                          = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
@@ -59,15 +59,15 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'back.urls'
+ROOT_URLCONF                        = 'back.urls'
 
-TEMPLATES = [
+TEMPLATES                           = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
+        'BACKEND'                   : 'django.template.backends.django.DjangoTemplates',
+        'DIRS'                      : [],
+        'APP_DIRS'                  : True,
+        'OPTIONS'                   : {
+            'context_processors'    : [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
@@ -77,70 +77,70 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'back.wsgi.application'
+WSGI_APPLICATION                    = 'back.wsgi.application'
 
 
 # Database
-# https://docs.djangoproject.com/en/2.1/ref/settings/#databases
+# https                             : //docs.djangoproject.com/en/2.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+DATABASES                           = {
+    'default'                       : {
+        'ENGINE'                    : 'django.db.backends.sqlite3',
+        'NAME'                      : os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
 
 
 # Password validation
-# https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
+# https                             : //docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
 
-AUTH_PASSWORD_VALIDATORS = [
+AUTH_PASSWORD_VALIDATORS            = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'NAME'                      : 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'NAME'                      : 'django.contrib.auth.password_validation.MinimumLengthValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'NAME'                      : 'django.contrib.auth.password_validation.CommonPasswordValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'NAME'                      : 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
 
 
 # Internationalization
-# https://docs.djangoproject.com/en/2.1/topics/i18n/
+# https                             : //docs.djangoproject.com/en/2.1/topics/i18n/
 
-LANGUAGE_CODE = 'zh-hans'
+LANGUAGE_CODE                       = 'zh-hans'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE                           = 'UTC'
 
-USE_I18N = True
+USE_I18N                            = True
 
-USE_L10N = True
+USE_L10N                            = True
 
-USE_TZ = True
+USE_TZ                              = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/2.1/howto/static-files/
+# https                             : //docs.djangoproject.com/en/2.1/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL                          = '/static/'
 
-REST_FRAMEWORK = {
-    'DEFAULT_RENDERER_CLASSES': (
+REST_FRAMEWORK                      = {
+    'DEFAULT_RENDERER_CLASSES'      : (
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.TemplateHTMLRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
     ),
-    'DEFAULT_PARSER_CLASSES': (
+    'DEFAULT_PARSER_CLASSES'        : (
         'rest_framework.parsers.JSONParser',
         'rest_framework.parsers.FormParser',
         'rest_framework.parsers.MultiPartParser',
     ),
-    'DEFAULT_PERMISSION_CLASSES': (
+    'DEFAULT_PERMISSION_CLASSES'    : (
         # 'rest_framework.permissions.AllowAny',
         'rest_framework.permissions.IsAuthenticated',
     ),
@@ -150,149 +150,150 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     ),
-    'PAGINATE_BY': 5
+    'DEFAULT_PAGINATION_CLASS'      : 'rest_framework.pagination.PageNumberPagination',
+    'PAGINATE_BY'                   : 5,
+    'PAGE_SIZE'                     : 10
 }
-
-JWT_AUTH = {
-    'JWT_AUTH_HEADER_PREFIX': 'Token',
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=1800),  # 生成的token有效期
-    'JWT_RESPONSE_PAYLOAD_HANDLER': 'authentication.utils.jwt_response_payload_handler', 
-    'JWT_GET_USER_SECRET_KEY': 'authentication.utils.reflush_secretkey',
-    'JWT_AUTH_COOKIE': None,
+JWT_AUTH                            = {
+    'JWT_AUTH_HEADER_PREFIX'        : 'Token',
+    'JWT_EXPIRATION_DELTA'          : datetime.timedelta(seconds = 1800),  # 生成的token有效期
+    'JWT_RESPONSE_PAYLOAD_HANDLER'  : 'authentication.utils.jwt_response_payload_handler', 
+    'JWT_GET_USER_SECRET_KEY'       : 'authentication.utils.reflush_secretkey',
+    'JWT_AUTH_COOKIE'               : None,
 }
 
 # 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND                       = 'django.core.mail.backends.smtp.EmailBackend'
   
-EMAIL_USE_TLS = False
-# EMAIL_USE_SSL = True
-EMAIL_HOST = 'smtp.tuweizhong.com'
-EMAIL_PORT = 25
-EMAIL_HOST_USER = 'mail@tuweizhong.com'
-EMAIL_HOST_PASSWORD = 'xxxx'
-DEFAULT_FROM_EMAIL = 'mail@tuweizhong.com'
+EMAIL_USE_TLS                       = False
+# EMAIL_USE_SSL                     = True
+EMAIL_HOST                          = 'smtp.tuweizhong.com'
+EMAIL_PORT                          = 25
+EMAIL_HOST_USER                     = 'mail@tuweizhong.com'
+EMAIL_HOST_PASSWORD                 = 'xxxx'
+DEFAULT_FROM_EMAIL                  = 'mail@tuweizhong.com'
 
 
 #LDAP认证
-AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend',]  
+AUTHENTICATION_BACKENDS             = ['django.contrib.auth.backends.ModelBackend',]  
 
 # Auth LDAP settings
-AUTH_LDAP = True
-AUTH_LDAP_SERVER_URI = 'ldap://172.18.207.237:389'
-AUTH_LDAP_BIND_DN = 'cn=admin,ou=SystemUser,dc=iwubida,dc=com'
-AUTH_LDAP_BIND_PASSWORD = 'Wubida@123'
-AUTH_LDAP_SEARCH_OU = 'ou=Users,dc=iwubida,dc=com'
-# AUTH_LDAP_SEARCH_FILTER = '(uid=%(user)s)'
-AUTH_LDAP_START_TLS = False
-AUTH_LDAP_USER_ATTR_MAP = {"username": "cn", "name": "sn", "email": "mail","nickname":"sn"}
-# AUTH_LDAP_GROUP_SEARCH_OU = ""
-# AUTH_LDAP_GROUP_SEARCH_FILTER = ""
-AUTH_LDAP_USER_SEARCH = LDAPSearch(AUTH_LDAP_SEARCH_OU, ldap.SCOPE_SUBTREE, "(&(uid=%(user)s))")
-# AUTH_LDAP_CONNECTION_OPTIONS = {
-#     ldap.OPT_TIMEOUT: 5
+AUTH_LDAP                           = True
+AUTH_LDAP_SERVER_URI                = 'ldap://172.18.207.237:389'
+AUTH_LDAP_BIND_DN                   = 'cn=admin,ou=SystemUser,dc=iwubida,dc=com'
+AUTH_LDAP_BIND_PASSWORD             = 'Wubida@123'
+AUTH_LDAP_SEARCH_OU                 = 'ou=Users,dc=iwubida,dc=com'
+# AUTH_LDAP_SEARCH_FILTER           = '(uid=%(user)s)'
+AUTH_LDAP_START_TLS                 = False
+AUTH_LDAP_USER_ATTR_MAP             = {"username": "cn", "name": "sn", "email": "mail","nickname":"sn"}
+# AUTH_LDAP_GROUP_SEARCH_OU         = ""
+# AUTH_LDAP_GROUP_SEARCH_FILTER     = ""
+AUTH_LDAP_USER_SEARCH               = LDAPSearch(AUTH_LDAP_SEARCH_OU, ldap.SCOPE_SUBTREE, "(&(uid=%(user)s))")
+# AUTH_LDAP_CONNECTION_OPTIONS      = {
+#     ldap.OPT_TIMEOUT              : 5
 # }
 
-# AUTH_LDAP_MIRROR_GROUPS = True
-# AUTH_LDAP_GROUP_TYPE_STRING = ''
-# AUTH_LDAP_GROUP_TYPE_STRING_ATTR = 'cn'
+# AUTH_LDAP_MIRROR_GROUPS           = True
+# AUTH_LDAP_GROUP_TYPE_STRING       = ''
+# AUTH_LDAP_GROUP_TYPE_STRING_ATTR  = 'cn'
 
-# AUTH_LDAP_GROUP_TYPE = GroupOfUniqueNamesType(name_attr="cn")
-# AUTH_LDAP_GROUP_SEARCH_OU = CONFIG.AUTH_LDAP_GROUP_SEARCH_OU
-# AUTH_LDAP_GROUP_SEARCH_FILTER = CONFIG.AUTH_LDAP_GROUP_SEARCH_FILTER
-# AUTH_LDAP_CONNECTION_OPTIONS = {
-#     ldap.OPT_TIMEOUT: 5
+# AUTH_LDAP_GROUP_TYPE              = GroupOfUniqueNamesType(name_attr="cn")
+# AUTH_LDAP_GROUP_SEARCH_OU         = CONFIG.AUTH_LDAP_GROUP_SEARCH_OU
+# AUTH_LDAP_GROUP_SEARCH_FILTER     = CONFIG.AUTH_LDAP_GROUP_SEARCH_FILTER
+# AUTH_LDAP_CONNECTION_OPTIONS      = {
+#     ldap.OPT_TIMEOUT              : 5
 # }
-# AUTH_LDAP_GROUP_CACHE_TIMEOUT = 1
-AUTH_LDAP_ALWAYS_UPDATE_USER = True
-# AUTH_LDAP_BACKEND = 'django_auth_ladp.backend.LDAPBackend' #配置为先使用LDAP认证，如通过认证则不再使用后面的认证方式
-AUTH_LDAP_BACKEND = 'authentication.ldap.backend.LDAPBackendAuthentication' #配置为先使用LDAP认证，如通过认证则不再使用后面的认证方式
+# AUTH_LDAP_GROUP_CACHE_TIMEOUT     = 1
+AUTH_LDAP_ALWAYS_UPDATE_USER        = True
+# AUTH_LDAP_BACKEND                 = 'django_auth_ladp.backend.LDAPBackend' #配置为先使用LDAP认证，如通过认证则不再使用后面的认证方式
+AUTH_LDAP_BACKEND                   = 'authentication.ldap.backend.LDAPBackendAuthentication' #配置为先使用LDAP认证，如通过认证则不再使用后面的认证方式
 
-if AUTH_LDAP:
+if AUTH_LDAP                        : 
     AUTHENTICATION_BACKENDS.insert(0, AUTH_LDAP_BACKEND)
-# AUTH_USER_MODEL = "authentication.UserProfile"
-AUTH_USER_MODEL="authentication.Users"
+# AUTH_USER_MODEL                   = "authentication.UserProfile"
+AUTH_USER_MODEL                     = "authentication.Users"
 
 
 
 # 日志部分
 # Django的日志配置项
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+LOGGING                             = {
+    'version'                       : 1,
+    'disable_existing_loggers'      : False,
+    'formatters'                    : {
+        'verbose'                   : {
+            'format'                : '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
         },
-        'main': {
-            'datefmt': '%Y-%m-%d %H:%M:%S',
-            'format': '%(asctime)s [%(module)s %(levelname)s] %(message)s',
+        'main'                      : {
+            'datefmt'               : '%Y-%m-%d %H:%M:%S',
+            'format'                : '%(asctime)s [%(module)s %(levelname)s] %(message)s',
         },
-        'simple': {
-            'format': '%(levelname)s %(message)s'
-        },
-    },
-    'handlers': {
-        'null': {
-            'level': 'DEBUG',
-            'class': 'logging.NullHandler',
-        },
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'formatter': 'main'
+        'simple'                    : {
+            'format'                : '%(levelname)s %(message)s'
         },
     },
-    'loggers': {
-        'django': {
-            'handlers': ['null'],
-            'propagate': False,
-            'level': 'DEBUG',
+    'handlers'                      : {
+        'null'                      : {
+            'level'                 : 'DEBUG',
+            'class'                 : 'logging.NullHandler',
         },
-        'django.request': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': False,
+        'console'                   : {
+            'level'                 : 'DEBUG',
+            'class'                 : 'logging.StreamHandler',
+            'formatter'             : 'main'
         },
-        'django.server': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': False,
+    },
+    'loggers'                       : {
+        'django'                    : {
+            'handlers'              : ['null'],
+            'propagate'             : False,
+            'level'                 : 'DEBUG',
         },
-        'django_auth_ldap': {
-            'handlers': ['console'],
-            'level': "INFO",
+        'django.request'            : {
+            'handlers'              : ['console'],
+            'level'                 : 'DEBUG',
+            'propagate'             : False,
         },
-        'cmdb_ldap': {
-            'handlers': ['console'],
-            'level': "INFO",
+        'django.server'             : {
+            'handlers'              : ['console'],
+            'level'                 : 'DEBUG',
+            'propagate'             : False,
+        },
+        'django_auth_ldap'          : {
+            'handlers'              : ['console'],
+            'level'                 : "INFO",
+        },
+        'cmdb_ldap'                 : {
+            'handlers'              : ['console'],
+            'level'                 : "INFO",
         },
     }
 }
 
 # swagger 配置项
-SWAGGER_SETTINGS = {
+SWAGGER_SETTINGS                    = {
     # 基础样式
-    'SECURITY_DEFINITIONS': {
-        'api_key': {
-            'type': 'apiKey',
-            'description': 'Personal API Key authorization',
-            'in': 'header',
-            'name': 'Authorization'
+    'SECURITY_DEFINITIONS'          : {
+        'api_key'                   : {
+            'type'                  : 'apiKey',
+            'description'           : 'Personal API Key authorization',
+            'in'                    : 'header',
+            'name'                  : 'Authorization'
         }
     },
-    'USE_SESSION_AUTH': False,
+    'USE_SESSION_AUTH'              : False,
     # 如果需要登录才能够查看接口文档, 登录的链接使用restframework自带的.
-    # 'LOGIN_URL': 'authentication:auth-login',
-    # 'LOGOUT_URL': 'authentication:logout',
-    # 'DOC_EXPANSION': None,
-    'SHOW_REQUEST_HEADERS':True,
-    'DOC_EXPANSION': 'list',
+    # 'LOGIN_URL'                   : 'authentication:auth-login',
+    # 'LOGOUT_URL'                  : 'authentication:logout',
+    # 'DOC_EXPANSION'               : None,
+    'SHOW_REQUEST_HEADERS'          : True,
+    'DOC_EXPANSION'                 : 'list',
     # 接口文档中方法列表以首字母升序排列
-    'APIS_SORTER': 'alpha',
+    'APIS_SORTER'                   : 'alpha',
     # 如果支持json提交, 则接口文档中包含json输入框
-    'JSON_EDITOR': True,
+    'JSON_EDITOR'                   : True,
     # 方法列表字母排序
-    'OPERATIONS_SORTER': 'alpha',
-    # 'VALIDATOR_URL': None,
+    'OPERATIONS_SORTER'             : 'alpha',
+    # 'VALIDATOR_URL'               : None,
 }
