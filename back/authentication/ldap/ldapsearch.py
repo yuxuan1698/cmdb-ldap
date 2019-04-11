@@ -53,11 +53,13 @@ class CmdbLDAP(object):
       changeStatus=self.conn.passwd_s(userDN,data['oldpassword'],data['newpassword'])
       Users.objects.filter(username=data['username']).update(secretkey=uuid.uuid4())
     except ldap.INVALID_CREDENTIALS as e:
+      errmsg=e.args[0].get('desc')
       logger.info("LDAP Auth Error: %s"%e)
-      return None,"用户原密码不正确！"
+      return None,"提交的原凭证无效！%s"%errmsg
     except ldap.CONSTRAINT_VIOLATION as e:
+      errmsg=e.args[0].get('info')
       logger.info("LDAP Error: %s"%e)
-      return None,"用户原密码策略没有通过，可能是之前使用过的密码！"
+      return None,"违反了服务器端策略约束！%s"%errmsg
     except ldap.LDAPError as e:
       logger.info("LDAP Error: %s"%e)
       return None,"%s"%e
