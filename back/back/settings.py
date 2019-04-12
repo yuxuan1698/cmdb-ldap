@@ -123,6 +123,7 @@ USE_L10N                            = True
 
 USE_TZ                              = True
 
+APPEND_SLASH                        = True
 
 # Static files (CSS, JavaScript, Images)
 # https                             : //docs.djangoproject.com/en/2.1/howto/static-files/
@@ -152,7 +153,8 @@ REST_FRAMEWORK                      = {
     ),
     'DEFAULT_PAGINATION_CLASS'      : 'rest_framework.pagination.PageNumberPagination',
     'PAGINATE_BY'                   : 5,
-    'PAGE_SIZE'                     : 10
+    'PAGE_SIZE'                     : 10,
+    'NON_FIELD_ERRORS_KEY'          : 'error'
 }
 JWT_AUTH                            = {
     'JWT_AUTH_HEADER_PREFIX'        : 'Token',
@@ -161,7 +163,6 @@ JWT_AUTH                            = {
     'JWT_GET_USER_SECRET_KEY'       : 'authentication.utils.reflush_secretkey',
     'JWT_AUTH_COOKIE'               : None,
 }
-
 # 
 EMAIL_BACKEND                       = 'django.core.mail.backends.smtp.EmailBackend'
   
@@ -181,6 +182,7 @@ AUTHENTICATION_BACKENDS             = ['django.contrib.auth.backends.ModelBacken
 AUTH_LDAP                           = True
 AUTH_LDAP_SERVER_URI                = 'ldap://172.18.207.237:389'
 AUTH_LDAP_BIND_DN                   = 'cn=admin,ou=SystemUser,dc=iwubida,dc=com'
+AUTH_LDAP_BASE_DN                   = 'dc=iwubida,dc=com'
 AUTH_LDAP_BIND_PASSWORD             = 'Wubida@123'
 AUTH_LDAP_SEARCH_OU                 = 'ou=Users,dc=iwubida,dc=com'
 # AUTH_LDAP_SEARCH_FILTER           = '(uid=%(user)s)'
