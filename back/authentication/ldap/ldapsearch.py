@@ -33,7 +33,7 @@ class CmdbLDAP(object):
     try:
       self.conn.simple_bind_s(dn or self.bindDN,password or self.bindDNPassword)
     except ldap.INVALID_CREDENTIALS as e:
-      self.errorMsg="连接认证失败: INVALID_CREDENTIALS"
+      self.errorMsg="连接认证失败,请检查密码是否正确: INVALID_CREDENTIALS"
       return False
     except ldap.LDAPError as e:
       self.errorMsg="%s%s."%(e.args[0]['desc'],",%s"%e.args[0]['info'] if 'info' in e.args[0] else '')

@@ -19,8 +19,8 @@ app_name='authentication'
 
 urlpatterns = [
     path('login/', LoginViewSet.as_view(),name='auth-login'),
-    url(r'ldap/ous/$', getLDAPOUListViewSet.as_view(),name='ldap-classes'),
-    url(r'ldap/ous/(?P<ou>\w+)/$', getLDAPOUListViewSet.as_view(),name='ldap-classes'),
+    url(r'ldap/ous/$', getLDAPOUListViewSet.as_view(),name='ldap-ous'),
+    url(r'ldap/ous/(?P<ou>\w+)/$', getLDAPOUListViewSet.as_view(),name='ldap-ous-other'),
     path('ldap/classes/', GetLdapAllCLassListViewSet.as_view(),name='ldap-classes'),
     path('ldap/attrs/', GetLdapAllAttrsListViewSet.as_view(),name='ldap-attrs'),
     path('ldap/user/list/', UserListViewSet.as_view(),name='ldap-userlist'),
