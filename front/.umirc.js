@@ -4,6 +4,7 @@ export default {
   treeShaking: true,
   outputPath: "output",
   hash:true,
+  ignoreMomentLocale: true,
   plugins: [
     // ref: https://umijs.org/plugin/umi-plugin-react.html
     ['umi-plugin-react', {
@@ -11,6 +12,8 @@ export default {
       dva: {
         immer: true,
       },
+      chunks: ['umi'],
+      // chunks: ['vendors', 'default.cmdb',  'cmdb'],
       dynamicImport: { webpackChunkName: true },
       title: 'CMDB-LDAP Manager',
       dll: true,
@@ -41,5 +44,27 @@ export default {
       "changeOrigin": true,
       "pathRewrite": { "^/api" : "" }
     }
+  },
+  chainWebpack: function (config, { webpack }) {
+    config.merge({
+      optimization: {
+        minimize: true,
+        splitChunks: {
+          chunks: 'all',
+          minSize: 30000,
+          minChunks: 3,
+          automaticNameDelimiter: '.',
+          cacheGroups: {
+            vendor: {
+              name: 'vendors',
+              test({ resource }) {
+                return /[\\/]node_modules[\\/]/.test(resource);
+              },
+              priority: 10,
+            },
+          },
+        },
+      }
+    });
   }
 }

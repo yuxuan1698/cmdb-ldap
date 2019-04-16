@@ -16,6 +16,7 @@ package-lock.json
 
 # production
 front/dist
+front/output
 
 # misc
 .DS_Store
