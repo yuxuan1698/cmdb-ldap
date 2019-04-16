@@ -2,7 +2,7 @@
 
 import { connect } from 'dva';
 import {PureComponent} from 'react'
-import { routerRedux } from 'dva/router';
+// import { routerRedux } from 'dva/router';
 
 function mapStateToProps(state) {  
   return {...state};  
@@ -11,13 +11,16 @@ function mapStateToProps(state) {
 class CMDB extends PureComponent {
   constructor(props){
     super(props)
-    let {login,dispatch}=this.props
-    console.log(this.props)
-    if(!login.islogin){
-      dispatch(routerRedux.push({
-        pathname:'login'
-      }))
-    }
+    let {login
+      // ,dispatch
+    }=this.props
+    console.log(login)
+    // console.log(this.props)
+    // if(!login.islogin){
+    //   dispatch(routerRedux.push({
+    //     pathname:'login'
+    //   }))
+    // }
   }
   componentDidMount() {
     // console.log()

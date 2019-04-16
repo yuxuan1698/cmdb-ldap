@@ -1,0 +1,37 @@
+.loginForm{
+    position: absolute;
+    height: 370px;
+    width: 420px;
+    bottom: 0;
+    padding: 5px;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    .loginFormForgot{
+        float: right;
+    }
+    .login{
+        width: 410px;
+        padding: 40px 40px 15px 40px;
+        border: 1px solid rgb(217, 222, 220);
+        background-color: #ffffffc9;
+        border-radius: 3px;
+        box-shadow: 1px 1px 1px rgb(234, 242, 239)
+    }
+    .loginTitle{
+        text-align: center;
+        line-height: 30px;
+        color: #1da57ab5;
+        margin-bottom: 30px;
+        margin-top: -56px;
+    }
+    .loginFormButton{
+        width: 100%;
+    }
+}
+@media (min-width: 1024px){
+    .loginForm{
+        right:50px;
+    }
+}

@@ -8,13 +8,16 @@ export default {
     // ref: https://umijs.org/plugin/umi-plugin-react.html
     ['umi-plugin-react', {
       antd: true,
-      dva: true,
+      dva: {
+        immer: true,
+      },
       dynamicImport: { webpackChunkName: true },
       title: 'CMDB-LDAP Manager',
       dll: true,
       locale: {
         enable: true,
-        default: 'en-US',
+        default: 'zh-CN',
+        antd: true
       },
       routes: {
         exclude: [
@@ -27,6 +30,11 @@ export default {
       },
     }],
   ],
+  "theme": {
+    "primary-color": "#1DA57A",
+    'border-radius-base': '2px',
+    'link-color': '#1DA57A',
+  },
   "proxy": {
     "/api": {
       "target": "http://127.0.0.1:8000/api",

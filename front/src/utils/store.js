@@ -1,24 +1,56 @@
-// index.js
-import dva from 'dva';
-// import { message } from 'antd';
-import createLoading from 'dva-loading';
-import { createBrowserHistory as createHistory } from 'history';
+// Replace Status text
+export function getUserStatus(status) {
+  if (status === 1) {
+    return { status: 'success', text: '正常' };
+  } else {
+    return { status: 'default', text: '禁用' };
+  }
+}
 
-// 1. Initialize
-const app = dva({
-  history: createHistory(),
-});
+export function getIsAdminStatus(status) {
+  if (status === 1) {
+    return { status: 'success', text: '是' };
+  } else {
+    return { status: 'default', text: '否' };
+  }
+}
 
-// 2. Plugins
-app.use(createLoading());
+// Operation Cookie
+export function getCookie(name) {
+  const reg = new RegExp('(^| )' + name + '=([^;]*)(;|$)');
+  const arr = document.cookie.match(reg);
+  if (arr) {
+    return decodeURIComponent(arr[2]);
+  } else {
+    return null;
+  }
+}
 
-// 3. Model
-// app.model(require('./models/app/global').default);
+export function delCookie({ name, domain, path }) {
+  if (getCookie(name)) {
+    document.cookie = name + '=; expires=Thu, 01-Jan-70 00:00:01 GMT; path=' + 
+                      path + '; domain=' + 
+                      domain;
+  }
+}
 
-// 4. Router
-// app.router(require('./router').default);
+// Operation LocalStorage
+export function setLocalStorage(key, vaule) {
+  const base64Encode=new Buffer(JSON.stringify(vaule)).toString('base64')
+  return localStorage.setItem(key, base64Encode);
+}
 
-// 5. Start
-app.start('#root');
-
-export default app._store;
+export function getLocalStorage(key) {
+  try {
+    const base64Decode = new Buffer(localStorage.getItem(key),'base64').toString();
+    const value = JSON.parse(base64Decode);
+    if(value.hasOwnProperty('token')){
+      return value
+    }else{
+      return false
+    }
+  } catch (error) {
+  //  console.log(error)
+   return false
+  }
+}
