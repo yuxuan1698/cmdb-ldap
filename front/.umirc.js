@@ -12,7 +12,7 @@ export default {
       dva: {
         immer: true,
       },
-      chunks: ['umi'],
+      // chunks: ['umi'],
       // chunks: ['vendors', 'default.cmdb',  'cmdb'],
       dynamicImport: { webpackChunkName: true },
       title: 'CMDB-LDAP Manager',
@@ -37,6 +37,7 @@ export default {
     "primary-color": "#1DA57A",
     'border-radius-base': '2px',
     'link-color': '#1DA57A',
+    'error-color': '#f5222d',
   },
   "proxy": {
     "/api": {
@@ -45,26 +46,4 @@ export default {
       "pathRewrite": { "^/api" : "" }
     }
   },
-  chainWebpack: function (config, { webpack }) {
-    config.merge({
-      optimization: {
-        minimize: true,
-        splitChunks: {
-          chunks: 'all',
-          minSize: 30000,
-          minChunks: 3,
-          automaticNameDelimiter: '.',
-          cacheGroups: {
-            vendor: {
-              name: 'vendors',
-              test({ resource }) {
-                return /[\\/]node_modules[\\/]/.test(resource);
-              },
-              priority: 10,
-            },
-          },
-        },
-      }
-    });
-  }
 }

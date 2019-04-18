@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'dva';
-import LoginFrom from '../components/login'
-// import { routerRedux } from 'dva/router';
+import LoginFrom from '../components/login';
+
 
 const RouterLogin = ({login, loading,dispatch }) => {
   return (
