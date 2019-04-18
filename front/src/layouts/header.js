@@ -10,7 +10,7 @@ class CMDBHeader extends Component {
     // let {children}=this.props
     return (
         <Header>
-          <div style={{float:"right"}}>
+          <div style={{float:"right",marginRight:10}}>
           <CMDBLanguage />
           </div>
         </Header>

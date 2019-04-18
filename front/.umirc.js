@@ -38,6 +38,9 @@ export default {
     'border-radius-base': '2px',
     'link-color': '#1DA57A',
     'error-color': '#f5222d',
+    'layout-header-height': '54px',
+    'layout-header-background': '#fcfcfdcc',
+    'layout-header-padding':"0px",
   },
   "proxy": {
     "/api": {

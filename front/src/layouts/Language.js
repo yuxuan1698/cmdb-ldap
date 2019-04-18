@@ -30,14 +30,9 @@ class CMDBLanguage extends Component{
     </Menu>)
     return (
       <Dropdown overlay={languageMenu} placement="bottomRight">
-        <Menu
-          onClick={""}
-          // selectedKeys={[this.state.current]}
-          mode="horizontal">
-          {/* <Menu.Item key="languages" style={{padding:"0px 2px;"}}> */}
-              <Avatar size="small" >{languages[defaultLanguage].flag}</Avatar>
-          {/* </Menu.Item> */}
-        </Menu>
+        <span style={{ display: "inline-block"}}>
+              <Avatar size="small" icon='global'></Avatar>
+        </span>
       </Dropdown>
       )
   }
