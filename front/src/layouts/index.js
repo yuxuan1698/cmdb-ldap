@@ -1,39 +1,46 @@
 import withRouter from 'umi/withRouter';
+import {connect} from 'dva';
+// 路由跳转
+import router from 'umi/router';
+
 import {
   Layout, LocaleProvider
 } from 'antd';
 import zh_CN from 'antd/lib/locale-provider/zh_CN';
 
-import { Component } from 'react';
-import CMDBSider from './Sider';
-import CMDBContent from './Content';
-// import css from './index.less';
-// import { connect } from 'dva';
-
-const { Content, Sider,Footer } = Layout;
-
-
+import css from './index.less';
+import { PureComponent } from 'react';
+import CMDBContent from './Content/';
+import CMDBFooter from './Footer';
 
 @withRouter
 // @connect(({ login, loading }) => ({ login, loading }))
-class CMDBLayout extends Component {
+class CMDBLayout extends PureComponent {
   constructor(props){
     super(props)
-    this.state={collapsed:false}
+    this.state={
+        collapsed:true,
+          }
   }
-  toggleSideMenu = () => {
+  toggleSideMenu = (s) => {
     this.setState({
-      collapsed: !this.state.collapsed,
+      collapsed: typeof s==='boolean'?s:!this.state.collapsed,
     });
   }
   render(){
     const {children,location}=this.props
-
     return (
       <LocaleProvider locale={zh_CN}>
-        <Layout style={{height:"100%"}}>
-        <CMDBContent children={children} />
-        </Layout>
+        <Layout className={css.mainLayer}>
+          <CMDBContent 
+            children={children} 
+            collapsed={this.state.collapsed}
+            toggleSideMenu={this.toggleSideMenu.bind(this)} 
+            location={location} />
+          {location.pathname.match('^/login')?(
+            <CMDBFooter />
+          ):""}
+        </Layout >
       </LocaleProvider>
       )
   }

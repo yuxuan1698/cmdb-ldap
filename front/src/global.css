@@ -7,7 +7,9 @@ html, body, #root {
 body {
   margin: 0;
 }
-
+#root{
+  min-width: 385px;
+}
 /* Make clicks pass-through */
 #nprogress {
   pointer-events: none;
@@ -45,13 +47,13 @@ body {
   display: block;
   position: fixed;
   z-index: 1031;
-  top: 15px;
-  right: 15px;
+  top: 14px;
+  right: 8px;
 }
 
 #nprogress .spinner-icon {
-  width: 18px;
-  height: 18px;
+  width: 28px;
+  height: 28px;
   box-sizing: border-box;
 
   border: solid 2px transparent;

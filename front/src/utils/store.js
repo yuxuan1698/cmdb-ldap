@@ -33,17 +33,23 @@ export class Store {
                         domain;
     }
   }
+  // 获取LOCAL键值
   static getLocal(key){
     try {
-      const base64Decode = new Buffer(localStorage.getItem(key),'base64').toString();
+      const base64Decode = new Buffer.from(localStorage.getItem(key),'base64').toString();
       const value = JSON.parse(base64Decode);
       return value
     } catch (error) {
      return false
     }
   }
+  // 设置LOCAL存储
   static setLocal(key,value){
-    const base64Encode=new Buffer(JSON.stringify(value)).toString('base64')
+    const base64Encode=new Buffer.from(JSON.stringify(value)).toString('base64')
     return localStorage.setItem(key, base64Encode);
+  }
+  // 删除local存储
+  static delLocal(key){
+    return localStorage.removeItem(key);
   }
 }

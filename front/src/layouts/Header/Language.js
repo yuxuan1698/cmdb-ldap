@@ -1,14 +1,14 @@
-import {Component} from 'react';
+import {PureComponent} from 'react';
 import {
     Menu,Avatar,Dropdown
   } from 'antd'
-import css from './index.less';
+import css from '../index.less';
 const {Item}=Menu
-class CMDBLanguage extends Component{
+class CMDBLanguage extends PureComponent{
   constructor(props){
     super(props)
     this.state={
-      defaultLanguage:'zh-CN',
+      // defaultLanguage:'zh-CN',
       languages:{
         "zh-CN":{flag:"🇨🇳",language:"中国-简体"},
         "zh-TW":{flag:"🇨🇳",language:"台湾-繁体"},
@@ -19,7 +19,7 @@ class CMDBLanguage extends Component{
     }
   }
   render(){
-    const {languages,defaultLanguage}=this.state
+    const {languages}=this.state
     const languageMenu=(<Menu >
       {Object.keys(languages).map(item => (
         <Item key={item}>
@@ -30,8 +30,8 @@ class CMDBLanguage extends Component{
     </Menu>)
     return (
       <Dropdown overlay={languageMenu} placement="bottomRight">
-        <span style={{ display: "inline-block"}}>
-              <Avatar size="small" icon='global'></Avatar>
+        <span className={css.headerControlMenu}>
+          <Avatar size="small" icon='global' style={{ backgroundColor: '#188fff' }} ></Avatar>
         </span>
       </Dropdown>
       )

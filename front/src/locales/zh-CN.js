@@ -1,4 +1,8 @@
 export default {
+  'header.user.menu.center': "个人中心",
+  'header.user.menu.changepass': "修改密码",
+  'header.user.menu.setting': "系统设置",
+  'header.user.menu.exit': "退出登陆",
   'login.title':'物必达IT信息管理平台-(CMDB)',
   'login.loginbtn': '登      陆',
   'login.username': '用户名',

@@ -1,4 +1,4 @@
-import {userlogin} from '../pages/login/services/login';
+import {userlogin} from '../services/login';
 import { Store } from '../utils/store'
 import router from 'umi/router';
 export default {
@@ -55,8 +55,7 @@ export default {
     effects: {
       *loginAction({payload,callback},{call,put,select}){
         const data = yield call(userlogin, payload)
-        const { historyPath } = yield select(_ => _.login)
-        console.log(historyPath)
+        // const { historyPath } = yield select(_ => _.login)
         if(data && data.hasOwnProperty('token')){
           Store.setLocal('userinfo',data)
           yield put({
@@ -69,7 +68,18 @@ export default {
             callback(data); // 返回结果
           }
         }
-      }
+      },
+      *logoutAction({payload},{call,put,select}){
+        // const data = yield call(userlogin, payload)
+        // if(data && data.hasOwnProperty('token')){
+        Store.delLocal('userinfo')
+        yield put({
+          type:'logout',
+          payload: {
+            userinfo: "",
+          }
+        })
+      },
     },
     reducers: {
       // 登陆
