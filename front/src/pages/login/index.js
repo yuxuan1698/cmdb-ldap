@@ -9,4 +9,4 @@ const RouterLogin = ({login, loading,dispatch }) => {
   );
 }
  
-export default connect(({ login, loading }) => ({ login, loading }))(RouterLogin);
+export default connect(({ login, loading,location }) => ({ login, loading,location }))(RouterLogin);

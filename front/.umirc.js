@@ -35,7 +35,7 @@ export default {
   ],
   "theme": {
     "primary-color": "#1DA57A",
-    'border-radius-base': '2px',
+    'border-radius-base': '3px',
     'link-color': '#1DA57A',
     'error-color': '#f5222d',
     'layout-header-height': '54px',

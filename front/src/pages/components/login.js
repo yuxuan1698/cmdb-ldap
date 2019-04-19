@@ -22,6 +22,7 @@ class Login extends Component {
     });
   }
   componentWillReceiveProps(nextProps){
+    console.log("dsafsdf",nextProps.location)
     if(nextProps.login.islogin){
       let {dispatch} = this.props
       router.push('/')

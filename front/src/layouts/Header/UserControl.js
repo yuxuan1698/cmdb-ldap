@@ -75,12 +75,17 @@ class CMDBUserControl extends PureComponent{
         }
       })}
     </Menu>)
+    const nickname = userinfo.nickname ? userinfo.nickname.substring(0, 1).toUpperCase():""
+
     return (
       <Dropdown  overlay={userMenu}  placement="bottomRight">
         <span className={css.headerControlMenu}>
           <span>
-            <Avatar icon='user' style={{ backgroundColor: '#138a64' }}/>
-            <span style={{marginLeft:8,fontSize:16}}>{userinfo.nickname}({userinfo.username})</span>
+            <Avatar className={css.userAvater}>{nickname}</Avatar>
+            <span className={css.userLogined}>
+              {userinfo.nickname}
+              <small>({userinfo.username})</small>
+            </span>
           </span>
         </span>
       </Dropdown>

@@ -10,6 +10,7 @@ class CMDBMessages extends PureComponent{
     super(props)
     this.state={
       // defaultLanguage:'zh-CN',
+      msgNum: 51,
       languages:{
         "zh-CN":{flag:"🇨🇳",language:"中国-简体"},
         "zh-TW":{flag:"🇨🇳",language:"台湾-繁体"},
@@ -18,6 +19,13 @@ class CMDBMessages extends PureComponent{
         "ja-JP":{flag:"🇯🇵",language:"日本-日语"},
       }
     }
+  }
+  changeNum(){
+    // alert()
+    this.setState({msgNum: parseInt(Math.random()*100,10)})
+  }
+  componentWillMount() {
+    setInterval(this.changeNum.bind(this), 2000);
   }
   render(){
     const {languages}=this.state
@@ -59,7 +67,7 @@ class CMDBMessages extends PureComponent{
     return (
       <Dropdown overlay={languageMenu} trigger='click' placement="bottomRight">
         <span className={css.headerControlMenu}>
-          <Badge count={51} overflowCount={100} style={{boxShadow: "3px 3px 4px #d4d2d2",background: '#f55922',padding:0}}>
+          <Badge count={this.state.msgNum} overflowCount={100} style={{boxShadow: "3px 3px 4px #d4d2d2",background: '#f55922',padding:0}}>
             <Icon type="bell" theme="filled" style={{fontSize:18}} />
           </Badge>
         </span>

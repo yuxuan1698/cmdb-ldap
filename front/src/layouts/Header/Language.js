@@ -31,7 +31,7 @@ class CMDBLanguage extends PureComponent{
     return (
       <Dropdown overlay={languageMenu} placement="bottomRight">
         <span className={css.headerControlMenu}>
-          <Avatar size="small" icon='global' style={{ backgroundColor: '#188fff' }} ></Avatar>
+          <Avatar size="small" icon='global' className={css.languageAvater} ></Avatar>
         </span>
       </Dropdown>
       )

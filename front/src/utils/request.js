@@ -77,7 +77,7 @@ export default function request (opt) {
     .catch((error) => {
       // 请求配置发生的错误
       if (!error.response) {
-        message.error(`${formatMessage({id:'request.status.timeout'})}:${error.message}`);
+        message.error(`${formatMessage({id:'request.status.timeout'})} ${error.message}`);
         console.log('Error', error.message);
         return false
       }
