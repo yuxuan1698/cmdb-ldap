@@ -49,7 +49,16 @@ class CMDBUserControl extends PureComponent{
     });
     Modal.destroyAll()
   }
+  
+  componentWillMount() {
+    if (!this.props.login.islogin) {
+      router.push('/login')
+    }
+  }
+  
+  
   componentWillReceiveProps(nextProps){
+    console.log("ddd")
     if(!nextProps.login.islogin){
       router.push('/login')
     }
