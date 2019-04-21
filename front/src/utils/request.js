@@ -3,9 +3,8 @@ import NProgress from 'nprogress';
 import { message } from 'antd';
 // 国际化
 import {formatMessage} from 'umi/locale';
+import { connect } from 'dva';
 
-// import { routerRedux } from 'dva/router';
-// import store from './store';
 
 /**
  * 一、功能：
@@ -30,8 +29,11 @@ axios.defaults.baseURL = '/api/';
 axios.defaults.withCredentials = true;
 
 // 添加一个请求拦截器，用于设请求HEADER及请求过渡状态
+
+// @connect(({login})=>({login}))
 axios.interceptors.request.use((config) => {
   // 请求开始，蓝色过渡滚动条开始出现
+
   NProgress.start();
   NProgress.set(.4);
   return config;
@@ -39,34 +41,49 @@ axios.interceptors.request.use((config) => {
   return Promise.reject(error);
 });
 
+// y延时
+// 2s 之后返回双倍的值
+function doubleAfter2seconds(num) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      // resolve(2 * num)
+    }, 2000);
+  })
+}
+
 // 添加一个返回拦截器
 axios.interceptors.response.use((response) => {
   // 请求结束，蓝色过渡滚动条消失
   NProgress.done();
   return response;
-}, (error) => {
+}, async (error) => {
   // 请求结束，蓝色过渡滚动条消失
   // 即使出现异常，也要调用关闭方法，否则一直处于加载状态很奇怪
-  NProgress.done();
   if(error.response){
     const {status}=error.response
-    let msg=formatMessage({id: 'request.status.'+status})
-    if(error.response.data){
-      const resErr=error.response.data.error
-      if(resErr){
-        msg=`返回内容:${resErr}`
-      }
-    }
-    message.error(`${msg?msg:formatMessage({id:'request.status.other'})} ${formatMessage({id: 'request.status'})}${status}`)
     if(status===401){
-      window.g_app._store.dispatch({
-        type: 'login/logout',
-      });
+      console.log(error.response)
+      const returnMsg = error.response.data.error?error.response.data.error:(error.response.data.detail?error.response.data.detail:"")
+      message.warn(`${formatMessage({ id: 'request.status.401' })} ${returnMsg}`)
+      // window.g_app._store.dispatch({
+      //   type: 'login/logoutAction',
+      // });
+    }else{
+      let msg = formatMessage({ id: 'request.status.' + status })
+      if (error.response.data) {
+        const resErr = error.response.data.error
+        if (resErr) {
+          msg = `返回内容:${resErr}`
+        }
+      }
+      message.error(`${msg ? msg : formatMessage({ id: 'request.status.other' })} ${formatMessage({ id: 'request.status' })}${status}`)
     }
   }
+  NProgress.done();
   return Promise.reject(error);
 });
 
+// @connect(({ login }) => ({ login }))
 export default function request (opt) {
   // 调用 axios api，统一拦截
   return axios(opt)

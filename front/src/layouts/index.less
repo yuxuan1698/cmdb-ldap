@@ -6,7 +6,7 @@
     background-size: 190px auto;
     width: 200px;
     height: 54px;
-    background-color: #148a65;
+    background-color:@primary-color;
     transition: all .3s ease-in-out;
   }
   .logoToggle{
@@ -14,9 +14,13 @@
     background-size: 200px auto;
     width: 210px;
   }
+  .headerbox{
+    box-shadow: 0px 0px 6px #b1b3b2e3;
+  }
   .headerControlMenu{
     display: inline-block;
     padding: 0 10px;
+    // height: 50px;
     cursor: pointer;
     user-select: none;
     &:hover{
@@ -24,12 +28,13 @@
     }
   }
   .userAvater{
-    background-color: #148a65;
+    background-color: @primary-color;
     margin-top: -3px;
     font-size: 18px;
   }
   .userLogined{
     margin-left:8px;
+    line-height: 0;
     font-size:16px;
   }
   .languageAvater{
@@ -38,6 +43,7 @@
   }
   .sider{
     overflow: hidden;
+    box-shadow: 0px 0px 6px #bec0bfe3;
   }
   .footer{
     text-align: center;

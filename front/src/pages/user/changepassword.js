@@ -2,143 +2,159 @@
 
 import {PureComponent} from 'react'
 import {
-    Form, Input, DatePicker, TimePicker, Select, Cascader, InputNumber,
+  Form, Input, Button,Icon
   } from 'antd';
+import { connect } from 'dva';
 
-const { Option } = Select;  
+// 国际化
+import { formatMessage } from 'umi/locale'; 
 
-class CMDBBase extends PureComponent {
+// 
+@connect(({ login, loading }) => ({ login, loading }))
+@Form.create()
+class CMDBChangePassword extends PureComponent {
   constructor(props){
     super(props)
   }
+  handleReset(e){
+    e.preventDefault();
+    this.props.form.resetFields()
+  }
+  handleConfirmPassword(rule, value, callback){
+    const { getFieldValue} = this.props.form;
+    if (value && value !== getFieldValue('newpassword')) {
+      callback(formatMessage({ id:'user.changepassword.passdiff'}));
+    } else {
+      callback();
+    }
+  }
+  handleSubmit = (e) => {
+    console.log(this.props.login)
+    e.preventDefault();
+    this.props.form.validateFields((err, values) => {
+      if (!err) {
+        let { dispatch } = this.props
+        dispatch({ 
+          type: 'global/changePasswordAction',
+          payload: values
+        })
+      }
+    });
+  }
   render(){
+    const currUser=this.props.login.userinfo
+    const { loading }=this.props
+    const { getFieldDecorator } = this.props.form;
     const formItemLayout = {
         labelCol: {
-          xs: { span: 24 },
-          sm: { span: 5 },
+          xs: { span: 7 },
+          sm: { span: 7 },
+          md: { span: 7 },
         },
         wrapperCol: {
-          xs: { span: 24 },
-          sm: { span: 12 },
+          xs: { span: 16 },
+          sm: { span: 14 },
+          md: { span: 12 },
         },
+        onSubmit: this.handleSubmit.bind(this)
       };
-    return (<Form {...formItemLayout}>
+    return (
+      <div style={{ marginTop: 50 }}>
+        <Form {...formItemLayout} >
+          <Form.Item hasFeedback
+            label={`${formatMessage({ id: 'user.changepassword.username' })}:`} >
+            {getFieldDecorator('username', {
+              initialValue: currUser.username,
+              rules: [
+                { required: true, message: formatMessage({ id: 'user.changepassword.username' }) }
+              ],
+            })(
+              <Input disabled
+                prefix={<Icon type="user"  />}
+                placeholder={formatMessage({ id: 'user.changepassword.username' })} />
+            )}
+          
+          </Form.Item>
+          <Form.Item label={`${formatMessage({ id: 'user.changepassword.oldpassword' })}:`} >
+            {getFieldDecorator('oldpassword', {
+              validateFirst: true,
+              rules: [
+                { 
+                  required: true, 
+                  message: formatMessage({ id: 'user.changepassword.oldpassword' }) 
+                },
+                {
+                  min: 6, 
+                  message: formatMessage({id: 'user.changepassword.newpasslen' }) 
+                },
+              ],
+            })(
+              <Input.Password prefix={<Icon type="unlock" theme="twoTone" />}
+                placeholder={formatMessage({ id: 'user.changepassword.oldpassword' })} />
+            )}
+          </Form.Item>
+          <Form.Item label={`${formatMessage({ id: 'user.changepassword.newpassword' })}:`} >
+            {getFieldDecorator('newpassword', {
+              validateFirst: true,
+              rules: [
+                { 
+                  required: true, 
+                  message: formatMessage({ id: 'user.changepassword.newpassword' }) 
+                },
+                {
+                  min: 6,
+                  message: formatMessage({ id: 'user.changepassword.newpasslen' })
+                },
+              ],
+            })(
+              <Input.Password prefix={<Icon type="lock" theme="twoTone" />}
+                placeholder={formatMessage({ id: 'user.changepassword.newpassword' })} />
+            )}
+          </Form.Item>
+          <Form.Item 
+            label={`${formatMessage({ id: 'user.changepassword.repassword' })}:`} >
+            {getFieldDecorator('repassword', {
+              validateFirst: true,
+              rules: [
+                { 
+                  required: true, 
+                  message: formatMessage({ id: 'user.changepassword.repassword' }) 
+                },
+                {
+                  min: 6,
+                  message: formatMessage({ id: 'user.changepassword.newpasslen' })
+                },
+                {
+                  validator: this.handleConfirmPassword.bind(this),
+                  // message: "两次密码不一致。"
+                },
+              ],
+            })(
+              <Input.Password prefix={<Icon type="lock" theme="twoTone" />}
+                placeholder={formatMessage({ id: 'user.changepassword.repassword' })} />
+            )}
+          </Form.Item>
         <Form.Item
-        label="Fail"
-        validateStatus="error"
-        help="Should be combination of numbers & alphabets"
+          wrapperCol={{
+            lg: { span: 24 },
+          }}
+          style={{textAlign:"center"}}
         >
-        <Input placeholder="unavailable choice" id="error" />
+          <Button 
+            style={{marginRight:10}}
+            htmlType="reset" 
+              onClick={this.handleReset.bind(this)}>
+                {formatMessage({ id: 'user.changepassword.reset' })}
+          </Button>
+          <Button loading={Boolean(loading.global)}
+            type="primary"
+            htmlType="submit">
+            {formatMessage({ id: 'user.changepassword.submit' })}
+          </Button>
         </Form.Item>
-
-        <Form.Item
-        label="Warning"
-        validateStatus="warning"
-        >
-        <Input placeholder="Warning" id="warning" />
-        </Form.Item>
-
-        <Form.Item
-        label="Validating"
-        hasFeedback
-        validateStatus="validating"
-        help="The information is being validated..."
-        >
-        <Input placeholder="I'm the content is being validated" id="validating" />
-        </Form.Item>
-
-        <Form.Item
-        label="Success"
-        hasFeedback
-        validateStatus="success"
-        >
-        <Input placeholder="I'm the content" id="success" />
-        </Form.Item>
-
-        <Form.Item
-        label="Warning"
-        hasFeedback
-        validateStatus="warning"
-        >
-        <Input placeholder="Warning" id="warning2" />
-        </Form.Item>
-
-        <Form.Item
-        label="Fail"
-        hasFeedback
-        validateStatus="error"
-        help="Should be combination of numbers & alphabets"
-        >
-        <Input placeholder="unavailable choice" id="error2" />
-        </Form.Item>
-
-        <Form.Item
-        label="Success"
-        hasFeedback
-        validateStatus="success"
-        >
-        <DatePicker style={{ width: '100%' }} />
-        </Form.Item>
-
-        <Form.Item
-        label="Warning"
-        hasFeedback
-        validateStatus="warning"
-        >
-        <TimePicker style={{ width: '100%' }} />
-        </Form.Item>
-
-        <Form.Item
-        label="Error"
-        hasFeedback
-        validateStatus="error"
-        >
-        <Select defaultValue="1">
-            <Option value="1">Option 1</Option>
-            <Option value="2">Option 2</Option>
-            <Option value="3">Option 3</Option>
-        </Select>
-        </Form.Item>
-
-        <Form.Item
-        label="Validating"
-        hasFeedback
-        validateStatus="validating"
-        help="The information is being validated..."
-        >
-        <Cascader defaultValue={['1']} options={[]} />
-        </Form.Item>
-
-        <Form.Item
-        label="inline"
-        style={{ marginBottom: 0 }}
-        >
-        <Form.Item
-            validateStatus="error"
-            help="Please select the correct date"
-            style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}
-        >
-            <DatePicker />
-        </Form.Item>
-        <span style={{ display: 'inline-block', width: '24px', textAlign: 'center' }}>
-            -
-        </span>
-        <Form.Item
-            style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}
-        >
-            <DatePicker />
-        </Form.Item>
-        </Form.Item>
-
-        <Form.Item
-        label="Success"
-        hasFeedback
-        validateStatus="success"
-        >
-        <InputNumber style={{ width: '100%' }} />
-        </Form.Item>
-    </Form>)
+      </Form>
+      </div>)
   }
 }
 
-export default CMDBBase;
+export default CMDBChangePassword;

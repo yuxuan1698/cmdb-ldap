@@ -15,7 +15,6 @@ export function UserList (data) {
         data: data,
     })
 }
-}
 // 获取组列表API
 export function GroupList (data) {
     return request({

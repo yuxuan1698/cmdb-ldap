@@ -68,7 +68,7 @@ class CMDBUserControl extends PureComponent{
       {userMenuAttr.map(item => {
         if(typeof(item)==='object'){
           return <Item key={item.icon} >
-            <Icon type={item.icon} />{item.name}
+            <Icon type={item.icon}  />{item.name}
           </Item>
         }else{
           return <Divider key={item+Math.random()}/>

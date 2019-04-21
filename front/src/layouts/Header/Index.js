@@ -12,26 +12,25 @@ class CMDBHeader extends PureComponent {
   render(){
     let {toggleSideMenu,collapsed,location}=this.props
     return (
-        <Header>
-          {!location.pathname.match('^/login')?(
-          <div style={{float:"left"}}>
-            <span className={css.headerControlMenu} onClick={toggleSideMenu}>
-              <Icon type={collapsed?"menu-unfold":"menu-fold"}/>
-            </span>
-          </div>
-          ):""}
-          <div style={{float:"right"}}>
-          {!location.pathname.match('^/login')?(
+      <Header className={css.headerbox}>
+        <div style={{ float: "right" }}>
+          {!location.pathname.match('^/login') ? (
             <Fragment>
               <CMDBMessages />
               <CMDBUserControl />
             </Fragment>
-          ):""}
-            <CMDBLanguage />
-          </div>
-        </Header>
-        
-      )
+          ) : ""}
+          <CMDBLanguage />
+        </div>
+        {!location.pathname.match('^/login')?(
+        <div>
+          <span className={css.headerControlMenu} onClick={toggleSideMenu}>
+            <Icon type={collapsed?"menu-unfold":"menu-fold"}/>
+          </span>
+        </div>
+        ):""}
+      </Header>
+    )
   }
   }
 export default CMDBHeader

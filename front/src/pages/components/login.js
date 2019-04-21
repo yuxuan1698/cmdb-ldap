@@ -8,6 +8,7 @@ import {formatMessage} from 'umi/locale';
 // 路由跳转
 import router from 'umi/router';
 
+@Form.create({name:'login'})
 class Login extends Component {
   handleSubmit = (e) => {
     e.preventDefault();
@@ -22,10 +23,14 @@ class Login extends Component {
     });
   }
   componentWillReceiveProps(nextProps){
-    console.log("dsafsdf",nextProps.location)
     if(nextProps.login.islogin){
-      let {dispatch} = this.props
-      router.push('/')
+      let { historyParse } = nextProps.login
+      const queryParse=Object.keys(historyParse)
+      if (queryParse.length !== 0 && historyParse.hasOwnProperty('from')){
+        router.push(historyParse.from)
+      }else{
+        router.push('/')
+      }
     }
   }
   render() {
@@ -77,5 +82,4 @@ class Login extends Component {
   }
 }
 
-const LoginFrom = Form.create({ name: 'normal_login' })(Login);
-export default LoginFrom;
+export default Login;

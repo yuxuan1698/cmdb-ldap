@@ -1,5 +1,4 @@
-import { Store } from '../utils/store'
-// import router from 'umi/router';
+import { UserChangePassword } from '../services/api';
 export default {
     namespace: 'global',
     state: {
@@ -11,6 +10,11 @@ export default {
       
     },
     effects: {
+      *changePasswordAction({ payload, callback }, { call }) {
+        // console.log(payload)
+        const data = yield call(UserChangePassword, payload)
+        callback(data)
+      }
       
     },
     reducers: {

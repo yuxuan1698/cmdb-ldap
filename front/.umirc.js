@@ -4,6 +4,7 @@ export default {
   treeShaking: true,
   outputPath: "output",
   hash:true,
+  // history: 'hash',
   ignoreMomentLocale: true,
   plugins: [
     // ref: https://umijs.org/plugin/umi-plugin-react.html

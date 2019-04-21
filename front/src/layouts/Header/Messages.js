@@ -5,6 +5,7 @@ import {
 import css from '../index.less';
 // const {Item}=Menu
 const TabPane=Tabs.TabPane
+
 class CMDBMessages extends PureComponent{
   constructor(props){
     super(props)
@@ -19,14 +20,19 @@ class CMDBMessages extends PureComponent{
         "ja-JP":{flag:"🇯🇵",language:"日本-日语"},
       }
     }
+    
   }
   changeNum(){
     // alert()
     this.setState({msgNum: parseInt(Math.random()*100,10)})
   }
-  componentWillMount() {
-    setInterval(this.changeNum.bind(this), 2000);
+  componentDidMount() {
+    const tt=setInterval(this.changeNum.bind(this), 2000);
   }
+  componentWillUnmount() {
+    // clearInterval(tt)
+  }
+  
   render(){
     const {languages}=this.state
     const data = [
@@ -65,9 +71,12 @@ class CMDBMessages extends PureComponent{
       </Tabs>
     </Menu>)
     return (
-      <Dropdown overlay={languageMenu} trigger='click' placement="bottomRight">
+      <Dropdown overlay={languageMenu} trigger={['click']} placement="bottomRight">
         <span className={css.headerControlMenu}>
-          <Badge count={this.state.msgNum} overflowCount={100} style={{boxShadow: "3px 3px 4px #d4d2d2",background: '#f55922',padding:0}}>
+          <Badge 
+            count={this.state.msgNum} 
+            overflowCount={100} 
+            style={{boxShadow: "3px 3px 4px #d4d2d2",background: '#f55922',padding:0}}>
             <Icon type="bell" theme="filled" style={{fontSize:18}} />
           </Badge>
         </span>

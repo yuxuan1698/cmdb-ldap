@@ -7,7 +7,7 @@ export default {
       islogin: false, 
       userinfo: {},
       historyPath: "",
-      historyParse: "",
+      historyParse: {},
       permissions:{},
 
     },

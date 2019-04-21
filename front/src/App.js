@@ -2,7 +2,6 @@
 // import { browserHistory } from 'dva/router'
 // import createLoading from 'dva-loading';
 export const dva = {
-  history: 'hash',
   config: {
     onError(err) {
       err.preventDefault();
