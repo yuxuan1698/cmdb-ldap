@@ -29,7 +29,6 @@ class CMDBChangePassword extends PureComponent {
     }
   }
   handleSubmit = (e) => {
-    console.log(this.props.login)
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {

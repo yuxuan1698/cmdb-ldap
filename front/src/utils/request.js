@@ -3,7 +3,7 @@ import NProgress from 'nprogress';
 import { message } from 'antd';
 // 国际化
 import {formatMessage} from 'umi/locale';
-import { connect } from 'dva';
+import { GenerateRequestAuthParams } from "../utils/utils";
 
 
 /**
@@ -30,10 +30,12 @@ axios.defaults.withCredentials = true;
 
 // 添加一个请求拦截器，用于设请求HEADER及请求过渡状态
 
-// @connect(({login})=>({login}))
 axios.interceptors.request.use((config) => {
   // 请求开始，蓝色过渡滚动条开始出现
-
+  const auth = GenerateRequestAuthParams()
+  if(auth){
+    config=Object.assign(config,auth)
+  }
   NProgress.start();
   NProgress.set(.4);
   return config;
@@ -62,12 +64,11 @@ axios.interceptors.response.use((response) => {
   if(error.response){
     const {status}=error.response
     if(status===401){
-      console.log(error.response)
       const returnMsg = error.response.data.error?error.response.data.error:(error.response.data.detail?error.response.data.detail:"")
       message.warn(`${formatMessage({ id: 'request.status.401' })} ${returnMsg}`)
-      // window.g_app._store.dispatch({
-      //   type: 'login/logoutAction',
-      // });
+      window.g_app._store.dispatch({
+        type: 'login/logoutAction',
+      });
     }else{
       let msg = formatMessage({ id: 'request.status.' + status })
       if (error.response.data) {
@@ -83,7 +84,7 @@ axios.interceptors.response.use((response) => {
   return Promise.reject(error);
 });
 
-// @connect(({ login }) => ({ login }))
+
 export default function request (opt) {
   // 调用 axios api，统一拦截
   return axios(opt)

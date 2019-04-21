@@ -2,6 +2,7 @@ import { PureComponent,Fragment } from 'react';
 import {
   Layout,Icon
 } from 'antd';
+import classnames from "classnames";
 import CMDBLanguage from './Language';
 import CMDBUserControl from './UserControl';
 import CMDBMessages from './Messages';
@@ -11,10 +12,11 @@ const {Header} =Layout;
 class CMDBHeader extends PureComponent {
   render(){
     let {toggleSideMenu,collapsed,location}=this.props
+    const currLogin = location.pathname.match('^/login')
     return (
-      <Header className={css.headerbox}>
+      <Header className={classnames({ [css.headerbox]: true, [css.headerlogined]: !currLogin })}>
         <div style={{ float: "right" }}>
-          {!location.pathname.match('^/login') ? (
+          {!currLogin ? (
             <Fragment>
               <CMDBMessages />
               <CMDBUserControl />
@@ -22,7 +24,7 @@ class CMDBHeader extends PureComponent {
           ) : ""}
           <CMDBLanguage />
         </div>
-        {!location.pathname.match('^/login')?(
+        {!currLogin?(
         <div>
           <span className={css.headerControlMenu} onClick={toggleSideMenu}>
             <Icon type={collapsed?"menu-unfold":"menu-fold"}/>
