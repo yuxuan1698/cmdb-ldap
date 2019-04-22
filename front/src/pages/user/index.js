@@ -1,10 +1,13 @@
 'use strict'
 import {connect} from 'dva';
 import {PureComponent} from 'react'
-import { Breadcrumb,Table,Divider,Icon,Button,Menu,Dropdown,Alert } from 'antd';
+import { Table, Divider, Icon, Button, Menu, Dropdown, Alert, Tooltip } from 'antd';
 import Link from 'umi/link';
 import usercss from "./user.less";
 import CMDBBreadcrumb from "../components/Breadcrumb";
+// import DrawerAddUser from "../components/addUser";
+import dynamic from 'umi/dynamic';
+
 const ButtonGroup = Button.Group;
 
 const columns = [{
@@ -36,14 +39,20 @@ const columns = [{
   title: "动作",
   key: 'action',
   align: 'center',
-  width:150,
+  width:115,
   render: (text, record) => (
     <span>
-      <a href="javascript:;">修改</a>
-      <Divider type="vertical" />
-      <a href="javascript:;">锁定</a>
-      <Divider type="vertical" />
-      <a href="javascript:;">删除</a>
+      <ButtonGroup size="small">
+        <Tooltip placement="topLeft" title={'编辑用户'} >
+          <Button type="Default" icon="edit" />
+        </Tooltip>
+        <Tooltip placement="top" title='锁定用户' >
+          <Button type="Default" icon="lock" />
+        </Tooltip>
+        <Tooltip placement="topRight" title={'删除用户'} overlayStyle={{}} >
+          <Button type="danger" icon="delete" />
+        </Tooltip>
+      </ButtonGroup>
     </span>
   ),
 }];
@@ -68,15 +77,27 @@ class CMDBUserList extends PureComponent {
   constructor(props){
     super(props)
     this.state = {
-      selectedRowKeys: []
+      selectedRowKeys: [],
+      visibleDrawer:false,
     }
   }
+  showHideUserAddDrawer = () => {
+    this.setState({
+      visibleDrawer: !this.state.visibleDrawer,
+    });
+  };
   onSelectChange=(selectedRowKeys)=>{
     this.setState({ selectedRowKeys });
   }
   render(){
+    console.log(this.props.loading)
+    const DrawerAddUser = dynamic({ 
+        loader: () => import('../components/addUser'),
+        loading:(e)=>{
+          return null
+        }
+      })
     const {selectedRowKeys}=this.state
-    console.log(selectedRowKeys)
     const {userlist}=this.props.users
     const data = [];
     Object.keys(userlist).map(it=>{
@@ -94,25 +115,44 @@ class CMDBUserList extends PureComponent {
         <div className={usercss.tableContent}>
           <div className={usercss.usercontrol}>
             <div style={{float:"right"}}>
-              <Alert message={`当前选中${selectedRowKeys.length}个用户`} type="success" showIcon />
+              <Alert message={`当前选中${selectedRowKeys.length}个用户`} 
+              type={selectedRowKeys.length>0?"info":"success"} showIcon />
             </div>
-            <Button type="primary">
+          <Button type="primary" 
+            loading={this.state.loadingAdduser} 
+            onClick={this.showHideUserAddDrawer.bind(this)} >
               <Icon type="plus" />添加用户
             </Button>
+          {this.state.visibleDrawer?(
+            <DrawerAddUser 
+              showHideUserAddDrawer={this.showHideUserAddDrawer.bind(this)}
+              visibleDrawer={this.state.visibleDrawer}
+              />
+          ):""}
+          {selectedRowKeys.length > 0 ? (
             <Dropdown overlay={menu}>
               <Button >
                 批量操作<Icon type="down" />
               </Button>
             </Dropdown>
+          ):""}
           </div>
-          <Table pagination={{size:"small",showSizeChanger:true,showQuickJumper:true,defaultPageSize:15,pageSizeOptions:[15,30,45]}} 
+          <Table pagination={{
+              size:"small",
+              showSizeChanger:true,
+              showQuickJumper:true,
+              defaultPageSize:15,
+              pageSizeOptions:["15","30","45"]
+            }} 
+            rowKey='uid'
             hasData 
             loading={this.props.loading.global} 
-            size='small' 
+            size='small'
+            // bordered 
             bodyStyle={{margin:0}}
             rowSelection={{
               selectedRowKeys,
-              columnWidth:40,
+              // columnWidth:200,
               onChange: this.onSelectChange.bind(this),
             }}
             columns={columns} 

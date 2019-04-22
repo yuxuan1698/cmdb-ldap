@@ -18,7 +18,7 @@ class CMDBBreadcrumb extends PureComponent {
           <Icon type='home' />主页</Link>
         </Breadcrumb.Item>
         {Object.keys(this.props.route).map(it=>{
-          return (<Breadcrumb.Item  >
+          return (<Breadcrumb.Item key={`${it}${Math.random()}`}  >
             {this.props.route[it]===""?it:(<Link to={this.props.route[it]} >{it}</Link>)}
             </Breadcrumb.Item>)
         })}

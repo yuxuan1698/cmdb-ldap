@@ -29,9 +29,9 @@ class CMDBMessages extends PureComponent{
   componentDidMount() {
     const tt=setInterval(this.changeNum.bind(this), 2000);
   }
-  componentWillUnmount() {
-    // clearInterval(tt)
-  }
+  // componentWillUnmount() {
+  //   // clearInterval(tt)
+  // }
   
   render(){
     const {languages}=this.state
