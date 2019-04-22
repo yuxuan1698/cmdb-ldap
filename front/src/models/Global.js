@@ -10,12 +10,7 @@ export default {
       
     },
     effects: {
-      *changePasswordAction({ payload, callback }, { call }) {
-        // console.log(payload)
-        const data = yield call(UserChangePassword, payload)
-        callback(data)
-      }
-      
+    
     },
     reducers: {
       

@@ -64,7 +64,7 @@ export default {
               userinfo: data,
             }
           })
-          if (callback && typeof callback === 'function') {
+          if (data && callback && typeof callback === 'function') {
             callback(data); // 返回结果
           }
         }

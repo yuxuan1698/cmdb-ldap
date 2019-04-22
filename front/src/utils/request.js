@@ -90,8 +90,6 @@ export default function request (opt) {
   return axios(opt)
     .then((response) => {
       console.log(`【${opt.method} ${opt.url}】请求成功，响应数据：${response}`, )
-      console.log(response.data)
-      notification.success({ message:"密码修改成功",description:response.data.status})
       return { ...response.data }
     })
     .catch((error) => {

@@ -8,11 +8,10 @@ export function UserChangePassword (data) {
     })
 }
 // 获取用户列表API
-export function UserList (data) {
+export function UserList () {
     return request({
         method: "get",
-        url: '/v1/ldap/userlist/',
-        data: data,
+        url: '/v1/ldap/user/list/'
     })
 }
 // 获取组列表API

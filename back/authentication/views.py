@@ -42,7 +42,7 @@ class UserListViewSet(APIView):
     if user_list:
       page=PageNumberPagination()
       page_roles=page.paginate_queryset(queryset=user_list,request=request,view=self)
-      return JsonResponse(page_roles,encoder=LDAPJSONEncoder,safe=False)
+      return JsonResponse(user_list,encoder=LDAPJSONEncoder,safe=False)
     else:
       return JsonResponse({'error':errorMsg},encoder=LDAPJSONEncoder,status=status.HTTP_400_BAD_REQUEST,safe=False)
 

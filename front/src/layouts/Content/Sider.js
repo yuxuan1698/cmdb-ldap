@@ -4,6 +4,7 @@
   } from 'antd'
   import classnames from 'classnames';
   import css from '../index.less';
+  import Link from 'umi/link';
   const Sider =Layout.Sider;
   const SubMenu = Menu.SubMenu;
   class CMDBSider extends PureComponent {
@@ -28,8 +29,12 @@
                 <Icon type="user" />
                 <span>用户管理</span>
               </span>}>
-              <Menu.Item key="1">用户列表</Menu.Item>
-              <Menu.Item key="2">用户组列表</Menu.Item>
+              <Menu.Item key="1">
+                <Link to='/user/'>用户列表</Link>
+              </Menu.Item>
+              <Menu.Item key="2">
+                <Link to='/user/groups/'>用户组列表</Link>
+              </Menu.Item>
             </SubMenu>
             <SubMenu key="sub1" title={
               <span>

@@ -2,10 +2,9 @@
 
 import {PureComponent} from 'react'
 import {
-  Form, Input, Button,Icon
+  Form, Input, Button,Icon,notification
   } from 'antd';
 import { connect } from 'dva';
-
 // 国际化
 import { formatMessage } from 'umi/locale'; 
 
@@ -16,9 +15,12 @@ class CMDBChangePassword extends PureComponent {
   constructor(props){
     super(props)
   }
-  handleReset(e){
-    e.preventDefault();
+  handleReset(){
     this.props.form.resetFields()
+  }
+  handleRelogin(){
+    const {dispatch}=this.props
+    dispatch({type:'login/logoutAction'})
   }
   handleConfirmPassword(rule, value, callback){
     const { getFieldValue} = this.props.form;
@@ -34,8 +36,16 @@ class CMDBChangePassword extends PureComponent {
       if (!err) {
         let { dispatch } = this.props
         dispatch({ 
-          type: 'global/changePasswordAction',
-          payload: values
+          type: 'users/changePasswordAction',
+          payload: values,
+          callback:(data)=>{
+            this.handleReset()
+            notification.success({
+              message:"密码修改提示",
+              description: `${data.status} 需要重新登陆！`
+            })
+          setTimeout(this.handleRelogin.bind(this),1000)
+          }
         })
       }
     });
@@ -58,7 +68,7 @@ class CMDBChangePassword extends PureComponent {
         onSubmit: this.handleSubmit.bind(this)
       };
     return (
-      <div style={{ marginTop: 50 }}>
+      <div style={{ marginTop: 60 }}>
         <Form {...formItemLayout} >
           <Form.Item hasFeedback
             label={`${formatMessage({ id: 'user.changepassword.username' })}:`} >
