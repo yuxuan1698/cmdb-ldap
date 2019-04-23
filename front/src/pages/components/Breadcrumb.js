@@ -1,7 +1,7 @@
 'use strict'
 
 import {PureComponent} from 'react'
-import { Breadcrumb,Icon } from 'antd';
+import { Breadcrumb, Icon, Badge } from 'antd';
 import Link from 'umi/link';
 import css from './index.less'
 class CMDBBreadcrumb extends PureComponent {
@@ -23,7 +23,7 @@ class CMDBBreadcrumb extends PureComponent {
             </Breadcrumb.Item>)
         })}
       </Breadcrumb>
-        <h1>*{this.props.title}</h1>
+        <h1><Badge status="success" />{this.props.title}</h1>
     </div>)
   }
 }

@@ -116,7 +116,7 @@ class CMDBUserList extends PureComponent {
           <div className={usercss.usercontrol}>
             <div style={{float:"right"}}>
               <Alert message={`当前选中${selectedRowKeys.length}个用户`} 
-              type={selectedRowKeys.length>0?"info":"success"} showIcon />
+              type={selectedRowKeys.length > 0 ? "success" : "info"} showIcon />
             </div>
           <Button type="primary" 
             loading={this.state.loadingAdduser} 

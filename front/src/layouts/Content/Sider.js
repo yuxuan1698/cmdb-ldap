@@ -19,9 +19,11 @@
                 >
           <div className={classnames({[css.logo]:true,[css.logoToggle]:collapsed})} />
           <Menu defaultSelectedKeys={['1']}
-                defaultOpenKeys={['sub3']}
+                defaultOpenKeys={['sub0']}
+                selectedKeys={["sub0"]}
                 mode="inline"
                 theme="light"
+
                 inlineCollapsed={collapsed}
                 >
             <SubMenu key="sub0" title={
