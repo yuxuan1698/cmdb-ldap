@@ -5,6 +5,7 @@ import {
 import css from '../index.less';
 // const {Item}=Menu
 const TabPane=Tabs.TabPane
+let tt=""
 
 class CMDBMessages extends PureComponent{
   constructor(props){
@@ -23,15 +24,14 @@ class CMDBMessages extends PureComponent{
     
   }
   changeNum(){
-    // alert()
     this.setState({msgNum: parseInt(Math.random()*100,10)})
   }
   componentDidMount() {
-    const tt=setInterval(this.changeNum.bind(this), 2000);
+     tt=setInterval(this.changeNum.bind(this), 2000);
   }
-  // componentWillUnmount() {
-  //   // clearInterval(tt)
-  // }
+  componentWillUnmount() {
+    clearInterval(tt)
+  }
   
   render(){
     const {languages}=this.state

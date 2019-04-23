@@ -121,7 +121,7 @@ class CMDBUserList extends PureComponent {
           <Button type="primary" 
             loading={this.state.loadingAdduser} 
             onClick={this.showHideUserAddDrawer.bind(this)} >
-              <Icon type="plus" />添加用户
+              <Icon type="user-add" />添加用户
             </Button>
           {this.state.visibleDrawer?(
             <DrawerAddUser 

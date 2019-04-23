@@ -16,15 +16,16 @@ class CMDBContent extends PureComponent {
     return (
       <Fragment >
         {!location.pathname.match('^/login')?<CMDBSider 
+            location={location}
             collapsed={collapsed} 
             toggleSideMenu={toggleSideMenu} />:""}
         <Layout>
-            <CMDBHeader location={location} 
+          <CMDBHeader location={location} 
             collapsed={collapsed} 
             toggleSideMenu={toggleSideMenu} />
-          <Content style={{ overflow: "auto"}}>
-                {children}
-            </Content>
+          <Content  style={{ overflow: "auto"}}>
+            {children}
+          </Content>
         </Layout>
       </Fragment>
       )

@@ -7,7 +7,87 @@
   import Link from 'umi/link';
   const Sider =Layout.Sider;
   const SubMenu = Menu.SubMenu;
+
+  const sideMenu=[
+    {
+      key: '/',
+      name: '我的首页',
+      icon:'home',
+      allow: true,
+    },
+    {
+      key:'user',
+      name: '用户管理',
+      icon: 'user',
+      allow: true,
+      submenu:[
+        {
+          key: '/user/',
+          name:'用户列表',
+        },
+        {
+          key: '/user/groups/',
+          name:'用户组列表'
+        },
+      ]
+    },
+    {
+      key:'equipment',
+      name: 'IT资源管理',
+      icon: 'edit',
+      allow: true,
+      submenu:[
+        {
+          key: '/equipment/',
+          name:'设备列表',
+          // allow: false,
+        },
+        {
+          key: '/equipment/groups/',
+          name:'设备监控',
+        },
+      ]
+    },
+  ]
   class CMDBSider extends PureComponent {
+    constructor(props){
+      super(props)
+      const {pathname}=this.props.location
+      this.state={
+        parentpath:[pathname==='/'?pathname:pathname.split('/')[1]],
+        subpath:[pathname]
+      }
+    }
+    initSideMenu=(arr)=>{
+      return arr.filter(it=>{
+        if(it.hasOwnProperty('allow')){
+          return it.allow
+        }
+        return true
+      }).map(it=>{
+        let menuItem=""
+        if(it.hasOwnProperty('submenu')){
+          const childMenu=this.initSideMenu(it.submenu)
+          menuItem=(<SubMenu key={it.key} title={
+            <span>
+              {it.icon?<Icon type={it.icon} />:""}
+              <span>{it.name}</span>
+            </span>}>
+            {childMenu}
+          </SubMenu>)
+        }else{
+          menuItem=(<Menu.Item key={it.key}>
+            <Link to={it.key}>
+              {it.icon?<Icon type={it.icon} />:""}
+              <span>
+                {it.name}
+              </span>
+            </Link>
+          </Menu.Item>)
+        }
+        return menuItem
+      })
+    }
     render(){
       let {collapsed,toggleSideMenu}=this.props
       return (
@@ -15,52 +95,17 @@
                 collapsed={collapsed}
                 breakpoint={'lg'}
                 onBreakpoint={toggleSideMenu}
-                // onCollapse={toggleSideMenu}
                 >
           <div className={classnames({[css.logo]:true,[css.logoToggle]:collapsed})} />
-          <Menu defaultSelectedKeys={['1']}
-                defaultOpenKeys={['sub0']}
-                selectedKeys={["sub0"]}
+          <Menu 
+                defaultSelectedKeys={this.state.subpath}
+                defaultOpenKeys={this.state.parentpath}
                 mode="inline"
                 theme="light"
-
                 inlineCollapsed={collapsed}
                 >
-            <SubMenu key="sub0" title={
-              <span>
-                <Icon type="user" />
-                <span>用户管理</span>
-              </span>}>
-              <Menu.Item key="1">
-                <Link to='/user/'>用户列表</Link>
-              </Menu.Item>
-              <Menu.Item key="2">
-                <Link to='/user/groups/'>用户组列表</Link>
-              </Menu.Item>
-            </SubMenu>
-            <SubMenu key="sub1" title={
-              <span>
-                <Icon type="mail" />
-                <span>Navigation One</span>
-              </span>}>
-              <Menu.Item key="5">Option 5</Menu.Item>
-              <Menu.Item key="6">Option 6</Menu.Item>
-              <Menu.Item key="7">Option 7</Menu.Item>
-              <Menu.Item key="8">Option 8</Menu.Item>
-            </SubMenu>
-            <SubMenu key="sub2" title={
-              <span>
-                <Icon type="appstore" />
-                <span>Navigation Two</span>
-              </span>}>
-              <Menu.Item key="9">Option 9</Menu.Item>
-              <Menu.Item key="10">Option 10</Menu.Item>
-              <SubMenu key="sub3" title="Submenu">
-                <Menu.Item key="11">Option 11</Menu.Item>
-                <Menu.Item key="12">Option 12</Menu.Item>
-              </SubMenu>
-          </SubMenu>
-        </Menu>
-      </Sider>)}
+              {this.initSideMenu(sideMenu)}
+          </Menu>
+        </Sider>)}
     }
   export default CMDBSider
