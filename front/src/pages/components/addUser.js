@@ -38,12 +38,6 @@ class DrawerAddUser extends Component {
       visible: true
     }
   }
-  componentWillUpdate(preProps,nextProps){
-    console.log(nextProps)
-  }
-  componentWillReceiveProps(nextProps){
-    console.log(nextProps)
-  }
   initSelectedItems(arr){
     const {classobjects}=this.state
     let supSet=[]
@@ -60,9 +54,7 @@ class DrawerAddUser extends Component {
   handleClassObjectsChange=(e)=>{
     const {classobjects}=this.state
     let supSet=this.initSelectedItems(e)
-    console.log(supSet)
-    let mayfiled=[]
-    let mustfiled=[]
+    let mayfiled=[], mustfiled=[]
     supSet.filter(i=>i!=='top').map(it=>{
       mustfiled=mustfiled.concat(['uid'],classobjects[it][1].must)
       mayfiled=mayfiled.concat(classobjects[it][2].may)
@@ -79,14 +71,18 @@ class DrawerAddUser extends Component {
       objectClass: this.state.selectedItems,
     });
   }
+  addInputField=(name)=>{
+    this.setState({ currField:this.state.currField.concat(name.key)})
+  }
   initAddFieldMenu=()=>{
     return (<Menu>
       {
         this.state.mayField
-        .map(it=>{
-          console.log(it)
+        .filter(it=>{
+          return !this.state.currField.includes(it)
+        }).map(it=>{
           return (
-            <Menu.Item key={it}>
+            <Menu.Item onClick={this.addInputField.bind(this)} key={it}>
               <span>{it}</span>
             </Menu.Item>)
         })
@@ -100,6 +96,7 @@ class DrawerAddUser extends Component {
             destroyOnClose
             title="添加新用户"
             width={680}
+            bodyStyle={{padding:"10px 24px 30px 24px",overflow:"auto"}}
             onClose={()=>{
               this.setState({visible:!this.state.visible})
               setTimeout(this.props.showHideUserAddDrawer,500)
@@ -108,7 +105,6 @@ class DrawerAddUser extends Component {
             >
               <Form layout="vertical" hasFeedback>
                 <Row gutter={12}>
-                  
                     <Form.Item label='字段归属(objectClass)' >
                       {getFieldDecorator('objectClass', {
                           initialValue:this.state.selectedItems,
