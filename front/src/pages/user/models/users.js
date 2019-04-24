@@ -1,4 +1,4 @@
-import { UserChangePassword,UserList } from '../../../services/api';
+import { UserChangePassword,getLDAPUserList,getLDAPObjectClassList } from '../../../services/api';
 export default {
     names: 'users',
     state:{
@@ -24,7 +24,7 @@ export default {
         }
       },
       *getUserList({ payload }, { call,put }) {
-        const data = yield call(UserList, payload)
+        const data = yield call(getLDAPUserList, payload)
         if (data) {
           yield put({
             type:'userlist', 
@@ -32,6 +32,12 @@ export default {
               userlist: data,
             }
           })
+        }
+      },
+      *getLDAPClassList({ callback }, { call }) {
+        const data = yield call(getLDAPObjectClassList)
+        if (data) {
+          callback(data)
         }
       },
     },

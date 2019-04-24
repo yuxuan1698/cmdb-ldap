@@ -29,6 +29,10 @@
           key: '/user/groups/',
           name:'用户组列表'
         },
+        {
+          key: '/user/permission/',
+          name:'用户权限'
+        },
       ]
     },
     {

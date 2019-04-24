@@ -1,134 +1,194 @@
 
 import { Component} from 'react';
 import {
-    Drawer, Form, Button, Col, Row, Input, Select, DatePicker, Icon,
+    Drawer, Form, Button, Col, Row, Input, Select, Icon,Dropdown,Menu
 } from 'antd';
+import {AddFieldButton} from './addUser/addFieldButton'
 
 const { Option } = Select;
 
+const models={ 
+    professional:{
+      objectclass:{}
+    },
+    template:{}
+  }
+const filedToName={
+  uid:'用户名',
+  sn:'姓名',
+  givenName:'别名',
+  mobile:'手机号',
+  ou:'部门',
+  cn:'别名',
+  mail:'邮箱',
+  mobile:'手机',
+}
 @Form.create()
 class DrawerAddUser extends Component {
-    render() {
-        const { getFieldDecorator } = this.props.form;
-        return (<Drawer
-                title="添加新用户"
-                width={620}
-                onClose={this.props.showHideUserAddDrawer}
-                visible={this.props.visibleDrawer}
-                >
-                    <Form layout="vertical" hideRequiredMark>
-                        <Row gutter={16}>
-                            <Col span={12}>
-                                <Form.Item label="Name">
-                                    {getFieldDecorator('name', {
-                                        rules: [{ required: true, message: 'Please enter user name' }],
-                                    })(<Input placeholder="Please enter user name" />)}
-                                </Form.Item>
-                            </Col>
-                            <Col span={12}>
-                                <Form.Item label="Url">
-                                    {getFieldDecorator('url', {
-                                        rules: [{ required: true, message: 'Please enter url' }],
-                                    })(
-                                        <Input
-                                            style={{ width: '100%' }}
-                                            addonBefore="http://"
-                                            addonAfter=".com"
-                                            placeholder="Please enter url"
-                                        />
-                                    )}
-                                </Form.Item>
-                            </Col>
-                        </Row>
-                        <Row gutter={16}>
-                            <Col span={12}>
-                                <Form.Item label="Owner">
-                                    {getFieldDecorator('owner', {
-                                        rules: [{ required: true, message: 'Please select an owner' }],
-                                    })(
-                                        <Select placeholder="Please select an owner">
-                                            <Option value="xiao">Xiaoxiao Fu</Option>
-                                            <Option value="mao">Maomao Zhou</Option>
-                                        </Select>
-                                    )}
-                                </Form.Item>
-                            </Col>
-                            <Col span={12}>
-                                <Form.Item label="Type">
-                                    {getFieldDecorator('type', {
-                                        rules: [{ required: true, message: 'Please choose the type' }],
-                                    })(
-                                        <Select placeholder="Please choose the type">
-                                            <Option value="private">Private</Option>
-                                            <Option value="public">Public</Option>
-                                        </Select>
-                                    )}
-                                </Form.Item>
-                            </Col>
-                        </Row>
-                        <Row gutter={16}>
-                            <Col span={12}>
-                                <Form.Item label="Approver">
-                                    {getFieldDecorator('approver', {
-                                        rules: [{ required: true, message: 'Please choose the approver' }],
-                                    })(
-                                        <Select placeholder="Please choose the approver">
-                                            <Option value="jack">Jack Ma</Option>
-                                            <Option value="tom">Tom Liu</Option>
-                                        </Select>
-                                    )}
-                                </Form.Item>
-                            </Col>
-                            <Col span={12}>
-                                <Form.Item label="DateTime">
-                                    {getFieldDecorator('dateTime', {
-                                        rules: [{ required: true, message: 'Please choose the dateTime' }],
-                                    })(
-                                        <DatePicker.RangePicker
-                                            style={{ width: '100%' }}
-                                            getPopupContainer={trigger => trigger.parentNode}
-                                        />
-                                    )}
-                                </Form.Item>
-                            </Col>
-                        </Row>
-                        <Row gutter={16}>
-                            <Col span={24}>
-                                <Form.Item label="Description">
-                                    {getFieldDecorator('description', {
-                                        rules: [
-                                            {
-                                                required: true,
-                                                message: 'please enter url description',
-                                            },
-                                        ],
-                                    })(<Input.TextArea rows={4} placeholder="please enter url description" />)}
-                                </Form.Item>
-                            </Col>
-                        </Row>
-                    </Form>
-                    <div
-                        style={{
-                            position: 'absolute',
-                            left: 0,
-                            bottom: 0,
-                            width: '100%',
-                            borderTop: '1px solid #e9e9e9',
-                            padding: '10px 16px',
-                            background: '#fff',
-                            textAlign: 'right',
-                        }}
-                    >
-                        <Button onClick={this.props.showHideUserAddDrawer} style={{ marginRight: 8 }}>
-                            取消
-                        </Button>
-                        <Button onClick={this.props.showHideUserAddDrawer} type="primary">
-                            保存
-                        </Button>
-                    </div>
-                </Drawer>
-        );
+  constructor(props){
+    super(props)
+    const { classobjects } =this.props
+    this.state={
+      options: Object.keys(classobjects),
+      classobjects: classobjects,
+      selectedItems:['top'],
+      mustField:['uid'],
+      mayField:[],
+      currField:['uid'],
+      visible: true
     }
+  }
+  componentWillUpdate(preProps,nextProps){
+    console.log(nextProps)
+  }
+  componentWillReceiveProps(nextProps){
+    console.log(nextProps)
+  }
+  initSelectedItems(arr){
+    const {classobjects}=this.state
+    let supSet=[]
+    arr.filter(it=>it!=='top').map((it)=>{
+      let tmp=classobjects[it][0].sup.filter(i=>i!=='top')
+      if(tmp.length>0) {
+        supSet=supSet.concat(this.initSelectedItems(tmp),[it])
+      }else{
+        supSet=supSet.concat(classobjects[it][0].sup,[it])
+      }
+    })
+    return Array.from(new Set(supSet))
+  }
+  handleClassObjectsChange=(e)=>{
+    const {classobjects}=this.state
+    let supSet=this.initSelectedItems(e)
+    console.log(supSet)
+    let mayfiled=[]
+    let mustfiled=[]
+    supSet.filter(i=>i!=='top').map(it=>{
+      mustfiled=mustfiled.concat(['uid'],classobjects[it][1].must)
+      mayfiled=mayfiled.concat(classobjects[it][2].may)
+    }) 
+    this.setState({
+      selectedItems:supSet,
+      mustField:Array.from(new Set(mustfiled)),
+      mayField:Array.from(new Set(mayfiled)),
+      currField:Array.from(new Set(mustfiled)),
+    })
+  }
+  hadleNewClassObject=()=>{
+    this.props.form.setFieldsValue({
+      objectClass: this.state.selectedItems,
+    });
+  }
+  initAddFieldMenu=()=>{
+    return (<Menu>
+      {
+        this.state.mayField
+        .map(it=>{
+          console.log(it)
+          return (
+            <Menu.Item key={it}>
+              <span>{it}</span>
+            </Menu.Item>)
+        })
+      }
+    </Menu>)
+  }
+  render() {
+    const { getFieldDecorator } = this.props.form;
+    const { selectedItems,options } = this.state;
+    return (<Drawer
+            destroyOnClose
+            title="添加新用户"
+            width={680}
+            onClose={()=>{
+              this.setState({visible:!this.state.visible})
+              setTimeout(this.props.showHideUserAddDrawer,500)
+            }}
+            visible={this.state.visible}
+            >
+              <Form layout="vertical" hasFeedback>
+                <Row gutter={12}>
+                  
+                    <Form.Item label='字段归属(objectClass)' >
+                      {getFieldDecorator('objectClass', {
+                          initialValue:this.state.selectedItems,
+                          rules: [{ required: true, message: '请选择属性归属类' }],
+                      })(
+                        <Select
+                          mode="multiple"
+                          showArrow
+                          allowClear
+                          placeholder="请选择属性归属类"
+                          onChange={this.handleClassObjectsChange.bind(this)}
+                          onMouseLeave={this.hadleNewClassObject.bind(this)}
+                          onBlur={this.hadleNewClassObject.bind(this)}
+                          style={{ width: '100%' }}>
+                          {options.filter(e=>!selectedItems.includes(e)).map(item => (
+                            <Option key={item} value={item}>
+                              {item}
+                            </Option>
+                          ))}
+                        </Select>
+                      )}
+                    </Form.Item>
+                  {this.state.currField.map((i)=>{
+                     return (
+                      <Form.Item  key={i} hasFeedback required>
+                        {getFieldDecorator(i, {
+                            rules: [{ required: true, message: i }],
+                        })(
+                            <Input style={{ width: '100%' }}
+                                addonBefore={filedToName[i]?filedToName[i]:i}
+                                // prefix={i}
+                                placeholder={filedToName[i]?filedToName[i]:i}/>
+                        )}
+                        {/* {<Icon
+                            className="dynamic-delete-button"
+                            type="minus-circle-o"
+                            onClick={()=>{}} />
+                        } */}
+                      </Form.Item>
+                    )
+                  })}
+                </Row>
+                <Row align='middle' >
+                  <Form.Item >
+                    <Dropdown trigger={['click']} 
+                    overlayStyle={{maxHeight:300,overflow:"auto",boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)"}}
+                    overlay={this.initAddFieldMenu.bind(this)} >
+                      <Button block  type="dashed"  >
+                        <Icon type="plus" /> 添加字段
+                      </Button>
+                    </Dropdown>
+                  </Form.Item>
+                </Row>
+              </Form>
+              <div
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  bottom: 0,
+                  width: '100%',
+                  borderTop: '1px solid #e9e9e9',
+                  padding: '10px 16px',
+                  background: '#fff',
+                  textAlign: 'right',
+                }}
+              >
+                <Button  style={{ marginRight: 8 }}>
+                  取消
+                </Button>
+                <Button onClick={()=>{
+                    this.props.form.setFieldsValue({
+                      objectClass: this.state.selectedItems,
+                    });
+                }} type="primary">
+                  保存
+                </Button>
+              </div>
+            </Drawer>
+    );
+  }
 }
 
 export default DrawerAddUser

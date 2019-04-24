@@ -8,14 +8,21 @@ export function UserChangePassword (data) {
     })
 }
 // 获取用户列表API
-export function UserList () {
+export function getLDAPUserList () {
     return request({
         method: "get",
         url: '/v1/ldap/user/list/'
     })
 }
+// 获取LDAPClass API
+export function getLDAPObjectClassList () {
+    return request({
+        method: "get",
+        url: '/v1/ldap/classes/'
+    })
+}
 // 获取组列表API
-export function GroupList (data) {
+export function getGroupList (data) {
     return request({
         method: "get",
         url: '/v1/ldap/ous/',

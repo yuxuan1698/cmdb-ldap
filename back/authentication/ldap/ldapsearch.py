@@ -87,7 +87,7 @@ class CmdbLDAP(object):
         for a in oc.keys():
             objc = self.schema.get_obj(ldap.schema.ObjectClass, a)
             if objc != None:
-                allobjc[objc.names[0]] = (objc.sup,objc.must)
+                allobjc[objc.names[0]] = ({'sup':objc.sup},{'must':objc.must},{'may':objc.may})
                 # allobjc[objc.oid] = (objc.names, objc.must, objc.may, objc.sup, objc.obsolete)
         return allobjc
 

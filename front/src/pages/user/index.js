@@ -78,19 +78,30 @@ class CMDBUserList extends PureComponent {
     super(props)
     this.state = {
       selectedRowKeys: [],
-      visibleDrawer:false,
+      loadedDrawer:false,
+      classobjects:""
     }
   }
   showHideUserAddDrawer = () => {
-    this.setState({
-      visibleDrawer: !this.state.visibleDrawer,
-    });
+    if(this.state.classobjects===""){
+      const { dispatch } = this.props;
+      dispatch({type:'users/getLDAPClassList',callback:(data)=>{
+        this.setState({
+          loadedDrawer: !this.state.loadedDrawer,
+          classobjects: data
+        });
+      }})
+    }else{
+      this.setState({
+        loadedDrawer: !this.state.loadedDrawer,
+      });
+    }
+    
   };
   onSelectChange=(selectedRowKeys)=>{
     this.setState({ selectedRowKeys });
   }
   render(){
-    console.log(this.props.loading)
     const DrawerAddUser = dynamic({ 
         loader: () => import('../components/addUser'),
         loading:(e)=>{
@@ -119,16 +130,14 @@ class CMDBUserList extends PureComponent {
               type={selectedRowKeys.length > 0 ? "success" : "info"} showIcon />
             </div>
           <Button type="primary" 
-            loading={this.state.loadingAdduser} 
+            loading={this.props.loading.global} 
             onClick={this.showHideUserAddDrawer.bind(this)} >
               <Icon type="user-add" />添加用户
             </Button>
-          {this.state.visibleDrawer?(
-            <DrawerAddUser 
-              showHideUserAddDrawer={this.showHideUserAddDrawer.bind(this)}
-              visibleDrawer={this.state.visibleDrawer}
-              />
-          ):""}
+            {
+              this.state.loadedDrawer?<DrawerAddUser showHideUserAddDrawer={this.showHideUserAddDrawer.bind(this)} classobjects={this.state.classobjects} />:""
+            }
+           
           {selectedRowKeys.length > 0 ? (
             <Dropdown overlay={menu}>
               <Button >
