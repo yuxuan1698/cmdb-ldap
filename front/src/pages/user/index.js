@@ -1,12 +1,12 @@
 'use strict'
 import {connect} from 'dva';
 import {PureComponent} from 'react'
-import { Table, Divider, Icon, Button, Menu, Dropdown, Alert, Tooltip } from 'antd';
-import Link from 'umi/link';
+import { Table, Icon, Button, Menu, Dropdown, Alert, Tooltip } from 'antd';
+// import Link from 'umi/link';
 import usercss from "./user.less";
 import CMDBBreadcrumb from "../components/Breadcrumb";
-// import DrawerAddUser from "../components/addUser";
 import dynamic from 'umi/dynamic';
+
 
 const ButtonGroup = Button.Group;
 
@@ -16,7 +16,7 @@ const columns = [{
   key: 'uid',
   sorter:()=>{},
 }, {
-  title: '姓名',
+  title: '用户姓名',
   dataIndex: 'sn',
   key: 'sn',
 }, {
@@ -28,13 +28,17 @@ const columns = [{
   dataIndex: 'mobile',
   key: 'mobile',
 },{
-  title: '部门',
+  title: '所属部门',
   dataIndex: 'ou',
   key: 'ou',
 }, {
   title: '邮箱',
   dataIndex: 'mail',
   key: 'mail',
+}, {
+  title: '创建时间',
+  dataIndex: 'createtime',
+  key: 'createtime',
 }, {
   title: "动作",
   key: 'action',
@@ -49,7 +53,7 @@ const columns = [{
         <Tooltip placement="top" title='锁定用户' >
           <Button type="Default" icon="lock" />
         </Tooltip>
-        <Tooltip placement="topRight" title={'删除用户'} overlayStyle={{}} >
+        <Tooltip placement="topRight" title='删除用户' >
           <Button type="danger" icon="delete" />
         </Tooltip>
       </ButtonGroup>
@@ -72,7 +76,7 @@ const menu = (
   </Menu>
 );
 
-@connect(({ users, loading }) => ({ users, loading }))
+@connect(({ users, loading }) => ({ userlist:users.userlist, loading }))
 class CMDBUserList extends PureComponent {
   constructor(props){
     super(props)
@@ -109,7 +113,7 @@ class CMDBUserList extends PureComponent {
         }
       })
     const {selectedRowKeys}=this.state
-    const {userlist}=this.props.users
+    const userlist=this.props.userlist
     const data = [];
     Object.keys(userlist).map(it=>{
       data.push({
@@ -135,9 +139,12 @@ class CMDBUserList extends PureComponent {
               <Icon type="user-add" />添加用户
             </Button>
             {
-              this.state.loadedDrawer?<DrawerAddUser showHideUserAddDrawer={this.showHideUserAddDrawer.bind(this)} classobjects={this.state.classobjects} />:""
+              this.state.loadedDrawer?<DrawerAddUser 
+                  dispatch={this.props.dispatch}
+                  showHideUserAddDrawer={this.showHideUserAddDrawer.bind(this)} 
+                  classobjects={this.state.classobjects} />:""
             }
-           
+          
           {selectedRowKeys.length > 0 ? (
             <Dropdown overlay={menu}>
               <Button >
@@ -161,7 +168,6 @@ class CMDBUserList extends PureComponent {
             bodyStyle={{margin:0}}
             rowSelection={{
               selectedRowKeys,
-              // columnWidth:200,
               onChange: this.onSelectChange.bind(this),
             }}
             columns={columns} 

@@ -46,6 +46,14 @@ class UserListViewSet(APIView):
     else:
       return JsonResponse({'error':errorMsg},encoder=LDAPJSONEncoder,status=status.HTTP_400_BAD_REQUEST,safe=False)
 
+class CreateUserViewSet(APIView):
+  """
+  创建用户
+  """
+  # serializer_class=LdapSerializer
+  def post(self,request, *args, **kwargs):
+    return JsonResponse({'status':request.data})
+
 class UserListByViewSet(APIView):
   """
   允许用户查看或编辑的API路径。

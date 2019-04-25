@@ -1,25 +1,30 @@
 'use strict'
 
 import {PureComponent} from 'react'
-import { Breadcrumb } from 'antd';
-import Link from 'umi/link';
-import usercss from "./user.less";
+import '../../../node_modules/react-resizable/css/styles.css';
+import React from 'react';
+import { Resizable, ResizableBox } from 'react-resizable';
 class CMDBUserCenter extends PureComponent {
   constructor(props){
     super(props)
+    this.state = {
+      width: 200,
+      height: 200
+    }
   }
-  render(){
-    return (<div className={usercss.userbody}>
-        <Breadcrumb separator=">">
-          <Breadcrumb.Item>
-            <Link to='/' >主页</Link>
-          </Breadcrumb.Item>
-          <Breadcrumb.Item >用户管理</Breadcrumb.Item>
-          <Breadcrumb.Item >
-            <Link to='/user/center/' >个人中心</Link>
-          </Breadcrumb.Item>
-        </Breadcrumb>
-      </div>)
+  onResize = (event, { element, size }) => {
+    this.setState({ width: size.width });
+  };
+  render() {
+    return (
+      <div>
+          <Resizable className="box"  axis="x"  minConstraints={[200,200]} width={this.state.width} onResize={this.onResize}>
+            <div className="box" style={{ width: this.state.width + 'px', height: this.state.height + 'px' }}>
+              <span className="text">{"Raw use of <Resizable> element. 200x200, no constraints."}</span>
+            </div>
+          </Resizable>
+      </div>
+    )
   }
 }
 

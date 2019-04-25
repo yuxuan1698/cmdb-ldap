@@ -1,6 +1,6 @@
 import axios from 'axios';
 import NProgress from 'nprogress';
-import { message,notification } from 'antd';
+import { message } from 'antd';
 // 国际化
 import {formatMessage} from 'umi/locale';
 import { GenerateRequestAuthParams } from "../utils/utils";

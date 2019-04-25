@@ -9027,6 +9027,14 @@ react-dom@^16.7.0:
     prop-types "^15.6.2"
     scheduler "^0.13.6"
 
+"react-draggable@^2.2.6 || ^3.0.3":
+  version "3.3.0"
+  resolved "https://registry.npm.taobao.org/react-draggable/download/react-draggable-3.3.0.tgz?cache=0&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-draggable%2Fdownload%2Freact-draggable-3.3.0.tgz#2ed7ea3f92e7d742d747f9e6324860606cd4d997"
+  integrity sha1-LtfqP5Ln10LXR/nmMkhgYGzU2Zc=
+  dependencies:
+    classnames "^2.2.5"
+    prop-types "^15.6.0"
+
 react-error-overlay@5.1.3:
   version "5.1.3"
   resolved "http://registry.npm.taobao.org/react-error-overlay/download/react-error-overlay-5.1.3.tgz#16fcbde75ed4dc6161dc6dc959b48e92c6ffa9ad"
@@ -9087,6 +9095,14 @@ react-redux@^5.0.5:
     prop-types "^15.6.1"
     react-is "^16.6.0"
     react-lifecycles-compat "^3.0.0"
+
+react-resizable@^1.7.5:
+  version "1.7.5"
+  resolved "https://registry.npm.taobao.org/react-resizable/download/react-resizable-1.7.5.tgz#83eb75bb3684da6989bbbf4f826e1470f0af902e"
+  integrity sha1-g+t1uzaE2mmJu79Pgm4UcPCvkC4=
+  dependencies:
+    prop-types "15.x"
+    react-draggable "^2.2.6 || ^3.0.3"
 
 react-router-config@1.0.0-beta.4:
   version "1.0.0-beta.4"

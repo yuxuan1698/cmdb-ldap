@@ -45,7 +45,7 @@ class CmdbLDAP(object):
     """ 返回所有LDAP用户列表 """
     if self.connect():
       searchFilter="(&(uid=%s))"%username
-      retrieveAttributes=None
+      retrieveAttributes=["*"]
       result_id=self.conn.search(self.userDN, self.searchScope, searchFilter, retrieveAttributes)
       result_set = []
       while 1:
@@ -150,5 +150,5 @@ class CmdbLDAP(object):
           break
         else:
           if result_type == ldap.RES_SEARCH_ENTRY:
-            result_set.append({result_data[0][0]:result_data[0][1]})
+            result_set.append((result_data[0][1],result_data[0][0]))
       return result_set,None

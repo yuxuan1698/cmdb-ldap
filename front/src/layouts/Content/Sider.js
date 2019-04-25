@@ -97,7 +97,7 @@
       return (
         <Sider className={css.sider}
                 collapsed={collapsed}
-                breakpoint={'lg'}
+                breakpoint={'xl'}
                 onBreakpoint={toggleSideMenu}
                 >
           <div className={classnames({[css.logo]:true,[css.logoToggle]:collapsed})} />

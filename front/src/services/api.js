@@ -7,6 +7,14 @@ export function UserChangePassword (data) {
         data: data,
     })
 }
+// 添加用户接口
+export function PostLDAPCreateUser (data) {
+    return request({
+        method: "post",
+        url: '/v1/ldap/user/createuser/',
+        data: data,
+    })
+}
 // 获取用户列表API
 export function getLDAPUserList () {
     return request({
