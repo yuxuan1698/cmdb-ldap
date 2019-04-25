@@ -57,14 +57,9 @@ class CreateUserSerializer(Serializer):
       error_messages={
         'required': '请填写用户姓名(sn)字段'
       })
-  objectClass=CharField(
-      required=True,
-      error_messages={
-      'required': '请填写字段归属(objectClass)'
-      })
-  userPassword=ListField(
-      required=True,
+  objectClass = ListField(
       child=CharField(),
+      required=True,
       error_messages={
         'required': '请填写用户密码(objectClass)字段'
       })
