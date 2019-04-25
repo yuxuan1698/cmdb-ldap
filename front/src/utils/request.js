@@ -43,16 +43,6 @@ axios.interceptors.request.use((config) => {
   return Promise.reject(error);
 });
 
-// y延时
-// 2s 之后返回双倍的值
-function doubleAfter2seconds(num) {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      // resolve(2 * num)
-    }, 2000);
-  })
-}
-
 // 添加一个返回拦截器
 axios.interceptors.response.use((response) => {
   // 请求结束，蓝色过渡滚动条消失

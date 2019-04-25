@@ -1,8 +1,10 @@
+'use strict'
 
-import { Component} from 'react';
+import { PureComponent } from 'react';
 import css from './index.less'
 import {
-    Drawer, Form, Button, Radio, Row, Input, Select, Icon,Dropdown,Menu,InputNumber,Divider,Col,Tooltip,notification
+    Drawer, Form, Button, Radio, Row, Input, Select, 
+    Icon,Dropdown,Menu,InputNumber,Divider,Col,Tooltip,notification
 } from 'antd';
 
 const { Option } = Select;
@@ -40,8 +42,9 @@ const filedToName={
   o:'组织单位',
 }
 
+
 @Form.create()
-class DrawerAddUser extends Component {
+class DrawerAddUser extends PureComponent {
   constructor(props){
     super(props)
     const { classobjects } =this.props
@@ -124,7 +127,7 @@ class DrawerAddUser extends Component {
     this.props.form.validateFields((err, values) => {
       if (!err) {
         const {dispatch} =this.props
-        dispatch({type:'users/postLDAPCreateUser',payload: values,callback:(data)=>{
+        dispatch({type:'createuser/postLDAPCreateUser',payload: values,callback:(data)=>{
           console.log(data)
         }})
       }
@@ -143,6 +146,7 @@ class DrawerAddUser extends Component {
   }
   render() {
     const { getFieldDecorator } = this.props.form;
+    const { loading } = this.props;
     const { selectedItems,options } = this.state;
     return (<Drawer
             destroyOnClose
@@ -234,8 +238,10 @@ class DrawerAddUser extends Component {
                 <Button  style={{ marginRight: 8 }} onClick={this.handleClose.bind(this)}>
                   取消
                 </Button>
-                <Button onClick={this.handleSubmit.bind(this)} type="primary">
-                  保存
+                <Button loading={loading.effects['createuser/postLDAPCreateUser']}
+                  disabled={this.state.selectedItems.filter(i=>i!=='top').length>0?false:true} 
+                  onClick={this.handleSubmit.bind(this)} type="primary">
+          <Icon type="save"  />保存
                 </Button>
               </div>
             </Drawer>

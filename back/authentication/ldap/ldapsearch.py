@@ -5,7 +5,7 @@ from ldap.schema.subentry import SCHEMA_ATTRS
 from django.conf import settings
 from common.utils import CmdbLDAPLogger
 from django.contrib.auth import get_user_model
-
+from ldap.modlist import addModlist
 
 logger=CmdbLDAPLogger().get_logger('cmdb_ldap')
 Users = get_user_model()

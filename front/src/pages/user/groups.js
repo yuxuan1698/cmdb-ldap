@@ -3,7 +3,7 @@
 import {PureComponent} from 'react'
 import { Layout,Tree,Input } from 'antd';
 import {connect} from 'dva';
-import { Resizable, ResizableBox } from 'react-resizable';
+import { Resizable } from 'react-resizable';
 import usercss from "./user.less";
 import CMDBBreadcrumb from "../components/Breadcrumb";
 import '../../../node_modules/react-resizable/css/styles.css';

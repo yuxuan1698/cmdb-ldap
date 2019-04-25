@@ -1,6 +1,8 @@
 from django.contrib.auth.models import Group
 from rest_framework.serializers import (
   CharField,
+  EmailField,
+  ListField,
   Serializer,
   HyperlinkedModelSerializer)
 from rest_framework.exceptions import ValidationError
@@ -33,7 +35,44 @@ class GroupSerializer(HyperlinkedModelSerializer):
         model  = Group
         fields = ('name',)
 
+
+class CreateUserSerializer(Serializer):
+  """
+    效验创建用户的字段
+  """
+  uid = CharField(
+      required=True,
+      min_length=4,
+      error_messages={
+        'min_length': '用户名不能小于4个字符',
+        'required': '请填写用户名(uid)字段'
+      })
+  sn = CharField(
+      required=True,
+      error_messages={
+        'required': '请填写用户姓名(sn)字段'
+      })
+  mail = EmailField(
+      required=True,
+      error_messages={
+        'required': '请填写用户姓名(sn)字段'
+      })
+  objectClass=CharField(
+      required=True,
+      error_messages={
+      'required': '请填写字段归属(objectClass)'
+      })
+  userPassword=ListField(
+      required=True,
+      child=CharField(),
+      error_messages={
+        'required': '请填写用户密码(objectClass)字段'
+      })
+
 class ChangePasswordSerializer(Serializer):
+  """
+    效验用户密码字段
+  """
   username = CharField(
     required       = True, 
     min_length     = 4,

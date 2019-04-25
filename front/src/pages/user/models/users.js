@@ -2,8 +2,7 @@ import {
   UserChangePassword,
   getGroupList,
   getLDAPUserList,
-  getLDAPObjectClassList,
-  PostLDAPCreateUser
+  getLDAPObjectClassList
 } from '../../../services/api';
 
 export default {
@@ -15,7 +14,6 @@ export default {
     subscriptions: {
       setup({ dispatch, history }) {
         history.listen(location => {
-          console.log(location.pathname)
           switch(location.pathname){
             case '/user/':
               dispatch({
@@ -62,12 +60,6 @@ export default {
       },
       *getLDAPClassList({ callback }, { call }) {
         const data = yield call(getLDAPObjectClassList)
-        if (data) {
-          callback(data)
-        }
-      },
-      *postLDAPCreateUser({ payload,callback }, { call }) {
-        const data = yield call(PostLDAPCreateUser,payload)
         if (data) {
           callback(data)
         }

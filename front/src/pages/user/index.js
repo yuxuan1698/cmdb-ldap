@@ -1,4 +1,5 @@
 'use strict'
+
 import {connect} from 'dva';
 import {PureComponent} from 'react'
 import { Table, Icon, Button, Menu, Dropdown, Alert, Tooltip } from 'antd';
@@ -75,6 +76,12 @@ const menu = (
     </Menu.Item>
   </Menu>
 );
+let DrawerAddUser = dynamic({
+  loader: () => import('../components/addUser'),
+  loading: (e) => {
+    return null
+  },
+})
 
 @connect(({ users, loading }) => ({ userlist:users.userlist, loading }))
 class CMDBUserList extends PureComponent {
@@ -106,14 +113,8 @@ class CMDBUserList extends PureComponent {
     this.setState({ selectedRowKeys });
   }
   render(){
-    const DrawerAddUser = dynamic({ 
-        loader: () => import('../components/addUser'),
-        loading:(e)=>{
-          return null
-        }
-      })
     const {selectedRowKeys}=this.state
-    const userlist=this.props.userlist
+    const {userlist,loading}=this.props
     const data = [];
     Object.keys(userlist).map(it=>{
       data.push({
@@ -134,14 +135,14 @@ class CMDBUserList extends PureComponent {
               type={selectedRowKeys.length > 0 ? "success" : "info"} showIcon />
             </div>
           <Button type="primary" 
-            loading={this.props.loading.global} 
+            loading={loading.effects['users/getLDAPClassList']} 
             onClick={this.showHideUserAddDrawer.bind(this)} >
               <Icon type="user-add" />添加用户
             </Button>
-            {
-              this.state.loadedDrawer?<DrawerAddUser 
-                  dispatch={this.props.dispatch}
+            { this.state.loadedDrawer?<DrawerAddUser 
                   showHideUserAddDrawer={this.showHideUserAddDrawer.bind(this)} 
+                  dispatch={this.props.dispatch}
+                  loading={this.props.loading}
                   classobjects={this.state.classobjects} />:""
             }
           
@@ -162,7 +163,7 @@ class CMDBUserList extends PureComponent {
             }} 
             rowKey='uid'
             hasData 
-            loading={this.props.loading.global} 
+            loading={loading.effects['users/getUserList']} 
             size='small'
             // bordered 
             bodyStyle={{margin:0}}

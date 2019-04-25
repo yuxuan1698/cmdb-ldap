@@ -3,7 +3,7 @@
 import {PureComponent} from 'react'
 import '../../../node_modules/react-resizable/css/styles.css';
 import React from 'react';
-import { Resizable, ResizableBox } from 'react-resizable';
+import { Resizable } from 'react-resizable';
 class CMDBUserCenter extends PureComponent {
   constructor(props){
     super(props)

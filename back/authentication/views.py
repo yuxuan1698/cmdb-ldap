@@ -4,7 +4,8 @@ from authentication.serializers import (
   LdapUserSerializer, 
   GroupSerializer,
   LdapSerializer,
-  ChangePasswordSerializer
+  ChangePasswordSerializer,
+  CreateUserSerializer
 )
 from authentication.ldap.ldapsearch import CmdbLDAP
 from common.utils import LDAPJSONEncoder
@@ -50,9 +51,24 @@ class CreateUserViewSet(APIView):
   """
   创建用户
   """
-  # serializer_class=LdapSerializer
+  serializer_class = CreateUserSerializer
   def post(self,request, *args, **kwargs):
-    return JsonResponse({'status':request.data})
+    """
+    提交用户数据
+    """
+    serializer = CreateUserSerializer(instance=request, data=request.data)
+    if serializer.is_valid():
+      # changeStatus, errorMsg = CmdbLDAP().change_self_password(request.data)
+      if changeStatus == True:
+        returnData = {"status": "密码修改成功！"}
+        returnStatus = status.HTTP_200_OK
+      else:
+        returnData = {"error": errorMsg}
+        returnStatus = status.HTTP_400_BAD_REQUEST
+    else:
+      returnData = serializer.errors
+      returnStatus = status.HTTP_400_BAD_REQUEST
+    return JsonResponse(returnData, status=returnStatus, safe=False)
 
 class UserListByViewSet(APIView):
   """
