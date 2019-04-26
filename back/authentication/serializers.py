@@ -3,6 +3,7 @@ from rest_framework.serializers import (
   CharField,
   EmailField,
   ListField,
+  IntegerField,
   Serializer,
   HyperlinkedModelSerializer)
 from rest_framework.exceptions import ValidationError
@@ -36,32 +37,61 @@ class GroupSerializer(HyperlinkedModelSerializer):
         fields = ('name',)
 
 
+class DeleteUserSerializer(Serializer):
+  """
+    效验删除用户的字段
+  """
+  uid = ListField(
+      required=True,
+      child=CharField(
+        required=True,
+        min_length=4,
+        error_messages={
+          'min_length': '用户名(uid)不能小于4个字符',
+        }
+      ),
+      error_messages={
+        'required': '请填写用户名(uid)字段'
+      })
+
 class CreateUserSerializer(Serializer):
   """
     效验创建用户的字段
   """
   uid = CharField(
-      required=True,
+      required=False,
       min_length=4,
       error_messages={
-        'min_length': '用户名不能小于4个字符',
-        'required': '请填写用户名(uid)字段'
+        'min_length': '用户名(uid)不能小于4个字符',
       })
   sn = CharField(
-      required=True,
+      required=False,
       error_messages={
         'required': '请填写用户姓名(sn)字段'
       })
   mail = EmailField(
-      required=True,
+      required=False,
       error_messages={
-        'required': '请填写用户姓名(sn)字段'
+        'required': '请填写用户姓名(mail)字段'
       })
+  userPassword = CharField(
+      required=True,
+      min_length=6,
+      error_messages={
+        'min_length': '用户密码(userPassword)不能小于6个字符',
+        'required': '请填写用户密码(userPassword)字段'
+      })
+  uidNumber = IntegerField(
+    required       = False, 
+  )
+  gidNumber = IntegerField(
+    required       = False, 
+  )
   objectClass = ListField(
       child=CharField(),
       required=True,
       error_messages={
-        'required': '请填写用户密码(objectClass)字段'
+        'required': '请填写字段归属(objectClass)字段'
       })
 
 class ChangePasswordSerializer(Serializer):

@@ -5,6 +5,7 @@ from authentication.serializers import (
   GroupSerializer,
   LdapSerializer,
   ChangePasswordSerializer,
+  DeleteUserSerializer,
   CreateUserSerializer
 )
 from authentication.ldap.ldapsearch import CmdbLDAP
@@ -58,9 +59,32 @@ class CreateUserViewSet(APIView):
     """
     serializer = CreateUserSerializer(instance=request, data=request.data)
     if serializer.is_valid():
-      # changeStatus, errorMsg = CmdbLDAP().change_self_password(request.data)
-      if changeStatus == True:
-        returnData = {"status": "密码修改成功！"}
+      changeStatus, errorMsg = CmdbLDAP().create_ldap_user(request.data)
+      if changeStatus:
+        returnData = {"status": changeStatus}
+        returnStatus = status.HTTP_200_OK
+      else:
+        returnData = {"error": errorMsg}
+        returnStatus = status.HTTP_400_BAD_REQUEST
+    else:
+      returnData = serializer.errors
+      returnStatus = status.HTTP_400_BAD_REQUEST
+    return JsonResponse(returnData, status=returnStatus, safe=False)
+
+class DeleteUserViewSet(APIView):
+  """
+  删除用户
+  """
+  serializer_class = DeleteUserSerializer
+  def post(self,request, *args, **kwargs):
+    """
+    提交用户数据
+    """
+    serializer = DeleteUserSerializer(instance=request, data=request.data)
+    if serializer.is_valid():
+      changeStatus, errorMsg = CmdbLDAP().delete_ldap_user(request.data)
+      if changeStatus:
+        returnData = {"status": changeStatus}
         returnStatus = status.HTTP_200_OK
       else:
         returnData = {"error": errorMsg}

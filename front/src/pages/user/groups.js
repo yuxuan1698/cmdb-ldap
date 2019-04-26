@@ -14,7 +14,7 @@ const {
 const { TreeNode } = Tree;
 const {Search} = Input;
 
-@connect(({loading,users})=>({loading,groups:users.groups}))
+@connect(({loading,groups})=>({loading,groups:groups.groups}))
 class CMDBUserGroups extends PureComponent {
   constructor(props){
     super(props)

@@ -12,13 +12,13 @@ const { Option } = Select;
 const models={ 
     pro:{
       selectedItems:['top'],
-      mustField:['uid'],
+      mustField:[],
       currField:['uid']
     },
     temp:{
       selectedItems:['top','person','organizationalPerson','inetOrgPerson','posixAccount','ldapPublicKey'],
       mustField:['uid','sn','cn','uidNumber','gidNumber','homeDirectory'],
-      currField:['uid','sn','cn','uidNumber','gidNumber','userPassword','homeDirectory','ou','manager',
+      currField:['uid','sn','cn','uidNumber','gidNumber','userPassword','homeDirectory','ou',
         'mobile','mail','loginShell','sshPublicKey','description']
     }
   }
@@ -78,7 +78,7 @@ class DrawerAddUser extends PureComponent {
     let supSet=this.initSelectedItems(e)
     let mayfiled=[], mustfiled=[]
     supSet.filter(i=>i!=='top').map(it=>{
-      mustfiled=mustfiled.concat(['uid'],classobjects[it][1].must)
+      mustfiled=mustfiled.concat([it==='simpleSecurityObject'?"cn":'uid'],classobjects[it][1].must)
       mayfiled=mayfiled.concat(classobjects[it][2].may)
     }) 
     this.setState({
@@ -127,8 +127,13 @@ class DrawerAddUser extends PureComponent {
     this.props.form.validateFields((err, values) => {
       if (!err) {
         const {dispatch} =this.props
-        dispatch({type:'createuser/postLDAPCreateUser',payload: values,callback:(data)=>{
-          console.log(data)
+        dispatch({type:'users/postLDAPCreateUser',payload: values,callback:(data)=>{
+          this.props.form.resetFields()
+          notification.info({
+            message:"添加成功提示",
+            description: "用户添加成功！"
+          })
+          dispatch({type:'users/getUserList'})
         }})
       }
     });
@@ -146,7 +151,7 @@ class DrawerAddUser extends PureComponent {
   }
   render() {
     const { getFieldDecorator } = this.props.form;
-    const { loading } = this.props;
+    const { loading,userselect } = this.props;
     const { selectedItems,options } = this.state;
     return (<Drawer
             destroyOnClose
@@ -168,6 +173,7 @@ class DrawerAddUser extends PureComponent {
               </div>
               <Form layout="horizontal" onSubmit={this.handleSubmit} >
                 <Row gutter={18} style={{margin:0}}>
+                  <Col span={24} >
                     <Form.Item label='字段归属(objectClass)' >
                       {getFieldDecorator('objectClass', {
                           initialValue:this.state.selectedItems,
@@ -188,7 +194,7 @@ class DrawerAddUser extends PureComponent {
                         </Select>
                       )}
                     </Form.Item>
-
+                  </Col>
                   <Divider dashed style={{margin:"10px 0px"}}/>
                   {this.state.currField.map((i)=>{
                     let inputField=<Input className={css.add_user_field_width}
@@ -199,6 +205,17 @@ class DrawerAddUser extends PureComponent {
                     }
                     if(i==='sshPublicKey' || i==='description'){
                       inputField=<Input.TextArea placeholder={filedToName[i]?filedToName[i]:i} autosize={{ minRows: 2, maxRows: 5 }} />
+                    }
+                    if(i==='manager'){
+                      inputField=<Select
+                                showArrow autoFocus allowClear showSearch
+                                placeholder="请选择属性领导/上级" >
+                                {userselect.map(item => (
+                                  <Option key={item['uid']} value={item['uid']}>
+                                    {item['sn']}({item['uid']})
+                                  </Option>
+                                ))}
+                              </Select>
                     }
                     return (
                       <Col span={24} key={i} >
@@ -222,23 +239,25 @@ class DrawerAddUser extends PureComponent {
                   })}
                 </Row>
                 <Row align='middle' >
-                  <Form.Item >
-                    <Dropdown trigger={['click']} 
-                    overlayStyle={{maxHeight:300,overflow:"auto",boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)"}}
-                    disabled={this.state.selectedItems.filter(i=>i!=='top').length>0?false:true}
-                    overlay={this.initAddFieldMenu.bind(this)} >
-                      <Button block type="dashed"  >
-                        <Icon type="plus" /> 添加字段信息
-                      </Button>
-                    </Dropdown>
-                  </Form.Item>
+                  <Col span={24} >
+                    <Form.Item >
+                      <Dropdown trigger={['click']} 
+                      overlayStyle={{maxHeight:300,overflow:"auto",boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)"}}
+                      disabled={this.state.selectedItems.filter(i=>i!=='top').length>0?false:true}
+                      overlay={this.initAddFieldMenu.bind(this)} >
+                        <Button block type="dashed"  >
+                          <Icon type="plus" /> 添加字段信息
+                        </Button>
+                      </Dropdown>
+                    </Form.Item>
+                  </Col>
                 </Row>
               </Form>
               <div className={css.add_user_field_submit} >
                 <Button  style={{ marginRight: 8 }} onClick={this.handleClose.bind(this)}>
                   取消
                 </Button>
-                <Button loading={loading.effects['createuser/postLDAPCreateUser']}
+                <Button loading={loading.effects['users/postLDAPCreateUser']}
                   disabled={this.state.selectedItems.filter(i=>i!=='top').length>0?false:true} 
                   onClick={this.handleSubmit.bind(this)} type="primary">
           <Icon type="save"  />保存

@@ -12,7 +12,8 @@ from .views import (
     GetLdapAllCLassListViewSet,
     GetLdapAllAttrsListViewSet,
     UserChangerPasswordSet,
-    CreateUserViewSet
+    CreateUserViewSet,
+    DeleteUserViewSet
 )
 from rest_framework_jwt.views import obtain_jwt_token
 
@@ -25,6 +26,7 @@ urlpatterns = [
     path('ldap/classes/', GetLdapAllCLassListViewSet.as_view(),name='ldap-classes'),
     path('ldap/attrs/', GetLdapAllAttrsListViewSet.as_view(),name='ldap-attrs'),
     path('ldap/user/createuser/', CreateUserViewSet.as_view(),name='ldap-createuser'),
+    path('ldap/user/deleteuser/', DeleteUserViewSet.as_view(),name='ldap-deleteuser'),
     path('ldap/user/list/', UserListViewSet.as_view(),name='ldap-userlist'),
     path('ldap/user/attr/', UserListByViewSet.as_view(),name='ldap-userattr'),
     path('ldap/user/changepassword/', UserChangerPasswordSet.as_view(),name='ldap-changepassword'),

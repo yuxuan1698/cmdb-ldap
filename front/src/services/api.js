@@ -15,6 +15,14 @@ export function PostLDAPCreateUser (data) {
         data: data,
     })
 }
+// 删除用户接口
+export function PostLDAPDeleteUser (data) {
+    return request({
+        method: "post",
+        url: '/v1/ldap/user/deleteuser/',
+        data: data,
+    })
+}
 // 获取用户列表API
 export function getLDAPUserList () {
     return request({

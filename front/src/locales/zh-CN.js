@@ -37,7 +37,7 @@ export default {
   'request.status.500': '服务器发生错误，请检查服务器.',
   'request.status.502': '网关错误.',
   'request.status.503': '服务不可用，服务器暂时过载或维护.',
-  'request.status.504': '网关超时,或连接不可达.',
+  'request.status.504': '网关超时,或服务器不可达.',
   'request.status.other': '未知状态.',
   'request.status.timeout': '连接超时，或未知错误！',
     // passwordmsg: '请输入用户密码!'

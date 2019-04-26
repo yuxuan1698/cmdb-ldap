@@ -6,6 +6,7 @@ from django.conf import settings
 from common.utils import CmdbLDAPLogger
 from django.contrib.auth import get_user_model
 from ldap.modlist import addModlist
+from authentication.utils import string_to_bytes,generate_ldap_password
 
 logger=CmdbLDAPLogger().get_logger('cmdb_ldap')
 Users = get_user_model()
@@ -152,3 +153,74 @@ class CmdbLDAP(object):
           if result_type == ldap.RES_SEARCH_ENTRY:
             result_set.append((result_data[0][1],result_data[0][0]))
       return result_set,None
+
+  def create_ldap_user(self,data):
+    """
+    创建用户
+    """
+    popid=''
+    adduser=''
+    if 'cn' in data.keys():
+      adduser="cn=%s"%data['cn']
+      popid='cn'
+    if 'uid' in data.keys():
+      adduser="uid=%s"%data['uid']
+      popid='uid'
+    else:
+      return False,"缺少必要的字段cn/uid"
+
+    data.pop(popid)
+    newuserdn="%s,%s"%(adduser,self.userDN)
+    modlist = []
+    if 'userPassword' in data.keys():
+      data['userPassword']=generate_ldap_password(data['userPassword'])
+    for attrtype, value in data.items():
+      modlist.append((attrtype, string_to_bytes(value)))
+    if self.connect():
+      try:
+        self.conn.add_s(newuserdn,modlist)
+      except ldap.ALREADY_EXISTS as e:
+        logger.error(e)
+        return False,"用户已经存在。"
+      except ldap.INVALID_SYNTAX as e:
+        logger.error(e)
+        return False,"字段值不合法。%s"%e
+      except ldap.LDAPError as e:
+        logger.error(e)
+        return False,e.args[0]
+    return "添加用户%s成功"%adduser,None
+
+  def delete_ldap_user(self,data):
+    """
+    删除用户
+    """
+    deluserid=data['uid']
+    
+    if self.connect():
+      try:
+        for uid in deluserid:
+          deletedn="uid=%s,%s"%(uid,self.userDN)
+          self.conn.delete_s(deletedn)
+      except ldap.NO_SUCH_OBJECT as e:
+        return False,"没有找到此用户,无法删除。"
+      except ldap.LDAPError as e:
+        return False,e.args[0]
+    return "删除用户%s成功"%(','.join(deluserid)),None
+
+  def update_ldap_user(self,data):
+    """
+    更新用户属性用户
+    """
+    adduser=data['uid']
+    modifydn="uid=%s,%s"%(adduser,self.userDN)
+    modlist = []
+    if 'userPassword' in data.keys():
+      data['userPassword']=generate_ldap_password(data['userPassword'])
+    for attrtype, value in data.items():
+      modlist.append((attrtype, string_to_bytes(value)))
+    if self.connect():
+      try:
+        self.conn.modify_s(modifydn,modlist)
+      except ldap.LDAPError as e:
+        return False,e.args[0]
+    return "更新用户%s成功"%adduser,None
