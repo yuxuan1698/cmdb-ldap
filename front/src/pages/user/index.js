@@ -2,7 +2,7 @@
 
 import {connect} from 'dva';
 import {PureComponent} from 'react'
-import { Table, Icon, Button, Alert } from 'antd';
+import { Table, Icon, Button, Alert,message } from 'antd';
 import usercss from "./user.less";
 import CMDBBreadcrumb from "../components/Breadcrumb";
 import dynamic from 'umi/dynamic';
@@ -44,8 +44,13 @@ class CMDBUserList extends PureComponent {
   onSelectChange=(selectedRowKeys)=>{
     this.setState({ selectedRowKeys });
   }
-  onDeleteUser(){
-    alert()
+  confirmDeletion=(userkeys)=>{
+    const {dispatch}=this.props
+    dispatch({type:'users/postLDAPDeleteUser',payload: {uid:userkeys},callback:(data)=>{
+      message.info(data.status)
+      dispatch({type:'users/getUserList'})
+      this.setState({selectedRowKeys:[]})
+    }})
   }
   render(){
     const {selectedRowKeys}=this.state
@@ -64,7 +69,7 @@ class CMDBUserList extends PureComponent {
         mobile: userlist[it].mobile?userlist[it].mobile[0]:"",
         givenName: userlist[it].givenName?userlist[it].givenName[0]:"",
         cn: userlist[it].cn?userlist[it].cn[0]:"",
-        mail:userlist[it].mail[0]
+        mail:userlist[it].mail?userlist[it].mail[0]:""
       })
     })
     const columns = [{
@@ -102,7 +107,7 @@ class CMDBUserList extends PureComponent {
       align: 'center',
       width:115,
       render: (text, record) => {
-        return <UserEditButton delkey={record['uid']} dispatch={dispatch}/>
+          return <UserEditButton delkey={record['uid']} confirmDeletion={this.confirmDeletion}/>
         },
     }];
     return (<div className={usercss.userbody}>
@@ -127,7 +132,7 @@ class CMDBUserList extends PureComponent {
             }
           
           {selectedRowKeys.length > 0 ? (
-            <UserBatchButton delkeys={selectedRowKeys}/>
+            <UserBatchButton confirmDeletion={this.confirmDeletion} delkeys={selectedRowKeys}/>
           ):""}
           </div>
           <Table pagination={{
