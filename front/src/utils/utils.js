@@ -42,8 +42,6 @@ export function formatReturnMsg(msgObj,status){
         description: errorMsg
       })
       break;
-    case 500:
-      break;
     case 504:
       errorMsg=formatMessage({ id: 'request.status.' + status })
       message.error(`${errorMsg}${formatMessage({ id: 'request.status' })}${status}`)

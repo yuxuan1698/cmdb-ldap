@@ -3,7 +3,7 @@ import {
 } from '../../../services/api';
 
 export default {
-    names: 'groups',
+    names: 'ldap',
     state:{
       groups:{}
     },
@@ -11,9 +11,9 @@ export default {
       setup({ dispatch, history }) {
         history.listen(location => {
           switch(location.pathname){
-            case '/user/groups/':
+            case '/user/ldap/':
               dispatch({
-                type: 'getGroupsList'
+                type: 'getLDAPGroupsList'
               })
               break;
           }
@@ -21,11 +21,11 @@ export default {
       },
     },
     effects: {
-      *getGroupsList({ payload }, { call,put }) {
+      *getLDAPGroupsList({ payload }, { call,put }) {
         const data = yield call(getGroupList, payload)
         if (data) {
           yield put({
-            type:'groupslist', 
+            type:'ldapgroupslist', 
             payload: {
               groups: data,
             }
@@ -35,7 +35,7 @@ export default {
     },
     reducers: {
       // 组列表
-      groupslist(state, {payload} ) {
+      ldapgroupslist(state, {payload} ) {
         return {...state,...payload}
       },
     },

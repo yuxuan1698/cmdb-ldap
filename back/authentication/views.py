@@ -59,6 +59,7 @@ class CreateUserViewSet(APIView):
     """
     serializer = CreateUserSerializer(instance=request, data=request.data)
     if serializer.is_valid():
+      # serializer.validated_data
       changeStatus, errorMsg = CmdbLDAP().create_ldap_user(request.data)
       if changeStatus:
         returnData = {"status": changeStatus}

@@ -1,3 +1,4 @@
+
 'use strict'
 
 import {connect} from 'dva';
@@ -16,7 +17,7 @@ let DrawerAddUser = dynamic({
 })
 
 @connect(({ users, loading }) => ({ userlist:users.userlist, loading }))
-class CMDBUserList extends PureComponent {
+class CMDBPermissionList extends PureComponent {
   constructor(props){
     super(props)
     this.state = {
@@ -110,7 +111,7 @@ class CMDBUserList extends PureComponent {
         },
     }];
     return (<div className={usercss.userbody}>
-        <CMDBBreadcrumb route={{'用户管理':"",'用户列表':'/user/'}} title='用户列表' />
+        <CMDBBreadcrumb route={{'用户管理':"",'用户权限':'/user/permission/'}} title='用户权限管理' />
         <div className={usercss.tableContent}>
           <div className={usercss.usercontrol}>
             <div style={{float:"right"}}>
@@ -158,4 +159,4 @@ class CMDBUserList extends PureComponent {
   }
 }
 
-export default CMDBUserList;
+export default CMDBPermissionList;

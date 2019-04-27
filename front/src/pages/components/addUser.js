@@ -36,6 +36,7 @@ const filedToName={
   homeDirectory:'用户目录',
   userPassword:'用户密码',
   sshPublicKey:'用户公钥',
+  uniqueMember:'唯一成员',
   manager:'领导/上级',
   description:'描述内容',
   ou:'所属部门',
@@ -177,12 +178,12 @@ class DrawerAddUser extends PureComponent {
                     <Form.Item label='字段归属(objectClass)' >
                       {getFieldDecorator('objectClass', {
                           initialValue:this.state.selectedItems,
-                          rules: [{ required: true, message: '请选择属性归属类' }],
+                        rules: [{ required: true, message: '请选择属性归属类(objectClass)' }],
                       })(
                         <Select
                           disabled={this.state.addmodel=='pro'?false:true}
                           mode="multiple" showArrow autoFocus allowClear
-                          placeholder="请选择属性归属类"
+                          placeholder="请选择属性归属类(objectClass)"
                           onChange={this.handleClassObjectsChange.bind(this)}
                           onMouseLeave={this.handleNewClassObject.bind(this)}
                           onBlur={this.handleNewClassObject.bind(this)} >
@@ -199,19 +200,23 @@ class DrawerAddUser extends PureComponent {
                   {this.state.currField.map((i)=>{
                     let inputField=<Input className={css.add_user_field_width}
                                     type={i==='userPassword'?"password":"text"}
-                                    placeholder={filedToName[i]?filedToName[i]:i}/>
+                                    placeholder={(filedToName[i]?filedToName[i]:i)+`(${i})`}/>
                     if(i==='gidNumber' || i==='uidNumber'){
-                      inputField=<InputNumber className={css.add_user_field_width}  min={2100} max={65535} />
+                      inputField = <InputNumber 
+                        placeholder={(filedToName[i] ? filedToName[i] : i) + `(${i})`}
+                        className={css.add_user_field_width}  min={2100} max={65535} />
                     }
                     if(i==='sshPublicKey' || i==='description'){
-                      inputField=<Input.TextArea placeholder={filedToName[i]?filedToName[i]:i} autosize={{ minRows: 2, maxRows: 5 }} />
+                      inputField = <Input.TextArea 
+                        placeholder={(filedToName[i] ? filedToName[i] : i) + `(${i})`} 
+                        autosize={{ minRows: 2, maxRows: 5 }} />
                     }
                     if(i==='manager'){
                       inputField=<Select
                                 showArrow autoFocus allowClear showSearch
-                                placeholder="请选择属性领导/上级" >
+                                placeholder={`请选择属性领导/上级(${i})`} >
                                 {userselect.map(item => (
-                                  <Option key={item['uid']} value={item['uid']}>
+                                  <Option key={item['userdn']} value={item['userdn']}>
                                     {item['sn']}({item['uid']})
                                   </Option>
                                 ))}
@@ -225,7 +230,7 @@ class DrawerAddUser extends PureComponent {
                               i==='gidNumber'?this.props.form.getFieldValue('uidNumber'):(
                                 i==='loginShell'?'/bin/bash':""
                               )),
-                            rules: [{ required: true, message: `请输入${filedToName[i]}` }],
+                            rules: [{ required: true, message: `请输入${filedToName[i]}(${i})` }],
                         })(inputField)}
                         {<Tooltip placement="top" title="删除字段">
                           <Icon className={css.delete_field_icon}

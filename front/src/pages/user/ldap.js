@@ -14,8 +14,8 @@ const {
 const { TreeNode } = Tree;
 const {Search} = Input;
 
-@connect(({loading,groups})=>({loading,groups:groups.groups}))
-class CMDBUserGroups extends PureComponent {
+@connect(({loading,ldap})=>({loading,ldap:ldap.groups}))
+class CMDBLdapGroups extends PureComponent {
   constructor(props){
     super(props)
     this.state = {
@@ -24,12 +24,12 @@ class CMDBUserGroups extends PureComponent {
     }
   }
   componentWillReceiveProps(nextProps){
-    console.log(nextProps.groups)
-    const groups=nextProps.groups,tmpGroups=[]
-    Object.keys(groups).map(i=>{
-      tmpGroups.push({title:groups[i][0].ou[0],key:groups[i][1]})
+    console.log(nextProps.ldap)
+    const ldap=nextProps.ldap,tmpldap=[]
+    Object.keys(ldap).map(i=>{
+      tmpldap.push({title:ldap[i][0].ou[0],key:ldap[i][1]})
     })
-    this.setState({treeData:tmpGroups})
+    this.setState({treeData:tmpldap})
   }
   renderTreeNodes = data => data.map((item) => {
     if (item.children) {
@@ -62,7 +62,7 @@ class CMDBUserGroups extends PureComponent {
   }
   render(){
     return (<div className={usercss.userbody}>
-      <CMDBBreadcrumb route={{'用户管理':"",'用户组列表':'/user/groups/'}} title='用户组列表'  />
+      <CMDBBreadcrumb route={{'用户管理':"",'用户组列表':'/user/ldap/'}} title='用户组列表'  />
       <div className={usercss.tableContent}> 
       <Layout>
         <Resizable axis="x"  minConstraints={[200,200]} width={this.state.width} onResize={this.onResize} >
@@ -80,4 +80,4 @@ class CMDBUserGroups extends PureComponent {
   }
 }
 
-export default CMDBUserGroups;
+export default CMDBLdapGroups;

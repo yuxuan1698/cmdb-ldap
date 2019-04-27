@@ -8,7 +8,12 @@ from rest_framework.serializers import (
   HyperlinkedModelSerializer)
 from rest_framework.exceptions import ValidationError
 from django.contrib.auth import get_user_model
- 
+from authentication.utils import convert_dict_to_tuple_bytes,generate_ldap_password
+from common.utils import CmdbLDAPLogger
+
+
+logger=CmdbLDAPLogger().get_logger('cmdb_ldap')
+
 Users = get_user_model()
 
 class LdapUserSerializer(Serializer):
@@ -41,13 +46,15 @@ class DeleteUserSerializer(Serializer):
   """
     效验删除用户的字段
   """
-  uid = ListField(
+  userdn = ListField(
       required=True,
       child=CharField(
-        required=True,
+        allow_blank=False,
         min_length=4,
         error_messages={
           'min_length': '用户名(uid)不能小于4个字符',
+          'blank':"uid不允许为空"
+
         }
       ),
       error_messages={
@@ -61,13 +68,22 @@ class CreateUserSerializer(Serializer):
   uid = CharField(
       required=False,
       min_length=4,
+      allow_blank=False,
       error_messages={
         'min_length': '用户名(uid)不能小于4个字符',
+        'blank': "字段(uid)不能为空。"
       })
   sn = CharField(
       required=False,
       error_messages={
         'required': '请填写用户姓名(sn)字段'
+      })
+  cn = CharField(
+      required=False,
+      allow_blank=False,
+      error_messages={
+        'required': '请填写用户别名(cn)字段',
+        'blank':"字段(cn)不能为空。"
       })
   mail = EmailField(
       required=False,
@@ -93,6 +109,11 @@ class CreateUserSerializer(Serializer):
       error_messages={
         'required': '请填写字段归属(objectClass)字段'
       })
+
+  def validate(self, data):
+    if 'userPassword' in data.keys():
+      data['userPassword']=generate_ldap_password(data['userPassword'])
+    return data
 
 class ChangePasswordSerializer(Serializer):
   """

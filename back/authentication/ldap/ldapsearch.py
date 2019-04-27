@@ -6,7 +6,7 @@ from django.conf import settings
 from common.utils import CmdbLDAPLogger
 from django.contrib.auth import get_user_model
 from ldap.modlist import addModlist
-from authentication.utils import string_to_bytes,generate_ldap_password
+from authentication.utils import convert_dict_to_tuple_bytes, generate_ldap_dn_prefix
 
 logger=CmdbLDAPLogger().get_logger('cmdb_ldap')
 Users = get_user_model()
@@ -55,7 +55,7 @@ class CmdbLDAP(object):
           break
         else:
           if result_type == ldap.RES_SEARCH_ENTRY:
-            result_set.append(result_data[0][1])
+            result_set.append(result_data[0])
       return result_set,None
     else:
       return None,self.errorMsg
@@ -158,24 +158,14 @@ class CmdbLDAP(object):
     """
     创建用户
     """
-    popid=''
-    adduser=''
-    if 'cn' in data.keys():
-      adduser="cn=%s"%data['cn']
-      popid='cn'
-    if 'uid' in data.keys():
-      adduser="uid=%s"%data['uid']
-      popid='uid'
+  
+    dn_pre , newdata = generate_ldap_dn_prefix(data)
+    modlist=""
+    if not dn_pre:
+      return False, newdata
     else:
-      return False,"缺少必要的字段cn/uid"
-
-    data.pop(popid)
-    newuserdn="%s,%s"%(adduser,self.userDN)
-    modlist = []
-    if 'userPassword' in data.keys():
-      data['userPassword']=generate_ldap_password(data['userPassword'])
-    for attrtype, value in data.items():
-      modlist.append((attrtype, string_to_bytes(value)))
+      modlist = convert_dict_to_tuple_bytes(newdata)
+    newuserdn="%s,%s"%(dn_pre,self.userDN)
     if self.connect():
       try:
         self.conn.add_s(newuserdn,modlist)
@@ -188,36 +178,34 @@ class CmdbLDAP(object):
       except ldap.LDAPError as e:
         logger.error(e)
         return False,e.args[0]
-    return "添加用户%s成功"%adduser,None
+    logger.info("create user %s success,dn:%s" % (dn_pre, newuserdn))
+    return "添加用户%s成功" % dn_pre, None
 
   def delete_ldap_user(self,data):
     """
     删除用户
     """
-    deluserid=data['uid']
-    
     if self.connect():
       try:
-        for uid in deluserid:
-          deletedn="uid=%s,%s"%(uid,self.userDN)
-          self.conn.delete_s(deletedn)
+        for dn in data['userdn']:
+          self.conn.delete_s(dn)
       except ldap.NO_SUCH_OBJECT as e:
         return False,"没有找到此用户,无法删除。"
       except ldap.LDAPError as e:
         return False,e.args[0]
-    return "删除用户%s成功"%(','.join(deluserid)),None
+    return "删除用户%s成功" % (';'.join(data['userdn'])), None
 
   def update_ldap_user(self,data):
     """
     更新用户属性用户
     """
-    adduser=data['uid']
-    modifydn="uid=%s,%s"%(adduser,self.userDN)
-    modlist = []
-    if 'userPassword' in data.keys():
-      data['userPassword']=generate_ldap_password(data['userPassword'])
-    for attrtype, value in data.items():
-      modlist.append((attrtype, string_to_bytes(value)))
+    # adduser=data['uid']
+    # modifydn="uid=%s,%s"%(adduser,self.userDN)
+    # modlist = []
+    # if 'userPassword' in data.keys():
+    #   data['userPassword']=generate_ldap_password(data['userPassword'])
+    # for attrtype, value in data.items():
+    #   modlist.append((attrtype, string_to_bytes(value)))
     if self.connect():
       try:
         self.conn.modify_s(modifydn,modlist)

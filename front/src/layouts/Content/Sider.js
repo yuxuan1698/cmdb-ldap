@@ -26,12 +26,12 @@
           name:'用户列表',
         },
         {
-          key: '/user/groups/',
-          name:'用户组列表'
-        },
-        {
           key: '/user/permission/',
           name:'用户权限'
+        },
+        {
+          key: '/user/ldap/',
+          name:'LDAP管理'
         },
       ]
     },

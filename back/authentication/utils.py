@@ -42,7 +42,47 @@ def check_ldap_password(ldap_password, password):
     hr.update(salt)
     return digest == hr.digest()
 
-def string_to_bytes(val):
-    if isinstance(val,list):
-       return  [item.encode('utf-8') for item in val ]
-    return [("%s"%val).encode('utf-8') if isinstance(val,int) else val.encode('utf-8')]
+
+def generate_ldap_dn_prefix(data):
+  """
+    生成LDAP的DN前缀
+  """
+  dn_prefix = ""
+  popid = ""
+  if 'cn' in data.keys():
+    dn_prefix = "cn=%s" % data['cn']
+    popid = 'cn'
+  if 'ou' in data.keys():
+    dn_prefix = "ou=%s" % data['ou']
+    popid = 'ou'
+  if 'uid' in data.keys():
+    dn_prefix = "uid=%s" % data['uid']
+    popid = 'uid'
+  data.pop(popid)
+  return dn_prefix,data
+  
+def convert_dict_to_tuple_bytes(val,turnList=False):
+  """
+  转换ldap需要的对象
+  """
+  dict_to_tuple=[]
+  if isinstance(val,dict) or isinstance(val,tuple):
+    for k,v in val.items():
+        dict_to_tuple.append((k,convert_dict_to_tuple_bytes(v)))
+  
+  if isinstance(val, list):
+    for i in val:
+      dict_to_tuple.append(convert_dict_to_tuple_bytes(i,True))
+
+  if isinstance(val,int):
+    if turnList:
+      return ("%s"%val).encode('utf-8')
+    dict_to_tuple.append(("%s"%val).encode('utf-8'))
+  if isinstance(val,str):
+    if turnList:
+      return val.encode('utf-8')
+    dict_to_tuple.append(val.encode('utf-8'))
+
+  return dict_to_tuple   
+
+
