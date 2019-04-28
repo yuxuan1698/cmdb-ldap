@@ -1,11 +1,16 @@
 import uuid
 import ldap
+import operator
 from ldap.schema import urlfetch
 from ldap.schema.subentry import SCHEMA_ATTRS
 from django.conf import settings
 from common.utils import CmdbLDAPLogger
 from django.contrib.auth import get_user_model
-from authentication.utils import convert_dict_to_tuple_bytes, generate_ldap_dn_prefix,convert_string_to_bytes,convert_bytes_to_string
+from authentication.utils import (
+  convert_dict_to_tuple_bytes, 
+  generate_ldap_dn_prefix,
+  convert_bytes_to_string,
+  convert_string_to_bytes)
 from ldap.modlist import modifyModlist
 
 logger=CmdbLDAPLogger().get_logger('cmdb_ldap')
@@ -202,14 +207,28 @@ class CmdbLDAP(object):
     # newdata = { k:v if isinstance(v,list) else [v] for k,v in data.items() }
     dndata,err=self.get_user_list(olddn.split(',')[0])
     if dndata:
-      olddata=convert_bytes_to_string(dndata[0][1])
-      newdata=convert_string_to_bytes(data)
-      # newdata=convert_string_to_bytes(data)
-    
+      olddata=dndata[0][1]
+      newdata = convert_string_to_bytes(data)
+      modlist=[]
+      old_keys=olddata.keys()
+      new_keys=data.keys()
+      diff_old_new = list(set(old_keys).difference(set(new_keys)))
+      for k in diff_old_new:
+        modlist.append((ldap.MOD_DELETE,k,None))
+      diff_new_old = list(set(new_keys).difference(set(old_keys)))
+      for s in diff_new_old:
+        modlist.append((ldap.MOD_ADD, s, data[s]))
+      
+      for i, v in newdata.items():
+        # logger.info(len(v))
+        if isinstance(v,list) and i in old_keys:
+          if not operator.eq(v, olddata[i]):
+            modlist.append((ldap.MOD_REPLACE, i, v))
+          continue
+        if i == 'userPassword' and v:
+          continue
+        if i in old_keys and v != olddata[i][0]:
+          modlist.append((ldap.MOD_REPLACE,i,v))
 
-      logger.info(olddata)
-      logger.info(newdata)
-      logger.info(data)
-      logger.info(ldap.MOD_ADD)
-      logger.info(ldap.MOD_REPLACE)
+      logger.info(modlist)
     return "更新用户成功",None
