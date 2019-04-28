@@ -28,7 +28,6 @@ export function formatReturnMsg(msgObj,status){
       errorMsg=Object.keys(msgObj).map(i=>{
         if(typeof(msgObj[i])==='object' && !(msgObj[i] instanceof Array)){
           return  Object.keys(msgObj[i]).map(v=>{
-
                     if(msgObj[i][v] instanceof Array){
                       return <div key={v}><Icon type="exclamation-circle" theme="twoTone" />{msgObj[i][v][0]} </div>
                     }

@@ -53,6 +53,7 @@ axios.interceptors.response.use((response) => {
   // 即使出现异常，也要调用关闭方法，否则一直处于加载状态很奇怪
   if(error.response){
     const {status,data}=error.response
+    NProgress.done();
     if(data){
       if(status===401){
         window.g_app._store.dispatch({
@@ -63,27 +64,7 @@ axios.interceptors.response.use((response) => {
         formatReturnMsg(data,status)
       }
     }
-    // if(status===401){
-    //   const returnMsg = error.response.data.error?error.response.data.error:(error.response.data.detail?error.response.data.detail:"")
-    //   message.warn(`${formatMessage({ id: 'request.status.401' })} ${returnMsg}`)
-    //   window.g_app._store.dispatch({
-    //     type: 'login/logoutAction',
-    //   });
-    // }else{
-    //   let msg = formatMessage({ id: 'request.status.' + status })
-    //   if (error.response.data) {
-    //     const resErr = error.response.data.error
-    //     if(typeof(resErr) ==='object'){
-    //       return formatReturnMsg(resErr)
-    //     }
-    //     if (resErr) {
-    //       msg = `返回内容:${resErr}`
-    //     }
-    //   }
-    //   message.error(`${msg ? msg : formatMessage({ id: 'request.status.other' })} ${formatMessage({ id: 'request.status' })}${status}`)
-    // }
   }
-  NProgress.done();
   return Promise.reject(error);
 });
 

@@ -5,8 +5,8 @@ from ldap.schema.subentry import SCHEMA_ATTRS
 from django.conf import settings
 from common.utils import CmdbLDAPLogger
 from django.contrib.auth import get_user_model
-from ldap.modlist import addModlist
-from authentication.utils import convert_dict_to_tuple_bytes, generate_ldap_dn_prefix
+from authentication.utils import convert_dict_to_tuple_bytes, generate_ldap_dn_prefix,convert_string_to_bytes,convert_bytes_to_string
+from ldap.modlist import modifyModlist
 
 logger=CmdbLDAPLogger().get_logger('cmdb_ldap')
 Users = get_user_model()
@@ -18,7 +18,7 @@ class CmdbLDAP(object):
     self.bindDN=settings.AUTH_LDAP_BIND_DN
     self.bindDNPassword=settings.AUTH_LDAP_BIND_PASSWORD
     self.conn=ldap.initialize(settings.AUTH_LDAP_SERVER_URI)
-    self.searchScope = ldap.SCOPE_SUBTREE
+    self.searchScope = ldap.SCOPE_ONELEVEL
     self.conn.set_option(ldap.OPT_REFERRALS,0)
     self.conn.set_option(ldap.OPT_PROTOCOL_VERSION,ldap.VERSION3)
     self.userDN=settings.AUTH_LDAP_SEARCH_OU
@@ -42,10 +42,10 @@ class CmdbLDAP(object):
       return False
     return True
 
-  def get_user_list(self,username='*'):
+  def get_user_list(self,username='uid=*'):
     """ 返回所有LDAP用户列表 """
     if self.connect():
-      searchFilter="(&(uid=%s))"%username
+      searchFilter="(&(%s))"%username
       retrieveAttributes=["*"]
       result_id=self.conn.search(self.userDN, self.searchScope, searchFilter, retrieveAttributes)
       result_set = []
@@ -139,7 +139,7 @@ class CmdbLDAP(object):
     获取Base OU信息
     """
     if self.connect():
-      result_id=self.conn.search(queryOU, ldap.SCOPE_ONELEVEL, "(objectClass=*)", None)
+      result_id=self.conn.search_s(queryOU, ldap.SCOPE_ONELEVEL, "(objectClass=*)", None)
       result_set = []
       while 1:
         try:
@@ -195,20 +195,21 @@ class CmdbLDAP(object):
         return False,e.args[0]
     return "删除用户%s成功" % (';'.join(data['userdn'])), None
 
-  def update_ldap_user(self,data):
+  def update_ldap_user(self,data,olddn):
     """
     更新用户属性用户
     """
-    # adduser=data['uid']
-    # modifydn="uid=%s,%s"%(adduser,self.userDN)
-    # modlist = []
-    # if 'userPassword' in data.keys():
-    #   data['userPassword']=generate_ldap_password(data['userPassword'])
-    # for attrtype, value in data.items():
-    #   modlist.append((attrtype, string_to_bytes(value)))
-    if self.connect():
-      try:
-        self.conn.modify_s(modifydn,modlist)
-      except ldap.LDAPError as e:
-        return False,e.args[0]
-    return "更新用户%s成功"%adduser,None
+    # newdata = { k:v if isinstance(v,list) else [v] for k,v in data.items() }
+    dndata,err=self.get_user_list(olddn.split(',')[0])
+    if dndata:
+      olddata=convert_bytes_to_string(dndata[0][1])
+      newdata=convert_string_to_bytes(data)
+      # newdata=convert_string_to_bytes(data)
+    
+
+      logger.info(olddata)
+      logger.info(newdata)
+      logger.info(data)
+      logger.info(ldap.MOD_ADD)
+      logger.info(ldap.MOD_REPLACE)
+    return "更新用户成功",None

@@ -60,7 +60,7 @@ def generate_ldap_dn_prefix(data):
     popid = 'uid'
   data.pop(popid)
   return dn_prefix,data
-  
+
 def convert_dict_to_tuple_bytes(val,turnList=False):
   """
   转换ldap需要的对象
@@ -85,4 +85,46 @@ def convert_dict_to_tuple_bytes(val,turnList=False):
 
   return dict_to_tuple   
 
+def convert_string_to_bytes(val,onlist=True):
+  bytes_dict={}
+  if isinstance(val,dict) or isinstance(val,tuple):
+    for k,v in val.items():
+      bytes_dict[k]=convert_string_to_bytes(v)
+  if isinstance(val, list):
+    return [ convert_string_to_bytes(i,False) for i in val]
+  if isinstance(val,int):
+    if onlist:
+      return [("%s"%val).encode('utf-8')]
+    else:
+      return ("%s"%val).encode('utf-8')
+  if isinstance(val,str):
+    if onlist:
+      return [val.encode('utf-8')]
+    else:
+      return val.encode('utf-8')
+  return bytes_dict
 
+def convert_bytes_to_string(val,onlist=True):
+  bytes_dict={}
+  if isinstance(val,dict) or isinstance(val,tuple):
+    for k,v in val.items():
+      bytes_dict[k]=convert_string_to_bytes(v)
+  if isinstance(val, list):
+    return [ convert_string_to_bytes(i,False) for i in val]
+  if isinstance(val,int) or isinstance(val,str):
+    if onlist:
+      return [("%s"%val).decode('utf-8')]
+    else:
+      return ("%s"%val).decode('utf-8')
+  return bytes_dict
+
+
+def modifyModlist(old_entry,new_entry,ignore_field=None):
+  list_tuple=[]
+  for k,v in old_entry:
+    for k1,v1 in new_entry:
+      if k==k1:
+        continue
+      if v1!=v and v1!="":
+        list_tuple.append(ldap.MOD_REPLACE,k1,v1)
+      

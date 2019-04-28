@@ -23,6 +23,14 @@ export function PostLDAPDeleteUser (data) {
         data: data,
     })
 }
+// 更新用户接口
+export function PostLDAPUpdateUser (data) {
+    return request({
+        method: "post",
+        url: '/v1/ldap/user/updateuser/',
+        data: data,
+    })
+}
 // 获取用户列表API
 export function getLDAPUserList () {
     return request({

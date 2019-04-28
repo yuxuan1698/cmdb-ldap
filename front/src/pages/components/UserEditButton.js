@@ -20,13 +20,22 @@ export class UserEditButton extends PureComponent {
     return (
       <div>
         <ButtonGroup size="small">
-          <Tooltip placement="topLeft" title={'编辑用户'} >
-            <Button type="Default" icon="edit" />
+          <Tooltip placement="topLeft" title={'编辑用户'} getPopupContainer={trigger => trigger.parentNode} >
+            <Button type="Default" icon="edit" onClick={()=>{
+           this.props.showHideUserDrawer('update',delkey)
+          }}/>
           </Tooltip>
-          <Tooltip placement="top" title='锁定用户' >
-            <Button type="Default" icon="lock" />
+          <Tooltip placement="top" title='锁定用户' getPopupContainer={trigger => trigger.parentNode} >
+            <Button type="Default" icon="lock"onClick={()=>{
+           const modal = Modal.confirm({
+            title: '貌似有此功能',
+            content: `你确定要锁定用户[${delkey}]吗？`,
+            onCancel: ()=>{Modal.destroyAll()},
+            onOk: ()=>{Modal.destroyAll()}
+          })
+          }} />
           </Tooltip>
-          <Tooltip placement="topRight" title='删除用户' >
+          <Tooltip placement="topRight" title='删除用户' getPopupContainer={trigger => trigger.parentNode} >
             <Button type="danger" icon="delete" onClick={this.onDeleteUser.bind(this,delkey)} />
           </Tooltip>
         </ButtonGroup>

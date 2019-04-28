@@ -3,25 +3,13 @@
 import { PureComponent } from 'react';
 import css from './index.less'
 import {
-    Drawer, Form, Button, Radio, Row, Input, Select, 
+    Drawer, Form, Button, Row, Input, Select, 
     Icon,Dropdown,Menu,InputNumber,Divider,Col,Tooltip,notification
 } from 'antd';
 
 const { Option } = Select;
 
-const models={ 
-    pro:{
-      selectedItems:['top'],
-      mustField:[],
-      currField:['uid']
-    },
-    temp:{
-      selectedItems:['top','person','organizationalPerson','inetOrgPerson','posixAccount','ldapPublicKey'],
-      mustField:['uid','sn','cn','uidNumber','gidNumber','homeDirectory'],
-      currField:['uid','sn','cn','uidNumber','gidNumber','userPassword','homeDirectory','ou',
-        'mobile','mail','loginShell','sshPublicKey','description']
-    }
-  }
+
 const filedToName={
   uid:'用户名',
   sn:'用户姓名',
@@ -45,7 +33,7 @@ const filedToName={
 
 
 @Form.create()
-class DrawerAddUser extends PureComponent {
+class DrawerUpdateUser extends PureComponent {
   constructor(props){
     super(props)
     const { classobjects } =this.props
@@ -55,11 +43,19 @@ class DrawerAddUser extends PureComponent {
       mayField:[],
       visible: true,
       addmodel:'temp',
-      ...models.temp
+      selectedItems:['top'],
+      mustField:[],
+      currField:['uid'],
+      currData:{}
     }
   }
+  componentWillMount(){
+    const {modifydata}=this.props
+    this.handleClassObjectsChange(modifydata['data']['objectClass'])
+  }
   componentDidMount(){
-    this.handleClassObjectsChange(models['temp']['selectedItems'],models['temp'])
+    const {modifydata}=this.props
+    this.setState({currField:Object.keys(modifydata['data']).filter(i=>i!=='objectClass')})
   }
   initSelectedItems(arr){
     const {classobjects}=this.state
@@ -106,7 +102,7 @@ class DrawerAddUser extends PureComponent {
   }
   handleClose=()=>{
     this.setState({visible:!this.state.visible})
-    setTimeout(this.props.showHideUserDrawer,500)
+    setTimeout(this.props.showHideUserDrawer,500,'update')
   }
   addInputField=(name)=>{
     this.setState({ currField:this.state.currField.concat(name.key)})
@@ -127,8 +123,10 @@ class DrawerAddUser extends PureComponent {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        const {dispatch} =this.props
-        dispatch({type:'users/postLDAPCreateUser',payload: values,callback:(data)=>{
+        const {dispatch,modifydata} =this.props
+        let modData=values
+        modData['userdn']=modifydata['userdn']
+        dispatch({type:'users/postLDAPUpdateUser',payload: modData,callback:(data)=>{
           this.props.form.resetFields()
           notification.info({
             message:"添加成功提示",
@@ -151,37 +149,26 @@ class DrawerAddUser extends PureComponent {
     }
   }
   render() {
-    const { getFieldDecorator,getFieldValue } = this.props.form;
-    const { loading,userselect } = this.props;
+    const { getFieldDecorator,getFieldValue,setFieldValue } = this.props.form;
+    const { loading,modifydata,userselect } = this.props;
+    console.log(modifydata)
     const { selectedItems,options } = this.state;
     return (<Drawer
             destroyOnClose={true}
-            title="添加新用户"
+            title="更新用户属性"
             width={680}
             bodyStyle={{padding:"10px 24px",overflow:"auto",height:"calc(100% - 106px)"}}
             onClose={this.handleClose.bind(this)}
             visible={this.state.visible} >
-              <div style={{textAlign:"center"}}>
-              <Radio.Group value={this.state.addmodel} onChange={(e)=>{
-                  let currState=models[e.target.value]
-                  currState['addmodel']=e.target.value
-                  this.handleClassObjectsChange(currState['selectedItems'],models[e.target.value])
-                  setTimeout(this.handleNewClassObject.bind(this),100)
-              }} >
-                <Radio.Button style={{width:270}} value="temp"><Icon type="profile" />模板模式</Radio.Button>
-                <Radio.Button style={{width:270}} value="pro"><Icon type="bars" />专业模式</Radio.Button>
-              </Radio.Group>
-              </div>
               <Form layout="horizontal" onSubmit={this.handleSubmit} >
                 <Row gutter={18} style={{margin:0}}>
                   <Col span={24} >
                     <Form.Item label='字段归属(objectClass)' >
                       {getFieldDecorator('objectClass', {
-                          initialValue:this.state.selectedItems,
+                        initialValue:this.state.selectedItems,
                         rules: [{ required: true, message: '请选择属性归属类(objectClass)' }],
                       })(
                         <Select
-                          disabled={this.state.addmodel=='pro'?false:true}
                           mode="multiple" showArrow autoFocus allowClear
                           placeholder="请选择属性归属类(objectClass)"
                           onChange={this.handleClassObjectsChange.bind(this)}
@@ -226,11 +213,8 @@ class DrawerAddUser extends PureComponent {
                       <Col span={24} key={i} >
                       <Form.Item  labelCol={{ span: 7 }} wrapperCol={{ span: 13 }} label={filedToName[i]?filedToName[i]:i} hasFeedback required>
                         {getFieldDecorator(i, {
-                            initialValue: i==='homeDirectory'?`/home/${getFieldValue('uid')}`:(
-                              i==='gidNumber'?getFieldValue('uidNumber'):(
-                                i==='loginShell'?'/bin/bash':(i==='mail'?`${getFieldValue('uid')}@iwubida.com`:"")
-                              )),
-                            rules: [{ required: true, message: `请输入${filedToName[i]}(${i})` }],
+                            initialValue: i==='userPassword'?"":(modifydata['data'][i]?modifydata['data'][i][0]:(i==='loginShell'?'/bin/bash':"")),
+                            rules: [{ required: i==='userPassword'?false:true, message: `请输入${filedToName[i]}(${i})` }],
                         })(inputField)}
                         {!this.state.mustField.includes(i)?<Tooltip placement="top" title="删除字段">
                               <Icon className={css.delete_field_icon}
@@ -244,7 +228,7 @@ class DrawerAddUser extends PureComponent {
                   })}
                 </Row>
                 <Row align='middle' >
-                  <div style={{width:"85%",margin: "0 auto"}} >
+                  <div style={{width:"80%",margin: "0 auto"}} >
                     <Form.Item >
                       <Dropdown trigger={['click']} 
                       overlayStyle={{maxHeight:300,overflow:"auto",boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)"}}
@@ -265,7 +249,7 @@ class DrawerAddUser extends PureComponent {
                 <Button loading={loading.effects['users/postLDAPCreateUser']}
                   disabled={this.state.selectedItems.filter(i=>i!=='top').length>0?false:true} 
                   onClick={this.handleSubmit.bind(this)} type="primary">
-          <Icon type="save"  />保存
+                  <Icon type="save"  />保存
                 </Button>
               </div>
             </Drawer>
@@ -273,4 +257,5 @@ class DrawerAddUser extends PureComponent {
   }
 }
 
-export default DrawerAddUser
+  
+export default DrawerUpdateUser

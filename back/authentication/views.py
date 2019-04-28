@@ -6,7 +6,8 @@ from authentication.serializers import (
   LdapSerializer,
   ChangePasswordSerializer,
   DeleteUserSerializer,
-  CreateUserSerializer
+  CreateUserSerializer,
+  UpdateUserSerializer
 )
 from authentication.ldap.ldapsearch import CmdbLDAP
 from common.utils import LDAPJSONEncoder
@@ -61,6 +62,31 @@ class CreateUserViewSet(APIView):
     if serializer.is_valid():
       # serializer.validated_data
       changeStatus, errorMsg = CmdbLDAP().create_ldap_user(request.data)
+      if changeStatus:
+        returnData = {"status": changeStatus}
+        returnStatus = status.HTTP_200_OK
+      else:
+        returnData = {"error": errorMsg}
+        returnStatus = status.HTTP_400_BAD_REQUEST
+    else:
+      returnData = serializer.errors
+      returnStatus = status.HTTP_400_BAD_REQUEST
+    return JsonResponse(returnData, status=returnStatus, safe=False)
+
+class UpdateUserViewSet(APIView):
+  """
+  更新用户
+  """
+  serializer_class = UpdateUserSerializer
+  def post(self,request, *args, **kwargs):
+    """
+    提交用户数据
+    """
+    serializer = UpdateUserSerializer(instance=request, data=request.data)
+    if serializer.is_valid():
+      olddn=request.data['userdn']
+      request.data.pop('userdn')
+      changeStatus, errorMsg = CmdbLDAP().update_ldap_user(request.data,olddn)
       if changeStatus:
         returnData = {"status": changeStatus}
         returnStatus = status.HTTP_200_OK

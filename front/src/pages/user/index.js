@@ -8,8 +8,15 @@ import CMDBBreadcrumb from "../components/Breadcrumb";
 import dynamic from 'umi/dynamic';
 import {UserEditButton,UserBatchButton} from '../components/UserEditButton'
 
-let DrawerAddUser = dynamic({
+const DrawerAddUser = dynamic({
   loader: () => import('../components/addUser'),
+  loading: (e) => {
+    return null
+  },
+})
+
+let DrawerUpdateUser = dynamic({
+  loader: () => import('../components/modifyUser'),
   loading: (e) => {
     return null
   },
@@ -22,25 +29,41 @@ class CMDBUserList extends PureComponent {
     this.state = {
       selectedRowKeys: [],
       loadedDrawer:false,
+      modifyDrawer:false,
+      modifydata:"",
       classobjects:""
     }
   }
-  showHideUserAddDrawer = () => {
-    if(this.state.classobjects===""){
+  showHideUserDrawer = (type,userdn) => {
+    let {classobjects,loadedDrawer,modifyDrawer,modifydata} = this.state
+    let {userlist} = this.props
+    let dispDrager={loadedDrawer:!loadedDrawer}
+    let moddata
+    if(userdn!=="" && modifydata===""){
+      Object.keys(userlist).filter(i=> userlist[i].includes(userdn)).map(i=>{
+        moddata={userdn,data:userlist[i][1]}
+      })
+    }
+    if(type==='update'){
+      dispDrager={
+        modifyDrawer:!modifyDrawer,
+        modifydata:modifydata?"":moddata
+      }
+    }
+    if(classobjects===""){
       const { dispatch } = this.props;
       dispatch({type:'users/getLDAPClassList',callback:(data)=>{
         this.setState({
-          loadedDrawer: !this.state.loadedDrawer,
-          classobjects: data
+          classobjects: data,
+          ...dispDrager
         });
       }})
     }else{
       this.setState({
-        loadedDrawer: !this.state.loadedDrawer,
-      });
+        ...dispDrager
+      })
     }
-    
-  };
+  }
   onSelectChange=(selectedRowKeys)=>{
     this.setState({ selectedRowKeys });
   }
@@ -53,7 +76,7 @@ class CMDBUserList extends PureComponent {
     }})
   }
   render(){
-    const {selectedRowKeys}=this.state
+    const {selectedRowKeys,loadedDrawer,modifyDrawer,modifydata,classobjects}=this.state
     const {userlist,loading,dispatch}=this.props
     const data = [];
     Object.keys(userlist).map(it=>{
@@ -68,9 +91,9 @@ class CMDBUserList extends PureComponent {
         userdn: userlist[it][0]
       })
     })
-    data.sort((a,b)=>{
-      if(a.uid>b.uid) return -1
-    })
+    // data.sort((a,b)=>{
+    //   if(a.uid>b.uid) return -1
+    // })
     const columns = [{
       title: '用户名',
       dataIndex: 'uid',
@@ -106,8 +129,13 @@ class CMDBUserList extends PureComponent {
       align: 'center',
       width:115,
       render: (text, record) => {
-        return <UserEditButton delkey={record['userdn']} confirmDeletion={this.confirmDeletion}/>
-        },
+        return (
+          <UserEditButton 
+            delkey={record['userdn']} 
+            showHideUserDrawer={this.showHideUserDrawer.bind(this)} 
+            confirmDeletion={this.confirmDeletion} />
+        )
+      }
     }];
     return (<div className={usercss.userbody}>
         <CMDBBreadcrumb route={{'用户管理':"",'用户列表':'/user/'}} title='用户列表' />
@@ -119,17 +147,24 @@ class CMDBUserList extends PureComponent {
             </div>
           <Button type="primary" 
             loading={loading.effects['users/getLDAPClassList']} 
-            onClick={this.showHideUserAddDrawer.bind(this)} >
+            onClick={this.showHideUserDrawer.bind(this)} >
               <Icon type="user-add" />添加用户
             </Button>
-            { this.state.loadedDrawer?<DrawerAddUser 
-                  showHideUserAddDrawer={this.showHideUserAddDrawer.bind(this)} 
-                  dispatch={this.props.dispatch}
+            { loadedDrawer?<DrawerAddUser 
+                  showHideUserDrawer={this.showHideUserDrawer.bind(this)} 
+                  dispatch={dispatch}
                   userselect={data}
                   loading={this.props.loading}
-                  classobjects={this.state.classobjects} />:""
+                  classobjects={classobjects} />:""
             }
-          
+            { modifyDrawer?<DrawerUpdateUser 
+              showHideUserDrawer={this.showHideUserDrawer.bind(this)} 
+              dispatch={dispatch}
+              modifydata={modifydata}
+              userselect={data}
+              loading={this.props.loading}
+              classobjects={classobjects} />:""
+            } 
           {selectedRowKeys.length > 0 ? (
             <UserBatchButton confirmDeletion={this.confirmDeletion} delkeys={selectedRowKeys}/>
           ):""}
