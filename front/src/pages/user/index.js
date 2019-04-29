@@ -93,9 +93,6 @@ class CMDBUserList extends PureComponent {
         userdn: userlist[it][0]
       })
     })
-    // data.sort((a,b)=>{
-    //   if(a.uid>b.uid) return -1
-    // })
     const columns = [{
       title: '用户名',
       dataIndex: 'uid',

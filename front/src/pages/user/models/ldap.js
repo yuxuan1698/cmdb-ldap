@@ -5,7 +5,10 @@ import {
 export default {
     names: 'ldap',
     state:{
-      groups:{}
+      groups:{
+        treedata:[],
+        treeobject:{},
+      }
     },
     subscriptions: {
       setup({ dispatch, history }) {
@@ -24,10 +27,15 @@ export default {
       *getLDAPGroupsList({ payload }, { call,put }) {
         const data = yield call(getGroupList, payload)
         if (data) {
+          let newdata = { treedata:[],treeobject:{}}
+          Object.keys(data).map(i => {
+            newdata['treedata'].push({ title: data[i][0].ou[0], dn: data[i][1], key: data[i][1] })
+            newdata['treeobject'][data[i][1]] = data[i][0]
+          })
           yield put({
             type:'ldapgroupslist', 
             payload: {
-              groups: data,
+              groups: newdata,
             }
           })
         }
