@@ -32,6 +32,12 @@ export default {
           })
         }
       },
+      *getLDAPGroupsSecendList({ payload,callback }, { call }) {
+        const data = yield call(getGroupList, payload)
+        if (data) {
+          callback(data)
+        }
+      },
     },
     reducers: {
       // 组列表

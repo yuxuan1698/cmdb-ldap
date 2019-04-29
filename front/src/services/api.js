@@ -46,10 +46,9 @@ export function getLDAPObjectClassList () {
     })
 }
 // 获取组列表API
-export function getGroupList (data) {
+export function getGroupList (baseou) {
     return request({
         method: "get",
-        url: '/v1/ldap/ous/',
-        data: data,
+        url: `/v1/ldap/ous/${baseou||''}`
     })
 }

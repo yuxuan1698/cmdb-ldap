@@ -23,7 +23,7 @@ class CMDBContent extends PureComponent {
           <CMDBHeader location={location} 
             collapsed={collapsed} 
             toggleSideMenu={toggleSideMenu} />
-          <Content  style={{ overflow: "auto"}}>
+          <Content  style={{ overflow: "auto",padding:10}}>
             {children}
           </Content>
         </Layout>

@@ -1,6 +1,5 @@
 import uuid
 import ldap
-import operator
 from ldap.schema import urlfetch
 from ldap.schema.subentry import SCHEMA_ATTRS
 from django.conf import settings
@@ -11,7 +10,7 @@ from authentication.utils import (
   generate_ldap_dn_prefix,
   convert_bytes_to_string,
   convert_string_to_bytes)
-from ldap.modlist import modifyModlist
+from authentication.ldap.utils import modifyModList
 
 logger=CmdbLDAPLogger().get_logger('cmdb_ldap')
 Users = get_user_model()
@@ -144,7 +143,7 @@ class CmdbLDAP(object):
     获取Base OU信息
     """
     if self.connect():
-      result_id=self.conn.search_s(queryOU, ldap.SCOPE_ONELEVEL, "(objectClass=*)", None)
+      result_id=self.conn.search(queryOU, ldap.SCOPE_ONELEVEL, "(objectClass=*)", None)
       result_set = []
       while 1:
         try:
@@ -204,31 +203,37 @@ class CmdbLDAP(object):
     """
     更新用户属性用户
     """
-    # newdata = { k:v if isinstance(v,list) else [v] for k,v in data.items() }
-    dndata,err=self.get_user_list(olddn.split(',')[0])
+    
+    rdn_prefix=olddn.split(',')
+    rdn_field=rdn_prefix[0].split('=')
+    dndata,err=self.get_user_list(rdn_prefix[0])
+    modrdn=""
+    if rdn_field[0]!='':
+      if data[rdn_field[0]]!=rdn_field[1]:
+        modrdn="{}={}".format(rdn_field[0],data[rdn_field[0]])
+      del dndata[0][1][rdn_field[0]]
+      del data[rdn_field[0]]
+      
     if dndata:
       olddata=dndata[0][1]
       newdata = convert_string_to_bytes(data)
-      modlist=[]
-      old_keys=olddata.keys()
-      new_keys=data.keys()
-      diff_old_new = list(set(old_keys).difference(set(new_keys)))
-      for k in diff_old_new:
-        modlist.append((ldap.MOD_DELETE,k,None))
-      diff_new_old = list(set(new_keys).difference(set(old_keys)))
-      for s in diff_new_old:
-        modlist.append((ldap.MOD_ADD, s, data[s]))
-      
-      for i, v in newdata.items():
-        # logger.info(len(v))
-        if isinstance(v,list) and i in old_keys:
-          if not operator.eq(v, olddata[i]):
-            modlist.append((ldap.MOD_REPLACE, i, v))
-          continue
-        if i == 'userPassword' and v:
-          continue
-        if i in old_keys and v != olddata[i][0]:
-          modlist.append((ldap.MOD_REPLACE,i,v))
-
-      logger.info(modlist)
-    return "更新用户成功",None
+      modlist=modifyModList(olddata,newdata)
+      if len(modlist):
+        logger.info("modlist:%s"%modlist)
+        try:
+          self.conn.modify_s(olddn,modlist)
+          return "更新用户成功",None
+        except ldap.NAMING_VIOLATION as e:
+          logger.error(e)
+          return False,"更新字段失败，失败内容:%s"%(e.args[0]['info'] if e.args[0]['info'] else "")
+        except ldap.CONSTRAINT_VIOLATION as e:
+          logger.error(e)
+          return False,"更新字段失败，失败内容:%s"%(e.args[0]['info'] if e.args[0]['info'] else "")
+      if modrdn!='':
+        try:
+          self.conn.modrdn_s(olddn,modrdn)
+          return "更新用户成功",None
+        except ldap.INVALID_DN_SYNTAX as e:
+          logger.error(e)
+          return False,"DN修改失败:%s"%(e.args[0]['info'] if e.args[0]['info'] else "")
+      return False,'字段没有发生变化，修改不成功。'

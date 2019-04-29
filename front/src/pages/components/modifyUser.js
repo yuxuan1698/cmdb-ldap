@@ -55,7 +55,7 @@ class DrawerUpdateUser extends PureComponent {
   }
   componentDidMount(){
     const {modifydata}=this.props
-    this.setState({currField:Object.keys(modifydata['data']).filter(i=>i!=='objectClass')})
+    this.setState({currField:Object.keys(modifydata['data']).filter(i=>i!=='objectClass').sort((i,b)=>i=='uid'?-1:0) })
   }
   initSelectedItems(arr){
     const {classobjects}=this.state
@@ -132,6 +132,7 @@ class DrawerUpdateUser extends PureComponent {
             message:"添加成功提示",
             description: "用户添加成功！"
           })
+          this.handleClose()
           dispatch({type:'users/getUserList'})
         }})
       }

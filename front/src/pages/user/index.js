@@ -2,12 +2,14 @@
 
 import {connect} from 'dva';
 import {PureComponent} from 'react'
-import { Table, Icon, Button, Alert,message } from 'antd';
+import { Table, Icon, Button, Alert,message,Layout } from 'antd';
 import usercss from "./user.less";
 import CMDBBreadcrumb from "../components/Breadcrumb";
 import dynamic from 'umi/dynamic';
 import {UserEditButton,UserBatchButton} from '../components/UserEditButton'
-
+const {
+  Content
+} = Layout;
 const DrawerAddUser = dynamic({
   loader: () => import('../components/addUser'),
   loading: (e) => {
@@ -137,59 +139,64 @@ class CMDBUserList extends PureComponent {
         )
       }
     }];
-    return (<div className={usercss.userbody}>
+    return (
+      <Layout className={usercss.userbody}>
         <CMDBBreadcrumb route={{'用户管理':"",'用户列表':'/user/'}} title='用户列表' />
-        <div className={usercss.tableContent}>
-          <div className={usercss.usercontrol}>
-            <div style={{float:"right"}}>
-              <Alert message={`当前选中${selectedRowKeys.length}个用户`} 
-              type={selectedRowKeys.length > 0 ? "success" : "info"} showIcon />
+        <Layout >
+          <Content>
+          <div className={usercss.tableContent}>
+            <div className={usercss.usercontrol}>
+              <div style={{float:"right"}}>
+                <Alert message={`当前选中${selectedRowKeys.length}个用户`} 
+                type={selectedRowKeys.length > 0 ? "success" : "info"} showIcon />
+              </div>
+            <Button type="primary" 
+              loading={loading.effects['users/getLDAPClassList']} 
+              onClick={this.showHideUserDrawer.bind(this)} >
+                <Icon type="user-add" />添加用户
+              </Button>
+              { loadedDrawer?<DrawerAddUser 
+                    showHideUserDrawer={this.showHideUserDrawer.bind(this)} 
+                    dispatch={dispatch}
+                    userselect={data}
+                    loading={this.props.loading}
+                    classobjects={classobjects} />:""
+              }
+              { modifyDrawer?<DrawerUpdateUser 
+                showHideUserDrawer={this.showHideUserDrawer.bind(this)} 
+                dispatch={dispatch}
+                modifydata={modifydata}
+                userselect={data}
+                loading={this.props.loading}
+                classobjects={classobjects} />:""
+              } 
+            {selectedRowKeys.length > 0 ? (
+              <UserBatchButton confirmDeletion={this.confirmDeletion} delkeys={selectedRowKeys}/>
+            ):""}
             </div>
-          <Button type="primary" 
-            loading={loading.effects['users/getLDAPClassList']} 
-            onClick={this.showHideUserDrawer.bind(this)} >
-              <Icon type="user-add" />添加用户
-            </Button>
-            { loadedDrawer?<DrawerAddUser 
-                  showHideUserDrawer={this.showHideUserDrawer.bind(this)} 
-                  dispatch={dispatch}
-                  userselect={data}
-                  loading={this.props.loading}
-                  classobjects={classobjects} />:""
-            }
-            { modifyDrawer?<DrawerUpdateUser 
-              showHideUserDrawer={this.showHideUserDrawer.bind(this)} 
-              dispatch={dispatch}
-              modifydata={modifydata}
-              userselect={data}
-              loading={this.props.loading}
-              classobjects={classobjects} />:""
-            } 
-          {selectedRowKeys.length > 0 ? (
-            <UserBatchButton confirmDeletion={this.confirmDeletion} delkeys={selectedRowKeys}/>
-          ):""}
+            <Table pagination={{
+                size:"small",
+                showSizeChanger:true,
+                showQuickJumper:true,
+                defaultPageSize:15,
+                pageSizeOptions:["15","30","45"]
+              }} 
+              rowKey='userdn'
+              hasData 
+              loading={loading.effects['users/getUserList']} 
+              size='small'
+              // bordered 
+              bodyStyle={{margin:0}}
+              rowSelection={{
+                selectedRowKeys,
+                onChange: this.onSelectChange.bind(this),
+              }}
+              columns={columns} 
+              dataSource={data} />
           </div>
-          <Table pagination={{
-              size:"small",
-              showSizeChanger:true,
-              showQuickJumper:true,
-              defaultPageSize:15,
-              pageSizeOptions:["15","30","45"]
-            }} 
-            rowKey='userdn'
-            hasData 
-            loading={loading.effects['users/getUserList']} 
-            size='small'
-            // bordered 
-            bodyStyle={{margin:0}}
-            rowSelection={{
-              selectedRowKeys,
-              onChange: this.onSelectChange.bind(this),
-            }}
-            columns={columns} 
-            dataSource={data} />
-        </div>
-      </div>)
+          </Content>
+        </Layout>
+      </Layout>)
   }
 }
 
