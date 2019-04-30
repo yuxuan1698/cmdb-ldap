@@ -1,14 +1,13 @@
+
 'use strict'
 
-import { PureComponent } from 'react';
-import css from './index.less'
+import {PureComponent} from 'react'
 import {
-    Drawer, Form, Button, Row, Input, Select, 
-    Icon,Dropdown,Menu,InputNumber,Divider,Col,Tooltip,notification
+  Drawer, Form, Button, Row, Input, Select, 
+  Icon,Dropdown,Menu,InputNumber,Divider,Col,Tooltip,notification
 } from 'antd';
-
+import css from './index.less'
 const { Option } = Select;
-
 
 const filedToName={
   uid:'用户名',
@@ -31,15 +30,14 @@ const filedToName={
   o:'组织单位',
 }
 
-
 @Form.create()
-class DrawerUpdateUser extends PureComponent {
+class CMDBLDAPAttribute extends PureComponent {
   constructor(props){
     super(props)
     const { classobjects } =this.props
     this.state={
-      options: Object.keys(classobjects),
-      classobjects: classobjects,
+      options: [],
+      classobjects: {},
       mayField:[],
       visible: true,
       addmodel:'temp',
@@ -49,14 +47,7 @@ class DrawerUpdateUser extends PureComponent {
       currData:{}
     }
   }
-  componentWillMount(){
-    const {modifydata}=this.props
-    this.handleClassObjectsChange(modifydata['data']['objectClass'])
-  }
-  componentDidMount(){
-    const {modifydata}=this.props
-    this.setState({currField:Object.keys(modifydata['data']).filter(i=>i!=='objectClass').sort((i,b)=>i=='uid'?-1:0) })
-  }
+
   initSelectedItems(arr){
     const {classobjects}=this.state
     let supSet=[]
@@ -152,14 +143,9 @@ class DrawerUpdateUser extends PureComponent {
   render() {
     const { getFieldDecorator,getFieldValue,setFieldValue } = this.props.form;
     const { loading,modifydata,userselect } = this.props;
+    console.log(modifydata)
     const { selectedItems,options } = this.state;
-    return (<Drawer
-            destroyOnClose={true}
-            title="更新用户属性"
-            width={680}
-            bodyStyle={{padding:"10px 24px",overflow:"auto",height:"calc(100% - 106px)"}}
-            onClose={this.handleClose.bind(this)}
-            visible={this.state.visible} >
+    return (<div>
               <Form layout="horizontal" onSubmit={this.handleSubmit} >
                 <Row gutter={18} style={{margin:0}}>
                   <Col span={24} >
@@ -213,7 +199,7 @@ class DrawerUpdateUser extends PureComponent {
                       <Col span={24} key={i} >
                       <Form.Item  labelCol={{ span: 7 }} wrapperCol={{ span: 13 }} label={filedToName[i]?filedToName[i]:i} hasFeedback required>
                         {getFieldDecorator(i, {
-                            initialValue: i==='userPassword'?"":(modifydata['data'][i]?modifydata['data'][i][0]:(i==='loginShell'?'/bin/bash':"")),
+                            initialValue: "",
                             rules: [{ required: i==='userPassword'?false:true, message: `请输入${filedToName[i]}(${i})` }],
                         })(inputField)}
                         {!this.state.mustField.includes(i)?<Tooltip placement="top" title="删除字段">
@@ -242,20 +228,9 @@ class DrawerUpdateUser extends PureComponent {
                   </div>
                 </Row>
               </Form>
-              <div className={css.add_user_field_submit} >
-                <Button  style={{ marginRight: 8 }} onClick={this.handleClose.bind(this)}>
-                  取消
-                </Button>
-                <Button loading={loading.effects['users/postLDAPCreateUser']}
-                  disabled={this.state.selectedItems.filter(i=>i!=='top').length>0?false:true} 
-                  onClick={this.handleSubmit.bind(this)} type="primary">
-                  <Icon type="save"  />保存
-                </Button>
               </div>
-            </Drawer>
     );
   }
 }
 
-  
-export default DrawerUpdateUser
+export default CMDBLDAPAttribute;

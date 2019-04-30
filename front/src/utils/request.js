@@ -50,10 +50,9 @@ axios.interceptors.response.use((response) => {
   return response;
 }, async (error) => {
   // 请求结束，蓝色过渡滚动条消失
-  // 即使出现异常，也要调用关闭方法，否则一直处于加载状态很奇怪
+  NProgress.done();
   if(error.response){
     const {status,data}=error.response
-    NProgress.done();
     if(data){
       if(status===401){
         window.g_app._store.dispatch({

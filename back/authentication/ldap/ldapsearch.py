@@ -1,5 +1,6 @@
 import uuid
 import ldap
+from ldap.ldapobject import ReconnectLDAPObject
 from ldap.schema import urlfetch
 from ldap.schema.subentry import SCHEMA_ATTRS
 from django.conf import settings
@@ -21,7 +22,7 @@ class CmdbLDAP(object):
   def __init__(self):
     self.bindDN=settings.AUTH_LDAP_BIND_DN
     self.bindDNPassword=settings.AUTH_LDAP_BIND_PASSWORD
-    self.conn=ldap.initialize(settings.AUTH_LDAP_SERVER_URI)
+    self.conn=ReconnectLDAPObject(settings.AUTH_LDAP_SERVER_URI,trace_level=1)
     self.searchScope = ldap.SCOPE_ONELEVEL
     self.conn.set_option(ldap.OPT_REFERRALS,0)
     self.conn.set_option(ldap.OPT_PROTOCOL_VERSION,ldap.VERSION3)
@@ -36,7 +37,10 @@ class CmdbLDAP(object):
   # @classmethod
   def connect(self,dn=None,password=None):
     try:
-      self.conn.simple_bind_s(dn or self.bindDN,password or self.bindDNPassword)
+      aa=self.conn.simple_bind_s(dn or self.bindDN,password or self.bindDNPassword)
+      logger.info(aa)
+    except ldap.SERVER_DOWN:
+      self.errorMsg="无法连接到LDAP"
     except ldap.INVALID_CREDENTIALS as e:
       self.errorMsg="连接认证失败,请检查密码是否正确: INVALID_CREDENTIALS"
       return False
@@ -138,17 +142,18 @@ class CmdbLDAP(object):
     else:
       return None,self.errorMsg
 
-  def get_base_ou(self,queryOU=settings.AUTH_LDAP_BASE_DN):
+  def get_base_ou(self,queryOU=settings.AUTH_LDAP_BASE_DN,ldapType=ldap.SCOPE_ONELEVEL):
     """
     获取Base OU信息
     """
     if self.connect():
-      result_id=self.conn.search(queryOU, ldap.SCOPE_ONELEVEL, "(objectClass=*)", None)
+      result_id=self.conn.search(queryOU, ldapType, "(objectClass=*)", None)
       result_set = []
       while 1:
         try:
           result_type, result_data = self.conn.result(result_id, 0)
         except ldap.NO_SUCH_OBJECT as e:
+          logger.info(e.args[0])
           self.errorMsg="没有找到对象: No such object"
           return None,self.errorMsg
         if(result_data == []):
@@ -156,6 +161,14 @@ class CmdbLDAP(object):
         else:
           if result_type == ldap.RES_SEARCH_ENTRY:
             result_set.append((result_data[0][1],result_data[0][0]))
+
+      if len(result_set)==0 and ldapType==ldap.SCOPE_ONELEVEL:
+        newresult,msg=self.get_base_ou(queryOU,ldapType=ldap.SCOPE_BASE)
+        if len(newresult)>0:
+          return {"notsubdir":True},None
+        else:
+          return False,"没有找到DN记录或者属性！"
+
       return result_set,None
 
   def create_ldap_user(self,data):

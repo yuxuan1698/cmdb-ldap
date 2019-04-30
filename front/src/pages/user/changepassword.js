@@ -68,7 +68,7 @@ class CMDBChangePassword extends PureComponent {
         onSubmit: this.handleSubmit.bind(this)
       };
     return (
-      <div style={{ marginTop: 60 }}>
+      <div style={{ width: "60%",margin: "60px auto" }}>
         <Form {...formItemLayout} >
           <Form.Item hasFeedback
             label={`${formatMessage({ id: 'user.changepassword.username' })}:`} >
