@@ -8980,6 +8980,13 @@ rc@^1.0.1, rc@^1.1.6, rc@^1.2.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
+react-contextmenu@^2.11.0:
+  version "2.11.0"
+  resolved "https://registry.yarnpkg.com/react-contextmenu/-/react-contextmenu-2.11.0.tgz#ec57614e6d687ceaec5c0ba97d56a302c9551d17"
+  dependencies:
+    classnames "^2.2.5"
+    object-assign "^4.1.0"
+
 react-dev-utils@7.0.3:
   version "7.0.3"
   resolved "http://registry.npm.taobao.org/react-dev-utils/download/react-dev-utils-7.0.3.tgz#f1316cfffd792fd41b0c28ad5db86c1d74484d6f"
@@ -9030,7 +9037,6 @@ react-dom@^16.7.0:
 "react-draggable@^2.2.6 || ^3.0.3":
   version "3.3.0"
   resolved "https://registry.npm.taobao.org/react-draggable/download/react-draggable-3.3.0.tgz?cache=0&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-draggable%2Fdownload%2Freact-draggable-3.3.0.tgz#2ed7ea3f92e7d742d747f9e6324860606cd4d997"
-  integrity sha1-LtfqP5Ln10LXR/nmMkhgYGzU2Zc=
   dependencies:
     classnames "^2.2.5"
     prop-types "^15.6.0"
@@ -9099,7 +9105,6 @@ react-redux@^5.0.5:
 react-resizable@^1.7.5:
   version "1.7.5"
   resolved "https://registry.npm.taobao.org/react-resizable/download/react-resizable-1.7.5.tgz#83eb75bb3684da6989bbbf4f826e1470f0af902e"
-  integrity sha1-g+t1uzaE2mmJu79Pgm4UcPCvkC4=
   dependencies:
     prop-types "15.x"
     react-draggable "^2.2.6 || ^3.0.3"

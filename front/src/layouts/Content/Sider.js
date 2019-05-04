@@ -59,7 +59,7 @@
       const {pathname}=this.props.location
       this.state={
         parentpath:[pathname==='/'?pathname:pathname.split('/')[1]],
-        subpath:[pathname]
+        subpath: [pathname.replace(/\//g, '')]
       }
     }
     initSideMenu=(arr)=>{
@@ -72,7 +72,7 @@
         let menuItem=""
         if(it.hasOwnProperty('submenu')){
           const childMenu=this.initSideMenu(it.submenu)
-          menuItem=(<SubMenu key={it.key} title={
+          menuItem = (<SubMenu key={it.key.replace(/\//g, '')} title={
             <span>
               {it.icon?<Icon type={it.icon} />:""}
               <span>{it.name}</span>
@@ -80,7 +80,7 @@
             {childMenu}
           </SubMenu>)
         }else{
-          menuItem=(<Menu.Item key={it.key}>
+          menuItem = (<Menu.Item key={it.key.replace(/\//g, '')}>
             <Link to={it.key}>
               {it.icon?<Icon type={it.icon} />:""}
               <span>
@@ -94,6 +94,8 @@
     }
     render(){
       let {collapsed,toggleSideMenu}=this.props
+      console.log(this.state.parentpath)
+      console.log(this.state.subpath)
       return (
         <Sider className={css.sider}
                 collapsed={collapsed}

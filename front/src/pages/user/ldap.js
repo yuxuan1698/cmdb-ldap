@@ -1,9 +1,10 @@
 'use strict'
 
 import {PureComponent} from 'react'
-import { Layout,Tree,Input,Button,Icon } from 'antd';
+import { Layout,Tree,Input,Button,Icon,Menu } from 'antd';
 import {connect} from 'dva';
 import { Resizable } from 'react-resizable';
+import { ContextMenuTrigger, ContextMenu } from 'react-contextmenu';
 import usercss from "./user.less";
 import CMDBBreadcrumb from "../components/Breadcrumb";
 import CMDBLDAPAttribute from "../components/Attribute"
@@ -15,6 +16,7 @@ const {
 const ButtonGroup = Button.Group;
 const { TreeNode,DirectoryTree } = Tree;
 const {Search} = Input;
+const { Item, Divider } = Menu
 
 @connect(({loading,ldap})=>({loading,groups:ldap.groups}))
 class CMDBLdapGroups extends PureComponent {
@@ -56,7 +58,22 @@ class CMDBLdapGroups extends PureComponent {
     }
     return <TreeNode icon={item.isLeaf?<Icon  type='bars' />:""}  key={item.key} title={title}  dataRef={item} />;
   })
- 
+  handleRightMenu=()=>{
+    let menu = (<ContextMenu id="ldap_control_menu" >
+      <Menu style={{ border:"none"}}>
+        <Menu.Item className={usercss.right_menu_item}>
+          <a target="_blank" rel="noopener noreferrer" href="http://www.alipay.com/">1st menu item</a>
+        </Menu.Item >
+        <Menu.Item key="1" className={usercss.right_menu_item}>
+          <a target="_blank" rel="noopener noreferrer" href="http://www.taobao.com/">2nd menu item</a>
+        </Menu.Item >
+        <Menu.Divider />
+        <Menu.Item key="3" disabled className={usercss.right_menu_item}>3rd menu item（disabled）</Menu.Item>
+      </Menu>
+    </ContextMenu>)
+    return menu
+
+  }
   onLoadData = treeNode => {
     return new Promise((resolve)=>{
       if (treeNode.props.children) {
@@ -130,13 +147,16 @@ class CMDBLdapGroups extends PureComponent {
             <Layout style={{height:"100%",padding:5,boxShadow:"0px 0px 3px #dcd8d8"}} >
               <Search style={{ marginBottom: 8 }} placeholder="Search(Key Press)" onChange={this.handleOnChange.bind(this)}  />
               <Content style={{overflow:"auto",padding:"0px 3px",boxShadow:"0px 0px 3px #dcd8d8",backgroundColor:"#fff"}} >
-                <DirectoryTree loadData={this.onLoadData} 
-                  expandedKeys={expandedKeys}
-                  autoExpandParent={autoExpandParent}
-                  onExpand={this.onExpand.bind(this)}
-                  onSelect={this.handleOnSelect.bind(this)}>
-                  {this.renderTreeNodes(treedata,searchValue)}
-                </DirectoryTree>
+                <ContextMenuTrigger id='ldap_control_menu' >
+                  <DirectoryTree loadData={this.onLoadData} 
+                    expandedKeys={expandedKeys}
+                    autoExpandParent={autoExpandParent}
+                    onExpand={this.onExpand.bind(this)}
+                    onSelect={this.handleOnSelect.bind(this)}>
+                    {this.renderTreeNodes(treedata,searchValue)}
+                  </DirectoryTree>
+                </ContextMenuTrigger>
+                {this.handleRightMenu()}
               </Content>
               <Footer style={{padding:0,}}>
                 <ButtonGroup size="small" >

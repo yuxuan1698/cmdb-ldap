@@ -2,6 +2,7 @@
 
 import {connect} from 'dva';
 import {PureComponent} from 'react'
+import PropTypes from 'prop-types';
 import { Table, Icon, Button, Alert,message,Layout } from 'antd';
 import usercss from "./user.less";
 import CMDBBreadcrumb from "../components/Breadcrumb";
@@ -197,4 +198,8 @@ class CMDBUserList extends PureComponent {
   }
 }
 
+CMDBUserList.propTypes={
+  userlist: PropTypes.object,
+  loading: PropTypes.object
+}
 export default CMDBUserList;

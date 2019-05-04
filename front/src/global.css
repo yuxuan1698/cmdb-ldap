@@ -109,3 +109,20 @@ body {
 .fade-exit-done {
   opacity: 0;
 }
+
+.react-contextmenu{
+    overflow: hidden;
+    border-radius: 5px;
+    background-color: #fff;
+    border: 1px solid #e8e8e8;
+    z-index: 10;
+    background-clip: padding-box;
+    border-radius: 3px;
+    outline: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: height .3s ease-in-out;
+}
+.react-contextmenu.ant-menu-item{
+  height: 30px;
+  line-height: 30px;
+}
