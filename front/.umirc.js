@@ -42,7 +42,7 @@ export default {
     'layout-header-height': '54px',
     'layout-header-background': '#fcfcfdcc',
     'layout-header-padding':"0px",
-    'layout-sider-background':"#1da57a"
+    'layout-sider-background':"#1da57a",
   },
   "proxy": {
     "/api": {

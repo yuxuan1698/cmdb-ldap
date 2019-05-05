@@ -143,7 +143,6 @@ class CMDBLDAPAttribute extends PureComponent {
   render() {
     const { getFieldDecorator,getFieldValue,setFieldValue } = this.props.form;
     const { loading,modifydata,userselect } = this.props;
-    console.log(modifydata)
     const { selectedItems,options } = this.state;
     return (<div>
               <Form layout="horizontal" onSubmit={this.handleSubmit} >

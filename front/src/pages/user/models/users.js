@@ -4,13 +4,14 @@ import {
   PostLDAPDeleteUser,
   PostLDAPCreateUser,
   PostLDAPUpdateUser,
+  getLDAPUserAttribute,
   getLDAPObjectClassList
 } from '../../../services/api';
 
 export default {
     names: 'users',
     state:{
-      userlist:{},
+      userlist:{}
     },
     subscriptions: {
       setup({ dispatch, history }) {
@@ -41,6 +42,12 @@ export default {
               userlist: data,
             }
           })
+        }
+      },
+      *getUserAttribute({ payload,callback }, { call }) {
+        const data = yield call(getLDAPUserAttribute,payload)
+        if (data) {
+          callback(data)
         }
       },
       *getLDAPClassList({ callback }, { call }) {

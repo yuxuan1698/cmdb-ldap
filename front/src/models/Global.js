@@ -1,4 +1,5 @@
 import { getLDAPObjectClassList } from '../services/api';
+import { Modal } from 'antd';
 export default {
     namespace: 'global',
     state: {
@@ -8,7 +9,11 @@ export default {
       classobjects:""
     },
     subscriptions: {
-      
+      setup({ history }) {
+        history.listen(() => {
+          Modal.destroyAll();
+        })
+      }
     },
     effects: {
       *getLDAPClassList({ callback }, { call,put }) {

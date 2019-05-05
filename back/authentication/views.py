@@ -20,6 +20,7 @@ from rest_framework_jwt.views import ObtainJSONWebToken
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.views import APIView
 from rest_framework import status
+from django.core.cache import cache
 
 from common.utils import CmdbLDAPLogger
 
@@ -121,7 +122,7 @@ class DeleteUserViewSet(APIView):
       returnStatus = status.HTTP_400_BAD_REQUEST
     return JsonResponse(returnData, status=returnStatus, safe=False)
 
-class UserListByViewSet(APIView):
+class UserAttributeByViewSet(APIView):
   """
   允许用户查看或编辑的API路径。
   """
@@ -130,19 +131,23 @@ class UserListByViewSet(APIView):
     """
     根据用户获取用户信息
     """
-    userattrs=cmdbldap.get_user_list(request.user)
-    return JsonResponse(userattrs,encoder=LDAPJSONEncoder,safe=False)
+    username=kwargs.get('username')
+    userattrs=cmdbldap.get_user_list(username,['*','+'])
+    return JsonResponse(userattrs[0],encoder=LDAPJSONEncoder,safe=False)
 
 class GetLdapAllCLassListViewSet(APIView):
   """
-  允许用户查看或编辑的API路径。
+  获取所有LDAP的CLASSES名称及字段信息
   """
   # serializer_class=LdapUserSerializer
   def get(self,request,*args,**kwargs):
     """
-    根据用户获取用户信息
+    获取所有LDAP的CLASSES名称及字段信息
     """
-    attrsOrClass,errorMsg=cmdbldap.get_attrsorclass_list()
+    attrsOrClass=cache.get('attrsOrClass')
+    if not attrsOrClass:
+      attrsOrClass,errorMsg=cmdbldap.get_attrsorclass_list()
+      cache.set('attrsOrClass',attrsOrClass)
     if attrsOrClass:
       return JsonResponse(attrsOrClass,encoder=LDAPJSONEncoder,safe=False)
     else:

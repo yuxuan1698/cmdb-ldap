@@ -6,12 +6,11 @@ from ldap.schema.subentry import SCHEMA_ATTRS
 from django.conf import settings
 from common.utils import CmdbLDAPLogger
 from django.contrib.auth import get_user_model
-from authentication.utils import (
+from authentication.ldap.utils import (modifyModList,
   convert_dict_to_tuple_bytes, 
   generate_ldap_dn_prefix,
-  convert_bytes_to_string,
-  convert_string_to_bytes)
-from authentication.ldap.utils import modifyModList
+  convert_string_to_bytes
+  )
 
 logger=CmdbLDAPLogger().get_logger('cmdb_ldap')
 Users = get_user_model()
@@ -50,11 +49,10 @@ class CmdbLDAP(object):
       return False
     return True
 
-  def get_user_list(self,username='uid=*'):
+  def get_user_list(self,username='uid=*',retrieveAttributes=["*"]):
     """ 返回所有LDAP用户列表 """
     if self.connect():
       searchFilter="(&(%s))"%username
-      retrieveAttributes=["*"]
       result_id=self.conn.search(self.userDN, self.searchScope, searchFilter, retrieveAttributes)
       result_set = []
       while 1:
@@ -221,11 +219,14 @@ class CmdbLDAP(object):
     rdn_field=rdn_prefix[0].split('=')
     dndata,err=self.get_user_list(rdn_prefix[0])
     modrdn=""
-    if rdn_field[0]!='':
-      if data[rdn_field[0]]!=rdn_field[1]:
-        modrdn="{}={}".format(rdn_field[0],data[rdn_field[0]])
-      del dndata[0][1][rdn_field[0]]
-      del data[rdn_field[0]]
+    if dndata:
+      if rdn_field[0]!='':
+        if data[rdn_field[0]]!=rdn_field[1]:
+          modrdn="{}={}".format(rdn_field[0],data[rdn_field[0]])
+        del dndata[0][1][rdn_field[0]]
+        del data[rdn_field[0]]
+    else:
+      return False,err
       
     if dndata:
       olddata=dndata[0][1]

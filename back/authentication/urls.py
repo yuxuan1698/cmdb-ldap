@@ -6,7 +6,7 @@ from django.conf.urls import url
 from rest_framework_jwt.views import obtain_jwt_token
 from .views import (
     UserListViewSet,
-    UserListByViewSet,
+    UserAttributeByViewSet,
     LoginViewSet,
     getLDAPOUListViewSet,
     GetLdapAllCLassListViewSet,
@@ -30,7 +30,7 @@ urlpatterns = [
     path('ldap/user/updateuser/', UpdateUserViewSet.as_view(),name='ldap-updateuser'),
     path('ldap/user/deleteuser/', DeleteUserViewSet.as_view(),name='ldap-deleteuser'),
     path('ldap/user/list/', UserListViewSet.as_view(),name='ldap-userlist'),
-    path('ldap/user/attr/', UserListByViewSet.as_view(),name='ldap-userattr'),
+    url(r'ldap/user/attr/(?P<username>[^/]+)/', UserAttributeByViewSet.as_view(),name='ldap-userattr'),
     path('ldap/user/changepassword/', UserChangerPasswordSet.as_view(),name='ldap-changepassword'),
     path('logout/', obtain_jwt_token,name='auth-logout'),
     ]

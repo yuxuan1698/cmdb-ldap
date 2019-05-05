@@ -8,7 +8,7 @@ from rest_framework.serializers import (
   HyperlinkedModelSerializer)
 from rest_framework.exceptions import ValidationError
 from django.contrib.auth import get_user_model
-from authentication.utils import convert_dict_to_tuple_bytes,generate_ldap_password
+from authentication.utils import generate_ldap_password
 from common.utils import CmdbLDAPLogger
 import re
 

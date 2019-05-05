@@ -3,11 +3,12 @@
 import {connect} from 'dva';
 import {PureComponent} from 'react'
 import PropTypes from 'prop-types';
-import { Table, Icon, Button, Alert,message,Layout } from 'antd';
+import { Table, Icon, Button, Alert,message,Layout,Modal } from 'antd';
 import usercss from "./user.less";
 import CMDBBreadcrumb from "../components/Breadcrumb";
 import dynamic from 'umi/dynamic';
 import {UserEditButton,UserBatchButton} from '../components/UserEditButton'
+// import { UserInfo } from '../components/UserInfo'
 const {
   Content
 } = Layout;
@@ -25,6 +26,13 @@ let DrawerUpdateUser = dynamic({
   },
 })
 
+let UserInfo = dynamic({
+  loader: () => import('../components/UserInfo'),
+  loading: (e) => {
+    return null
+  },
+})
+
 @connect(({ users, loading }) => ({ userlist:users.userlist, loading }))
 class CMDBUserList extends PureComponent {
   constructor(props){
@@ -34,7 +42,9 @@ class CMDBUserList extends PureComponent {
       loadedDrawer:false,
       modifyDrawer:false,
       modifydata:"",
-      classobjects:""
+      classobjects:"",
+      userinfo:{},
+      displayuser:false,
     }
   }
   showHideUserDrawer = (type,userdn) => {
@@ -78,6 +88,26 @@ class CMDBUserList extends PureComponent {
       this.setState({selectedRowKeys:[]})
     }})
   }
+  handleDisplayModal=(record)=>{
+    const {dispatch}=this.props
+    if(!this.state.displayuser){
+      this.setState({
+        displayuser:!this.state.displayuser,
+        })
+      const userdn=record.userdn.split(',')[0]
+      dispatch({type:'users/getUserAttribute',payload:userdn,callback:(data)=>{
+        this.setState({
+          userinfo:data[0][1]
+          })
+      }})
+    }else{
+      this.setState({
+        displayuser:!this.state.displayuser,
+        userinfo:{}
+        })
+    }
+
+  }
   render(){
     const {selectedRowKeys,loadedDrawer,modifyDrawer,modifydata,classobjects}=this.state
     const {userlist,loading,dispatch}=this.props
@@ -119,11 +149,7 @@ class CMDBUserList extends PureComponent {
       title: '邮箱',
       dataIndex: 'mail',
       key: 'mail',
-    }, {
-      title: '创建时间',
-      dataIndex: 'createtime',
-      key: 'createtime',
-    }, {
+    },{
       title: "动作",
       key: 'action',
       align: 'center',
@@ -140,7 +166,7 @@ class CMDBUserList extends PureComponent {
     return (
       <Layout className={usercss.userbody}>
         <CMDBBreadcrumb route={{'用户管理':"",'用户列表':'/user/'}} title='用户列表' />
-        <Layout >
+        <Layout style={{margin:"10px 0 0 0"}}>
           <Content>
           <div className={usercss.tableContent}>
             <div className={usercss.usercontrol}>
@@ -189,10 +215,18 @@ class CMDBUserList extends PureComponent {
                 selectedRowKeys,
                 onChange: this.onSelectChange.bind(this),
               }}
+              onRow={(record)=>{
+                return {
+                  onDoubleClick: this.handleDisplayModal.bind(this,record),   
+                }
+              }}
               columns={columns} 
               dataSource={data} />
           </div>
           </Content>
+          <UserInfo visible={this.state.displayuser} 
+            loading={this.props.loading}
+            userinfo={this.state.userinfo} handleDisplayModal={this.handleDisplayModal.bind(this)} />
         </Layout>
       </Layout>)
   }

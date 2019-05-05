@@ -38,6 +38,13 @@ export function getLDAPUserList () {
         url: '/v1/ldap/user/list/'
     })
 }
+// 获取用户列表API
+export function getLDAPUserAttribute (user) {
+    return request({
+        method: "get",
+        url: `/v1/ldap/user/attr/${user}/`
+    })
+}
 // 获取LDAPClass API
 export function getLDAPObjectClassList () {
     return request({

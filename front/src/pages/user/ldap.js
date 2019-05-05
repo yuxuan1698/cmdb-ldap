@@ -4,11 +4,10 @@ import {PureComponent} from 'react'
 import { Layout,Tree,Input,Button,Icon,Menu } from 'antd';
 import {connect} from 'dva';
 import { Resizable } from 'react-resizable';
-import { ContextMenuTrigger, ContextMenu } from 'react-contextmenu';
+import { ContextMenuTrigger, ContextMenu,MenuItem } from 'react-contextmenu';
 import usercss from "./user.less";
 import CMDBBreadcrumb from "../components/Breadcrumb";
 import CMDBLDAPAttribute from "../components/Attribute"
-import '../../../node_modules/react-resizable/css/styles.css';
 
 const {
    Content, Sider,Footer
@@ -16,7 +15,6 @@ const {
 const ButtonGroup = Button.Group;
 const { TreeNode,DirectoryTree } = Tree;
 const {Search} = Input;
-const { Item, Divider } = Menu
 
 @connect(({loading,ldap})=>({loading,groups:ldap.groups}))
 class CMDBLdapGroups extends PureComponent {
@@ -60,16 +58,16 @@ class CMDBLdapGroups extends PureComponent {
   })
   handleRightMenu=()=>{
     let menu = (<ContextMenu id="ldap_control_menu" >
-      <Menu style={{ border:"none"}}>
-        <Menu.Item className={usercss.right_menu_item}>
-          <a target="_blank" rel="noopener noreferrer" href="http://www.alipay.com/">1st menu item</a>
-        </Menu.Item >
-        <Menu.Item key="1" className={usercss.right_menu_item}>
-          <a target="_blank" rel="noopener noreferrer" href="http://www.taobao.com/">2nd menu item</a>
-        </Menu.Item >
-        <Menu.Divider />
-        <Menu.Item key="3" disabled className={usercss.right_menu_item}>3rd menu item（disabled）</Menu.Item>
-      </Menu>
+      <MenuItem data={{foo: 'bar'}} >
+          新建节点(Entry)
+        </MenuItem>
+        <MenuItem data={{foo: 'bar'}} >
+          删除节点(Entry)
+        </MenuItem>
+        <MenuItem divider />
+        <MenuItem data={{foo: 'bar'}} >
+   	      重命名节点(Entry)
+        </MenuItem>
     </ContextMenu>)
     return menu
 
@@ -113,7 +111,7 @@ class CMDBLdapGroups extends PureComponent {
   onResize=(event, { element, size })=>{
     this.setState({ width: size.width });
   }
-  handleOnSelect=(selectkey,{selected,selectedNodes, node, event})=>{
+  handleOnSelect=(selectkey)=>{
     const { treeobject}=this.props.groups
     if (treeobject.hasOwnProperty(selectkey)){
       this.setState({ selectdata: treeobject[selectkey]})
@@ -150,8 +148,10 @@ class CMDBLdapGroups extends PureComponent {
                 <ContextMenuTrigger id='ldap_control_menu' >
                   <DirectoryTree loadData={this.onLoadData} 
                     expandedKeys={expandedKeys}
+                    // expandAction='doubleClick'
                     autoExpandParent={autoExpandParent}
                     onExpand={this.onExpand.bind(this)}
+                    onRightClick={this.handleOnSelect.bind(this)}
                     onSelect={this.handleOnSelect.bind(this)}>
                     {this.renderTreeNodes(treedata,searchValue)}
                   </DirectoryTree>
@@ -169,7 +169,7 @@ class CMDBLdapGroups extends PureComponent {
             </Layout>
           </Sider>
         </Resizable>
-        <Content style={{padding: 15,marginLeft:5, backgroundColor: "white"}}>
+        <Content style={{padding: 15,marginLeft:5, backgroundColor: "white",boxShadow: "#dcd8d8 0px 0px 3px"}}>
           <CMDBLDAPAttribute />
         </Content>
       </Layout>

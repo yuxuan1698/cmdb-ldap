@@ -94,8 +94,6 @@
     }
     render(){
       let {collapsed,toggleSideMenu}=this.props
-      console.log(this.state.parentpath)
-      console.log(this.state.subpath)
       return (
         <Sider className={css.sider}
                 collapsed={collapsed}

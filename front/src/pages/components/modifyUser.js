@@ -129,8 +129,8 @@ class DrawerUpdateUser extends PureComponent {
         dispatch({type:'users/postLDAPUpdateUser',payload: modData,callback:(data)=>{
           this.props.form.resetFields()
           notification.info({
-            message:"添加成功提示",
-            description: "用户添加成功！"
+            message:"修改成功提示",
+            description: "用户修改成功！"
           })
           this.handleClose()
           dispatch({type:'users/getUserList'})
