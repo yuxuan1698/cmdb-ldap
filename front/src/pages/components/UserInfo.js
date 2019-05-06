@@ -1,6 +1,6 @@
 'use strict'
 
-import {PureComponent} from 'react';
+import {Fragment,PureComponent} from 'react';
 import {
   Modal,Row,Col,Divider,Tag, Icon
 } from 'antd';
@@ -8,10 +8,11 @@ import css from './index.less'
 const color=["blue","cyan","geekblue","magenta","red","volcano","green","orange","gold","lime","purple"];
 const DescriptionItem = ({ title, content,keyval }) => {
   let index=0
-  let formatcontent=(<div className={css.userinfo_value}>{content instanceof Array?content.map(i=>{
+  let formatcontent=(<div className={css.userinfo_value}>{
+    content instanceof Array?content.map(i=>{
         if(index>color.length) index=0
         index+=1
-        if(keyval==='memberOf') return <Tag color={color[index-1]}>{i}</Tag>
+        if(keyval==='memberOf') return <Tag key={i} color={color[index-1]}>{i}</Tag>
         return content.length>1?<Tag key={i} color={color[index-1]}>{i.replace(/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})Z$/g,`$1/$2/$3 $4:$5:$6`)}</Tag>:
         <Tag key={i} style={{ background: '#fff', borderStyle: 'dashed' }} >{i.replace(/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})Z$/g,`$1/$2/$3 $4:$5:$6`)}</Tag>
         }):<Tag style={{ background: '#fff', borderStyle: 'dashed' }} >{content}</Tag>}</div>)
@@ -27,35 +28,36 @@ const DescriptionItem = ({ title, content,keyval }) => {
 }
 const base_profile={
   'uid':{name:"用户名",col:12},
-  'ou':{name:"用户部门",col:12},
   'sn':{name:"用户姓名",col:12},
   'cn':{name:"用户别名",col:12},
   'givenName':{name:"用户附名",col:12},
+  'ou':{name:"用户部门",col:12},
   'departmentNumber':{name:"用户职位",col:12},
   'uidNumber':{name:"用户UID",col:12},
   'gidNumber':{name:"用户组ID",col:12},
-  'loginShell':{name:"用户登陆SHELL",col:12},
+  'loginShell':{name:"用户登陆Shell",col:12},
   'homeDirectory':{name:"用户目录",col:12},
   'mail':{name:"邮箱地址",col:12},
   'mobile':{name:"手机号码",col:12},
-  'entryDN':{name:"用户DN",col:24},
-  'entryUUID':{name:"用户UUID",col:24},
+  'entryDN':{name:"用户DN",col:12},
+  'entryUUID':{name:"用户UUID",col:12},
   'objectClass':{name:"用户属性",col:24},
 }
 const extra_profile={
-  'creatorsName':{name:"创建人",col:12},
   'createTimestamp':{name:"创建时间",col:12},
   'modifyTimestamp':{name:"修改时间",col:12},
   'pwdChangedTime':{name:"密码修改时间",col:12},
-  'modifiersName':{name:"修改人",col:12},
   'hasSubordinates':{name:"有无下属",col:12},
-  'manager':{name:"用户上级",col:24},
+  'manager':{name:"用户上级",col:12},
+  'creatorsName':{name:"创建人",col:12},
+  'modifiersName':{name:"修改人",col:12},
   'memberOf':{name:"用户权限",col:24},
   'sshPublicKey':{name:"用户公钥",col:24}
 }
 const other_profile={
   'description':{name:"备注/描述",col:12},
   'structuralObjectClass':{name:"结构对象类",col:12},
+  'subschemaSubentry':{name:"subschemaSubentry",col:12},
   'entryCSN':{name:"entryCSN",col:24},
 }
 class UserInfo extends PureComponent {
@@ -114,24 +116,25 @@ class UserInfo extends PureComponent {
       <Modal  
         title={<span>用户属性</span>}
         destroyOnClose
+        centered
         visible={this.props.visible} 
         width={1000}
         footer={null}
-        bodyStyle={{padding:"15px 40px",maxHeight:730,overflow:"auto"}}
+        bodyStyle={{padding:"15px 25px",overflow:"auto"}}
         onCancel={this.props.handleDisplayModal}>
         <Divider style={{margin:"20px 0px"}} orientation="left">基本属性</Divider>
           <Row style={{paddingLeft:20}}>
             {base_profile_html}
           </Row>
           {loading?<Icon style={{fontSize:30}} type="loading" />:(
-          <div><Divider style={{margin:"20px 0px"}} orientation="left">扩展属性</Divider>
+          <Fragment><Divider style={{margin:"20px 0px"}} orientation="left">扩展属性</Divider>
           <Row style={{paddingLeft:20}}>
             {extra_profile_html}
           </Row>
           <Divider style={{margin:"20px 0px"}} orientation="left">其它属性</Divider>
           <Row style={{paddingLeft:20}}>
             {other_profile_html}
-          </Row></div>)}
+            </Row></Fragment>)}
           
       </Modal>
     );
