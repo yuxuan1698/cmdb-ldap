@@ -19,7 +19,7 @@ const models={
       selectedItems:['top','person','organizationalPerson','inetOrgPerson','posixAccount','ldapPublicKey'],
       mustField:['uid','sn','cn','uidNumber','gidNumber','homeDirectory'],
       currField:['uid','sn','cn','uidNumber','gidNumber','userPassword','homeDirectory','ou',
-        'mobile','mail','loginShell','sshPublicKey','description']
+        'mobile','mail','loginShell','departmentNumber','sshPublicKey','description']
     }
   }
 const filedToName={

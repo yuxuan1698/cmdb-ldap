@@ -21,7 +21,7 @@ export class UserEditButton extends PureComponent {
       <div>
         <ButtonGroup size="small">
           <Tooltip placement="topLeft" title={'编辑用户'} getPopupContainer={trigger => trigger.parentNode} >
-            <Button type="Default" icon="edit" onClick={()=>{
+            <Button type="Default" icon="bars" onClick={()=>{
            this.props.showHideUserDrawer('update',delkey)
           }}/>
           </Tooltip>

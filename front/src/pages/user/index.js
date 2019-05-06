@@ -93,6 +93,7 @@ class CMDBUserList extends PureComponent {
     if(!this.state.displayuser){
       this.setState({
         displayuser:!this.state.displayuser,
+        userinfo:record
         })
       const userdn=record.userdn.split(',')[0]
       dispatch({type:'users/getUserAttribute',payload:userdn,callback:(data)=>{
@@ -121,6 +122,7 @@ class CMDBUserList extends PureComponent {
         givenName: userlist[it][1].givenName ? userlist[it][1].givenName[0]:"",
         cn: userlist[it][1].cn ? userlist[it][1].cn[0]:"",
         mail: userlist[it][1].mail ? userlist[it][1].mail[0]:"",
+        departmentNumber: userlist[it][1].departmentNumber ? userlist[it][1].departmentNumber[0]:"",
         userdn: userlist[it][0]
       })
     })
@@ -141,6 +143,10 @@ class CMDBUserList extends PureComponent {
       title: '手机号码',
       dataIndex: 'mobile',
       key: 'mobile',
+    },{
+      title: '职位',
+      dataIndex: 'departmentNumber',
+      key: 'departmentNumber',
     },{
       title: '所属部门',
       dataIndex: 'ou',
