@@ -32,7 +32,7 @@ const filedToName={
   uidNumber:'用户UID',
   gidNumber:'用户组ID',
   loginShell:'登陆SHELL',
-  departmentNumber:'部门编号',
+  departmentNumber:'职位名称',
   homeDirectory:'用户目录',
   userPassword:'用户密码',
   sshPublicKey:'用户公钥',

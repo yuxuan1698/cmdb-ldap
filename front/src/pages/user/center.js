@@ -1,7 +1,7 @@
 'use strict'
 
-import {PureComponent} from 'react'
-import '../../../node_modules/react-resizable/css/styles.css';
+import {Fragment,PureComponent} from 'react'
+// import '../../../node_modules/react-resizable/css/styles.css';
 import React from 'react';
 import { Resizable } from 'react-resizable';
 class CMDBUserCenter extends PureComponent {
@@ -17,13 +17,13 @@ class CMDBUserCenter extends PureComponent {
   };
   render() {
     return (
-      <div>
+      <Fragment>
           <Resizable className="box"  axis="x"  minConstraints={[200,200]} width={this.state.width} onResize={this.onResize}>
             <div className="box" style={{ width: this.state.width + 'px', height: this.state.height + 'px' }}>
               <span className="text">{"Raw use of <Resizable> element. 200x200, no constraints."}</span>
             </div>
           </Resizable>
-      </div>
+      </Fragment>
     )
   }
 }

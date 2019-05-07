@@ -5,6 +5,7 @@ import {
   Modal,Row,Col,Divider,Tag, Icon
 } from 'antd';
 import css from './index.less'
+
 const color=["blue","cyan","geekblue","magenta","red","volcano","green","orange","gold","lime","purple"];
 const DescriptionItem = ({ title, content,keyval }) => {
   let index=0
@@ -126,7 +127,7 @@ class UserInfo extends PureComponent {
           <Row style={{paddingLeft:20}}>
             {base_profile_html}
           </Row>
-          {loading?<Icon style={{fontSize:30}} type="loading" />:(
+          {loading?<Icon style={{fontSize:30,marginTop:30}} type="loading" />:(
           <Fragment><Divider style={{margin:"20px 0px"}} orientation="left">扩展属性</Divider>
           <Row style={{paddingLeft:20}}>
             {extra_profile_html}

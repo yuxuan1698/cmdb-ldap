@@ -21,6 +21,7 @@ class CmdbLDAP(object):
   def __init__(self):
     self.bindDN=settings.AUTH_LDAP_BIND_DN
     self.bindDNPassword=settings.AUTH_LDAP_BIND_PASSWORD
+    # self.conn=ldap.initialize(settings.AUTH_LDAP_SERVER_URI)
     self.conn=ReconnectLDAPObject(settings.AUTH_LDAP_SERVER_URI,trace_level=1)
     self.searchScope = ldap.SCOPE_ONELEVEL
     self.conn.set_option(ldap.OPT_REFERRALS,0)
@@ -163,7 +164,7 @@ class CmdbLDAP(object):
       if len(result_set)==0 and ldapType==ldap.SCOPE_ONELEVEL:
         newresult,msg=self.get_base_ou(queryOU,ldapType=ldap.SCOPE_BASE)
         if len(newresult)>0:
-          return {"notsubdir":True},None
+          return {"notsubdir":True,"data":newresult},None
         else:
           return False,"没有找到DN记录或者属性！"
 

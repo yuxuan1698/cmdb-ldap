@@ -1,10 +1,10 @@
 'use strict'
 
 import {PureComponent} from 'react'
-import { Layout,Tree,Input,Button,Icon,Menu } from 'antd';
+import { Layout,Tree,Input,Button,Icon,Empty } from 'antd';
 import {connect} from 'dva';
 import { Resizable } from 'react-resizable';
-import { ContextMenuTrigger, ContextMenu,MenuItem } from 'react-contextmenu';
+import { ContextMenuTrigger, ContextMenu,MenuItem,Tooltip } from 'react-contextmenu';
 import usercss from "./user.less";
 import CMDBBreadcrumb from "../components/Breadcrumb";
 import CMDBLDAPAttribute from "../components/Attribute"
@@ -25,7 +25,9 @@ class CMDBLdapGroups extends PureComponent {
       searchValue:"",
       expandedKeys:[],
       autoExpandParent: true,
-      loadedKeys:[]
+      selectdata:"",
+      loadedKeys:[],
+      classobjects:"",
     }
   }
   renderTreeNodes = (data,searchValue) => data.filter(i=>{
@@ -70,15 +72,14 @@ class CMDBLdapGroups extends PureComponent {
         </MenuItem>
     </ContextMenu>)
     return menu
-
   }
   onLoadData = treeNode => {
+    const {dispatch} =this.props
     return new Promise((resolve)=>{
       if (treeNode.props.children) {
         resolve();
         return;
       }
-      const {dispatch} =this.props
       const curkey=treeNode.props.dataRef.key
       dispatch({'type':'ldap/getLDAPGroupsSecendList',payload:`${curkey}/`,callback:(data)=>{
         let list=[]
@@ -106,15 +107,26 @@ class CMDBLdapGroups extends PureComponent {
           }, 10);
         }
       }})
+    }).then(()=>{
+      if(this.state.classobjects===""){
+        dispatch({type:'users/getLDAPClassList',callback:(data)=>{
+          this.setState({
+            classobjects: data
+          });
+        }})
+      }
     })
   }
-  onResize=(event, { element, size })=>{
+  onResize=(event, { size })=>{
     this.setState({ width: size.width });
   }
-  handleOnSelect=(selectkey)=>{
-    const { treeobject}=this.props.groups
+  handleOnSelect=(selectkey,value)=>{
+    const { treeobject }=this.props.groups
+    const { dispatch }=this.props
     if (treeobject.hasOwnProperty(selectkey)){
-      this.setState({ selectdata: treeobject[selectkey]})
+      this.setState({ 
+        selectdata: Object.assign(treeobject[selectkey],{selectkey:selectkey})
+        })
     }
   }
   handleOnChange = (e) => {
@@ -131,7 +143,7 @@ class CMDBLdapGroups extends PureComponent {
     });
   }
   render(){
-    const { searchValue, expandedKeys, autoExpandParent,width } = this.state
+    const { searchValue, expandedKeys, autoExpandParent,width,classobjects } = this.state
     const {treedata}=this.props.groups
     return (
     <Layout className={usercss.userbody}>
@@ -148,10 +160,8 @@ class CMDBLdapGroups extends PureComponent {
                 <ContextMenuTrigger id='ldap_control_menu' >
                   <DirectoryTree loadData={this.onLoadData} 
                     expandedKeys={expandedKeys}
-                    // expandAction='doubleClick'
                     autoExpandParent={autoExpandParent}
                     onExpand={this.onExpand.bind(this)}
-                    onRightClick={this.handleOnSelect.bind(this)}
                     onSelect={this.handleOnSelect.bind(this)}>
                     {this.renderTreeNodes(treedata,searchValue)}
                   </DirectoryTree>
@@ -160,17 +170,20 @@ class CMDBLdapGroups extends PureComponent {
               </Content>
               <Footer style={{padding:0,}}>
                 <ButtonGroup size="small" >
-                  <Button style={{height:22,fontSize:10,borderRadius:0}} icon='plus'>
-                  </Button>
-                  <Button style={{height:22,fontSize:10,borderRadius:0}} icon='minus'>
-                  </Button>
+                    <Button title="添加" style={{height:22,fontSize:10,borderRadius:0}} icon='plus' ></Button>
+                    <Button title="删除" style={{height:22,fontSize:10,borderRadius:0}} icon='minus' ></Button>
+                    <Button title="刷新" style={{height:22,fontSize:10,borderRadius:0}} icon='reload' ></Button>
                 </ButtonGroup>
               </Footer>
             </Layout>
           </Sider>
         </Resizable>
         <Content style={{padding: 15,marginLeft:5, backgroundColor: "white",boxShadow: "#dcd8d8 0px 0px 3px"}}>
-          <CMDBLDAPAttribute />
+          {classobjects?<CMDBLDAPAttribute 
+            dispatch={this.props.dispatch} 
+            loading={this.props.loading} 
+            selectdata={this.state.selectdata}
+            classobjects={classobjects} />:<Empty />}
         </Content>
       </Layout>
     </Layout>

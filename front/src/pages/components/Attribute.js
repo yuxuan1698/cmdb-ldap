@@ -36,21 +36,34 @@ class CMDBLDAPAttribute extends PureComponent {
     super(props)
     const { classobjects } =this.props
     this.state={
-      options: [],
-      classobjects: {},
+      options: Object.keys(classobjects),
+      classobjects: classobjects,
       mayField:[],
       visible: true,
-      addmodel:'temp',
       selectedItems:['top'],
       mustField:[],
-      currField:['uid'],
+      currField:[],
       currData:{}
     }
   }
-
+  componentWillMount(){
+    const { selectdata }=this.props
+    this.handleClassObjectsChange(selectdata['objectClass'])
+  }
+  componentWillReceiveProps(nextProps){
+    const { selectdata }=nextProps
+    if(this.props.selectdata!==selectdata){
+      this.setState({
+        currField:Object.keys(selectdata).filter(i=>!(i==='objectClass' || i==='selectkey')),
+        selectedItems:selectdata['objectClass']
+      })
+      setTimeout(this.handleNewClassObject,50)
+    }
+  }
   initSelectedItems(arr){
     const {classobjects}=this.state
     let supSet=[]
+    if(!arr instanceof Array) return []
     arr.filter(it=>it!=='top').map((it)=>{
       let tmp=classobjects[it][0].sup.filter(i=>i!=='top')
       if(tmp.length>0) {
@@ -63,10 +76,12 @@ class CMDBLDAPAttribute extends PureComponent {
   }
   handleClassObjectsChange=(e,v)=>{
     const {classobjects}=this.state
+    const {selectkey}=this.props.selectdata
+    let defautlMustfield=(selectkey instanceof Array && selectkey[0]!=='')?selectkey[0].split(',')[0].split('=')[0]:'uid'
     let supSet=this.initSelectedItems(e)
     let mayfiled=[], mustfiled=[]
     supSet.filter(i=>i!=='top').map(it=>{
-      mustfiled=mustfiled.concat([it==='simpleSecurityObject'?"cn":'uid'],classobjects[it][1].must)
+      mustfiled=mustfiled.concat([it==='simpleSecurityObject'?"cn":defautlMustfield],classobjects[it][1].must)
       mayfiled=mayfiled.concat(classobjects[it][2].may)
     }) 
     this.setState({
@@ -90,10 +105,6 @@ class CMDBLDAPAttribute extends PureComponent {
         objectClass: this.state.selectedItems,
       });
     }
-  }
-  handleClose=()=>{
-    this.setState({visible:!this.state.visible})
-    setTimeout(this.props.showHideUserDrawer,500,'update')
   }
   addInputField=(name)=>{
     this.setState({ currField:this.state.currField.concat(name.key)})
@@ -123,8 +134,6 @@ class CMDBLDAPAttribute extends PureComponent {
             message:"添加成功提示",
             description: "用户添加成功！"
           })
-          this.handleClose()
-          dispatch({type:'users/getUserList'})
         }})
       }
     });
@@ -141,9 +150,10 @@ class CMDBLDAPAttribute extends PureComponent {
     }
   }
   render() {
-    const { getFieldDecorator,getFieldValue,setFieldValue } = this.props.form;
-    const { loading,modifydata,userselect } = this.props;
+    const { getFieldDecorator } = this.props.form;
+    const { loading,userselect } = this.props;
     const { selectedItems,options } = this.state;
+    const {selectdata}=this.props
     return (<div>
               <Form layout="horizontal" onSubmit={this.handleSubmit} >
                 <Row gutter={18} style={{margin:0}}>
@@ -157,6 +167,10 @@ class CMDBLDAPAttribute extends PureComponent {
                           mode="multiple" showArrow autoFocus allowClear
                           placeholder="请选择属性归属类(objectClass)"
                           onChange={this.handleClassObjectsChange.bind(this)}
+                          loading={loading.effects['users/getLDAPClassList']}
+                          // onDropdownVisibleChange={(e)=>{
+                          //   if(e) this.handleLoadObjectsClass()
+                          // }}
                           onMouseLeave={this.handleNewClassObject.bind(this)}
                           onBlur={this.handleNewClassObject.bind(this)} >
                           {options.filter(e=>!selectedItems.includes(e)).map(item => (
@@ -183,22 +197,22 @@ class CMDBLDAPAttribute extends PureComponent {
                         placeholder={(filedToName[i] ? filedToName[i] : i) + `(${i})`} 
                         autosize={{ minRows: 2, maxRows: 5 }} />
                     }
-                    if(i==='manager'){
-                      inputField=<Select
-                                showArrow autoFocus allowClear showSearch
-                                placeholder={`请选择属性领导/上级(${i})`} >
-                                {userselect.map(item => (
-                                  <Option key={item['userdn']} value={item['userdn']}>
-                                    {item['sn']}({item['uid']})
-                                  </Option>
-                                ))}
-                              </Select>
-                    }
+                    // if(i==='manager'){
+                    //   inputField=<Select
+                    //             showArrow autoFocus allowClear showSearch
+                    //             placeholder={`请选择属性领导/上级(${i})`} >
+                    //             {userselect.map(item => (
+                    //               <Option key={item['userdn']} value={item['userdn']}>
+                    //                 {item['sn']}({item['uid']})
+                    //               </Option>
+                    //             ))}
+                    //           </Select>
+                    // }
                     return (
                       <Col span={24} key={i} >
                       <Form.Item  labelCol={{ span: 7 }} wrapperCol={{ span: 13 }} label={filedToName[i]?filedToName[i]:i} hasFeedback required>
                         {getFieldDecorator(i, {
-                            initialValue: "",
+                            initialValue: selectdata.hasOwnProperty(i)?selectdata[i][0]:"",
                             rules: [{ required: i==='userPassword'?false:true, message: `请输入${filedToName[i]}(${i})` }],
                         })(inputField)}
                         {!this.state.mustField.includes(i)?<Tooltip placement="top" title="删除字段">
@@ -216,6 +230,7 @@ class CMDBLDAPAttribute extends PureComponent {
                   <div style={{width:"80%",margin: "0 auto"}} >
                     <Form.Item >
                       <Dropdown trigger={['click']} 
+                      loading={loading.effects['users/getLDAPClassList']}
                       overlayStyle={{maxHeight:300,overflow:"auto",boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)"}}
                       disabled={this.state.selectedItems.filter(i=>i!=='top').length>0?false:true}
                       overlay={this.initAddFieldMenu.bind(this)} >

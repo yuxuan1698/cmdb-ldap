@@ -29,7 +29,8 @@ export default {
         if (data) {
           let newdata = { treedata:[],treeobject:{}}
           Object.keys(data).map(i => {
-            newdata['treedata'].push({ title: data[i][0].ou[0], key: data[i][1] })
+            let titlefield=data[i][1].split(',')[0].split('=')[0]
+            newdata['treedata'].push({ title: data[i][0][titlefield][0], key: data[i][1] })
             newdata['treeobject'][data[i][1]] = data[i][0]
           })
           yield put({

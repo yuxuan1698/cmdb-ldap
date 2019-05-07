@@ -20,7 +20,7 @@ const filedToName={
   uidNumber:'用户UID',
   gidNumber:'用户组ID',
   loginShell:'登陆SHELL',
-  departmentNumber:'部门编号',
+  departmentNumber:'职位名称',
   homeDirectory:'用户目录',
   userPassword:'用户密码',
   sshPublicKey:'用户公钥',
@@ -49,12 +49,9 @@ class DrawerUpdateUser extends PureComponent {
       currData:{}
     }
   }
-  componentWillMount(){
-    const {modifydata}=this.props
-    this.handleClassObjectsChange(modifydata['data']['objectClass'])
-  }
   componentDidMount(){
     const {modifydata}=this.props
+    this.handleClassObjectsChange(modifydata['data']['objectClass'])
     this.setState({currField:Object.keys(modifydata['data']).filter(i=>i!=='objectClass').sort((i,b)=>i=='uid'?-1:0) })
   }
   initSelectedItems(arr){
@@ -150,7 +147,7 @@ class DrawerUpdateUser extends PureComponent {
     }
   }
   render() {
-    const { getFieldDecorator,getFieldValue,setFieldValue } = this.props.form;
+    const { getFieldDecorator } = this.props.form;
     const { loading,modifydata,userselect } = this.props;
     const { selectedItems,options } = this.state;
     return (<Drawer
