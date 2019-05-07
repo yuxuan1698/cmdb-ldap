@@ -22,6 +22,9 @@ export default {
                 type: 'getUserList'
               })
               break;
+            default:
+              alert()
+              dispatch({ type: 'userlist', payload: { userlist:{}}})
           }
         });
       },

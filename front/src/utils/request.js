@@ -48,7 +48,6 @@ axios.interceptors.response.use((response) => {
   return response;
 }, async (error) => {
   // 请求结束，蓝色过渡滚动条消失
-  // clearInterval(timer)
   NProgress.done();
   if(error.response){
     const {status,data}=error.response
@@ -68,19 +67,18 @@ axios.interceptors.response.use((response) => {
 
 
 export default function request (opt) {
-  const timer = setInterval(()=>{
-    NProgress.inc(.05)
-  }, 400);
+  let timer= setInterval(()=>{
+      NProgress.inc(.05)
+    }, 400);
   // 调用 axios api，统一拦截
   return axios(opt)
     .then((response) => {
       console.log(`【${opt.method} ${opt.url}】请求成功，响应数据：${response}`, )
+      clearInterval(timer)
       return { ...response.data }
-      // clearInterval(timer)
-      
     })
     .catch((error) => {
-      // clearInterval(timer)
+      clearInterval(timer)
       // 请求配置发生的错误
       if (!error.response) {
         message.error(`${formatMessage({id:'request.status.timeout'})} ${error.message}`);

@@ -104,7 +104,7 @@ class CMDBLdapGroups extends PureComponent {
               treedata: [...this.props.groups.treedata],
             });
             resolve();
-          }, 10);
+          }, 50);
         }
       }})
     })
