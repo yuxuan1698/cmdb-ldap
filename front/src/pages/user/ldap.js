@@ -107,14 +107,6 @@ class CMDBLdapGroups extends PureComponent {
           }, 10);
         }
       }})
-    }).then(()=>{
-      if(this.state.classobjects===""){
-        dispatch({type:'users/getLDAPClassList',callback:(data)=>{
-          this.setState({
-            classobjects: data
-          });
-        }})
-      }
     })
   }
   onResize=(event, { size })=>{
@@ -127,6 +119,15 @@ class CMDBLdapGroups extends PureComponent {
       this.setState({ 
         selectdata: Object.assign(treeobject[selectkey],{selectkey:selectkey})
         })
+    }
+    if (this.state.classobjects === "") {
+      dispatch({
+        type: 'users/getLDAPClassList', callback: (data) => {
+          this.setState({
+            classobjects: data
+          });
+        }
+      })
     }
   }
   handleOnChange = (e) => {

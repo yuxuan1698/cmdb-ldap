@@ -29,7 +29,7 @@ logger=CmdbLDAPLogger().get_logger('cmdb_ldap')
 
 
 Users = get_user_model()
-cmdbldap=CmdbLDAP()
+# cmdbldap=CmdbLDAP()()
 class LoginViewSet(ObtainJSONWebToken):
   """用户登陆接口"""
   
@@ -42,7 +42,7 @@ class UserListViewSet(APIView):
     """ 
     获取所有用户的列表信息
     """
-    user_list,errorMsg=cmdbldap.get_user_list()
+    user_list,errorMsg=CmdbLDAP().get_user_list()
     if user_list:
       page=PageNumberPagination()
       page_roles=page.paginate_queryset(queryset=user_list,request=request,view=self)
@@ -62,7 +62,7 @@ class CreateUserViewSet(APIView):
     serializer = CreateUserSerializer(instance=request, data=request.data)
     if serializer.is_valid():
       # serializer.validated_data
-      changeStatus, errorMsg = cmdbldap.create_ldap_user(request.data)
+      changeStatus, errorMsg = CmdbLDAP().create_ldap_user(request.data)
       if changeStatus:
         returnData = {"status": changeStatus}
         returnStatus = status.HTTP_200_OK
@@ -87,7 +87,7 @@ class UpdateUserViewSet(APIView):
     if serializer.is_valid():
       olddn=request.data['userdn']
       request.data.pop('userdn')
-      changeStatus, errorMsg = cmdbldap.update_ldap_user(request.data,olddn)
+      changeStatus, errorMsg = CmdbLDAP().update_ldap_user(request.data,olddn)
       if changeStatus:
         returnData = {"status": changeStatus}
         returnStatus = status.HTTP_200_OK
@@ -110,7 +110,7 @@ class DeleteUserViewSet(APIView):
     """
     serializer = DeleteUserSerializer(instance=request, data=request.data)
     if serializer.is_valid():
-      changeStatus, errorMsg = cmdbldap.delete_ldap_user(request.data)
+      changeStatus, errorMsg = CmdbLDAP().delete_ldap_user(request.data)
       if changeStatus:
         returnData = {"status": changeStatus}
         returnStatus = status.HTTP_200_OK
@@ -132,7 +132,7 @@ class UserAttributeByViewSet(APIView):
     根据用户获取用户信息
     """
     username=kwargs.get('username')
-    userattrs=cmdbldap.get_user_list(username,['*','+'])
+    userattrs=CmdbLDAP().get_user_list(username,['*','+'])
     return JsonResponse(userattrs[0],encoder=LDAPJSONEncoder,safe=False)
 
 class GetLdapAllCLassListViewSet(APIView):
@@ -146,7 +146,7 @@ class GetLdapAllCLassListViewSet(APIView):
     """
     attrsOrClass=cache.get('attrsOrClass')
     if not attrsOrClass:
-      attrsOrClass,errorMsg=cmdbldap.get_attrsorclass_list()
+      attrsOrClass,errorMsg=CmdbLDAP().get_attrsorclass_list()
       cache.set('attrsOrClass',attrsOrClass)
     if attrsOrClass:
       return JsonResponse(attrsOrClass,encoder=LDAPJSONEncoder,safe=False)
@@ -162,7 +162,7 @@ class GetLdapAllAttrsListViewSet(APIView):
     """
     根据用户获取用户信息
     """
-    attrsOrClass,errorMsg=cmdbldap.get_attrsorclass_list(type='attr')
+    attrsOrClass,errorMsg=CmdbLDAP().get_attrsorclass_list(type='attr')
     if attrsOrClass:
       return JsonResponse(attrsOrClass,encoder=LDAPJSONEncoder,safe=False)
     else:
@@ -176,7 +176,7 @@ class getLDAPOUListViewSet(APIView):
       queryOU=kwargs.get('baseou')
     else:
       queryOU=settings.AUTH_LDAP_BASE_DN
-    ous,errorMsg=cmdbldap.get_base_ou(queryOU)
+    ous,errorMsg=CmdbLDAP().get_base_ou(queryOU)
     logger.info(errorMsg)
     if len(ous)>0:
       return JsonResponse(ous,encoder=LDAPJSONEncoder,safe=False)
@@ -191,7 +191,7 @@ class UserChangerPasswordSet(APIView):
   def post(self,request,*args,**kwargs):
     serializer=ChangePasswordSerializer(instance=request,data=request.data)
     if serializer.is_valid():
-      changeStatus,errorMsg=cmdbldap.change_self_password(request.data)
+      changeStatus,errorMsg=CmdbLDAP().change_self_password(request.data)
       if changeStatus==True:
         returnData={"status":"密码修改成功！"}
         returnStatus=status.HTTP_200_OK

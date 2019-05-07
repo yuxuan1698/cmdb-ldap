@@ -5,7 +5,6 @@ import { message } from 'antd';
 import {formatMessage} from 'umi/locale';
 import { GenerateRequestAuthParams,formatReturnMsg } from "../utils/utils";
 
-
 /**
  * 一、功能：
  * 1. 统一拦截http错误请求码；
@@ -29,7 +28,6 @@ axios.defaults.baseURL = '/api/';
 axios.defaults.withCredentials = true;
 
 // 添加一个请求拦截器，用于设请求HEADER及请求过渡状态
-
 axios.interceptors.request.use((config) => {
   // 请求开始，蓝色过渡滚动条开始出现
   const auth = GenerateRequestAuthParams()
@@ -37,7 +35,7 @@ axios.interceptors.request.use((config) => {
     config=Object.assign(config,auth)
   }
   NProgress.start();
-  NProgress.set(.4);
+  NProgress.set(.3)
   return config;
 }, (error) => {
   return Promise.reject(error);
@@ -50,6 +48,7 @@ axios.interceptors.response.use((response) => {
   return response;
 }, async (error) => {
   // 请求结束，蓝色过渡滚动条消失
+  // clearInterval(timer)
   NProgress.done();
   if(error.response){
     const {status,data}=error.response
@@ -69,13 +68,19 @@ axios.interceptors.response.use((response) => {
 
 
 export default function request (opt) {
+  const timer = setInterval(()=>{
+    NProgress.inc(.05)
+  }, 400);
   // 调用 axios api，统一拦截
   return axios(opt)
     .then((response) => {
       console.log(`【${opt.method} ${opt.url}】请求成功，响应数据：${response}`, )
       return { ...response.data }
+      // clearInterval(timer)
+      
     })
     .catch((error) => {
+      // clearInterval(timer)
       // 请求配置发生的错误
       if (!error.response) {
         message.error(`${formatMessage({id:'request.status.timeout'})} ${error.message}`);
