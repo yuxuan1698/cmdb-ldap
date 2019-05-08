@@ -54,7 +54,9 @@ class CMDBLDAPAttribute extends PureComponent {
     this.handleClassObjectsChange(selectdata['objectClass'])
   }
   componentWillReceiveProps(nextProps){
+    // console.log(this.props.form)
     const { selectdata }=nextProps
+    const { setFieldsValue }=nextProps.form
     if(this.props.selectdata!==selectdata){
       this.setState({
         currField:Object.keys(selectdata).filter(i=>!(i==='objectClass' || i==='selectkey')),
@@ -102,15 +104,17 @@ class CMDBLDAPAttribute extends PureComponent {
   handleNewClassObject=()=>{
     let { getFieldValue,setFieldsValue }=this.props.form
     let curSeleItem=getFieldValue('objectClass'),isIdent
-    if(curSeleItem.length>this.state.selectedItems.length){
-      isIdent=curSeleItem.filter(i=>!this.state.selectedItems.includes(i)).length
-    }else{
-      isIdent=this.state.selectedItems.filter(i=>!curSeleItem.includes(i)).length
-    }
-    if(isIdent>0){
-      setFieldsValue({
-        objectClass: this.state.selectedItems,
-      });
+    if(curSeleItem instanceof Array){
+      if(curSeleItem.length>this.state.selectedItems.length){
+        isIdent=curSeleItem.filter(i=>!this.state.selectedItems.includes(i)).length
+      }else{
+        isIdent=this.state.selectedItems.filter(i=>!curSeleItem.includes(i)).length
+      }
+      if(isIdent>0){
+        setFieldsValue({
+          objectClass: this.state.selectedItems,
+        });
+      }
     }
   }
   addInputField=(name)=>{
@@ -206,7 +210,7 @@ class CMDBLDAPAttribute extends PureComponent {
                       inputField=<Select
                                 mode="multiple" showArrow autoFocus allowClear
                                 loading={loading.effects['users/getUserList']}
-                                notFoundContent={<Icon type='loading' style={{fontSize:50}} />}
+                                notFoundContent={<div style={{textAlign:"center"}}><Icon type='loading' style={{ fontSize: 60 }} /></div>}
                                 onDropdownVisibleChange={this.handelOnSyncLoadUserDn.bind(this)}
                                 placeholder={`请选择属性领导/上级(${i})`} >
                                 {userdnlist.filter(s=>!(curval && curval.includes(s))).map(item => (
