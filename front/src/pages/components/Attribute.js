@@ -1,13 +1,16 @@
 
 'use strict'
 
-import {PureComponent} from 'react'
+import {Fragment,PureComponent} from 'react'
 import {
-  Drawer, Form, Button, Row, Input, Select, 
+  Form, Button, Row, Input, Select, Layout,
   Icon,Dropdown,Menu,InputNumber,Divider,Col,Tooltip,notification
 } from 'antd';
+import {connect} from 'dva';
+import PropTypes from 'prop-types';
 import css from './index.less'
 const { Option } = Select;
+const { Content,Footer } = Layout;
 
 const filedToName={
   uid:'用户名',
@@ -19,7 +22,7 @@ const filedToName={
   uidNumber:'用户UID',
   gidNumber:'用户组ID',
   loginShell:'登陆SHELL',
-  departmentNumber:'部门编号',
+  departmentNumber:'职位名称',
   homeDirectory:'用户目录',
   userPassword:'用户密码',
   sshPublicKey:'用户公钥',
@@ -31,6 +34,7 @@ const filedToName={
 }
 
 @Form.create()
+@connect(({users,loading})=>({userdnlist:users.userdnlist,loading}))
 class CMDBLDAPAttribute extends PureComponent {
   constructor(props){
     super(props)
@@ -39,14 +43,13 @@ class CMDBLDAPAttribute extends PureComponent {
       options: Object.keys(classobjects),
       classobjects: classobjects,
       mayField:[],
-      visible: true,
       selectedItems:['top'],
       mustField:[],
       currField:[],
       currData:{}
     }
   }
-  componentWillMount(){
+  componentDidMount(){
     const { selectdata }=this.props
     this.handleClassObjectsChange(selectdata['objectClass'])
   }
@@ -55,9 +58,13 @@ class CMDBLDAPAttribute extends PureComponent {
     if(this.props.selectdata!==selectdata){
       this.setState({
         currField:Object.keys(selectdata).filter(i=>!(i==='objectClass' || i==='selectkey')),
-        selectedItems:selectdata['objectClass']
+        selectedItems:selectdata['objectClass'],
+        currUserDn:selectdata['uniqueMember']
       })
-      setTimeout(this.handleNewClassObject,50)
+      setTimeout(()=>{
+        this.handleClassObjectsChange(selectdata['objectClass'])
+        this.handleNewClassObject()
+      },100)
     }
   }
   initSelectedItems(arr){
@@ -125,16 +132,7 @@ class CMDBLDAPAttribute extends PureComponent {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        const {dispatch,modifydata} =this.props
-        let modData=values
-        modData['userdn']=modifydata['userdn']
-        dispatch({type:'users/postLDAPUpdateUser',payload: modData,callback:(data)=>{
-          this.props.form.resetFields()
-          notification.info({
-            message:"添加成功提示",
-            description: "用户添加成功！"
-          })
-        }})
+        
       }
     });
   }
@@ -149,12 +147,22 @@ class CMDBLDAPAttribute extends PureComponent {
       this.setState({currField:currField.filter(i=>i!==key)})
     }
   }
+  handelOnSyncLoadUserDn=(e)=>{
+    if(e){
+      const {userdnlist,dispatch}=this.props
+      if(userdnlist.length===0){
+        dispatch({type:'users/getUserList'})
+      }
+    }
+  }
   render() {
     const { getFieldDecorator } = this.props.form;
-    const { loading,userselect } = this.props;
+    const { loading,selectdata,userdnlist } = this.props;
     const { selectedItems,options } = this.state;
-    const {selectdata}=this.props
-    return (<div>
+    let { getFieldValue }=this.props.form
+    return (
+            <Fragment>
+            <Content style={{overflow:"auto"}}>
               <Form layout="horizontal" onSubmit={this.handleSubmit} >
                 <Row gutter={18} style={{margin:0}}>
                   <Col span={24} >
@@ -162,15 +170,11 @@ class CMDBLDAPAttribute extends PureComponent {
                       {getFieldDecorator('objectClass', {
                         initialValue:this.state.selectedItems,
                         rules: [{ required: true, message: '请选择属性归属类(objectClass)' }],
-                      })(
-                        <Select
+                      })(<Select
                           mode="multiple" showArrow autoFocus allowClear
                           placeholder="请选择属性归属类(objectClass)"
                           onChange={this.handleClassObjectsChange.bind(this)}
                           loading={loading.effects['users/getLDAPClassList']}
-                          // onDropdownVisibleChange={(e)=>{
-                          //   if(e) this.handleLoadObjectsClass()
-                          // }}
                           onMouseLeave={this.handleNewClassObject.bind(this)}
                           onBlur={this.handleNewClassObject.bind(this)} >
                           {options.filter(e=>!selectedItems.includes(e)).map(item => (
@@ -190,30 +194,34 @@ class CMDBLDAPAttribute extends PureComponent {
                     if(i==='gidNumber' || i==='uidNumber'){
                       inputField = <InputNumber 
                         placeholder={(filedToName[i] ? filedToName[i] : i) + `(${i})`}
-                        className={css.add_user_field_width}  min={2100} max={65535} />
+                        className={css.add_user_field_width}  min={1000} max={65535} />
                     }
                     if(i==='sshPublicKey' || i==='description'){
                       inputField = <Input.TextArea 
                         placeholder={(filedToName[i] ? filedToName[i] : i) + `(${i})`} 
                         autosize={{ minRows: 2, maxRows: 5 }} />
                     }
-                    // if(i==='manager'){
-                    //   inputField=<Select
-                    //             showArrow autoFocus allowClear showSearch
-                    //             placeholder={`请选择属性领导/上级(${i})`} >
-                    //             {userselect.map(item => (
-                    //               <Option key={item['userdn']} value={item['userdn']}>
-                    //                 {item['sn']}({item['uid']})
-                    //               </Option>
-                    //             ))}
-                    //           </Select>
-                    // }
+                    if(i==='manager' || i==='member' || i==='uniqueMember'){
+                      let curval=getFieldValue(i)
+                      inputField=<Select
+                                mode="multiple" showArrow autoFocus allowClear
+                                loading={loading.effects['users/getUserList']}
+                                notFoundContent={<Icon type='loading' style={{fontSize:50}} />}
+                                onDropdownVisibleChange={this.handelOnSyncLoadUserDn.bind(this)}
+                                placeholder={`请选择属性领导/上级(${i})`} >
+                                {userdnlist.filter(s=>!(curval && curval.includes(s))).map(item => (
+                                  <Option key={item} value={item}>
+                                    {item}
+                                  </Option>
+                                ))}
+                              </Select>
+                    }
                     return (
                       <Col span={24} key={i} >
-                      <Form.Item  labelCol={{ span: 7 }} wrapperCol={{ span: 13 }} label={filedToName[i]?filedToName[i]:i} hasFeedback required>
+                      <Form.Item  labelCol={{ span: 7 }} wrapperCol={{ span: 13 }} label={filedToName[i]?`${filedToName[i]}(${i})`:i} hasFeedback required>
                         {getFieldDecorator(i, {
-                            initialValue: selectdata.hasOwnProperty(i)?selectdata[i][0]:"",
-                            rules: [{ required: i==='userPassword'?false:true, message: `请输入${filedToName[i]}(${i})` }],
+                            initialValue: (selectdata.hasOwnProperty(i) && i!=='userPassword')?selectdata[i]:[],
+                            rules: [{ required: i==='userPassword'?false:true, message: `请输入${filedToName[i]?filedToName[i]:i}(${i})` }],
                         })(inputField)}
                         {!this.state.mustField.includes(i)?<Tooltip placement="top" title="删除字段">
                               <Icon className={css.delete_field_icon}
@@ -242,9 +250,21 @@ class CMDBLDAPAttribute extends PureComponent {
                   </div>
                 </Row>
               </Form>
-              </div>
+            </Content>
+            <Footer style={{padding:10,textAlign:"center"}}>
+              <Button onClick={this.handleSubmit.bind(this)} type="primary">保存</Button>
+            </Footer>
+          </Fragment>           
     );
   }
 }
+
+CMDBLDAPAttribute.propTypes = {
+  classobjects: PropTypes.object.isRequired,
+  selectdata: PropTypes.object.isRequired,
+  userdnlist: PropTypes.array,
+  loading: PropTypes.object,
+  dispatch: PropTypes.func
+};
 
 export default CMDBLDAPAttribute;

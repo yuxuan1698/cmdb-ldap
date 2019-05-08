@@ -11,7 +11,8 @@ import {
 export default {
     names: 'users',
     state:{
-      userlist:{}
+      userlist:{},
+      userdnlist:[]
     },
     subscriptions: {
       setup({ dispatch, history }) {
@@ -22,9 +23,6 @@ export default {
                 type: 'getUserList'
               })
               break;
-            default:
-              alert()
-              dispatch({ type: 'userlist', payload: { userlist:{}}})
           }
         });
       },
@@ -43,6 +41,7 @@ export default {
             type:'userlist', 
             payload: {
               userlist: data,
+              userdnlist: Object.keys(data).map(i=>data[i][0]),
             }
           })
         }
