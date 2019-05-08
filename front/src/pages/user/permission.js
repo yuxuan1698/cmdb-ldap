@@ -10,9 +10,8 @@ import CMDBBreadcrumb from "../components/Breadcrumb";
 import CMDBLDAPAttribute from "../components/Attribute"
 
 const {
-  Content, Sider, Footer
+  Content, Sider
 } = Layout;
-const ButtonGroup = Button.Group;
 const { TreeNode, DirectoryTree } = Tree;
 const { Search } = Input;
 
@@ -37,16 +36,12 @@ class CMDBLdapPermission extends PureComponent {
       loadedKeys: []
     })
   }
-  renderTreeNodes = (data, searchValue) => data.filter(i => {
-    if (i.children) return true
-    if (i.title.indexOf(searchValue) > -1) return true
-    return false
-  }).map((item) => {
-    let title = <span>{item.title}</span>
+  renderTreeNodes = (data, searchValue) => data.map((item) => {
+    let title = <span>{item[1].uid}</span>
     if (searchValue) {
-      const index = item.title.indexOf(searchValue);
-      const beforeStr = item.title.substr(0, index);
-      const afterStr = item.title.substr(index + searchValue.length);
+      const index = item[1].uid.indexOf(searchValue);
+      const beforeStr = item[1].uid.substr(0, index);
+      const afterStr = item[1].uid.substr(index + searchValue.length);
       if (index > -1) {
         title = (<span>
           {beforeStr}
@@ -55,42 +50,14 @@ class CMDBLdapPermission extends PureComponent {
         </span>)
       }
     }
-
-    if (item.children) {
-      return (
-        <TreeNode title={title} key={item.key} dataRef={item}>
-          {this.renderTreeNodes(item.children, searchValue)}
-        </TreeNode>
-      );
-    }
-    return <TreeNode icon={item.isLeaf ? <Icon type='bars' /> : ""} key={item.key} title={title} dataRef={item} />;
+    return <TreeNode icon={<Icon type='user' /> }
+       key={item[0]} style={{padding:1}} title={title} dataRef={item} />;
   })
   onResize = (event, { size }) => {
     this.setState({ width: size.width });
   }
   handleOnSelect = (selectkey) => {
-    const { treeobject } = this.props.groups
-    const { loadedData } = this.state
-    const { dispatch } = this.props
-    if (treeobject.hasOwnProperty(selectkey)) {
-      this.setState({
-        selectdata: Object.assign(treeobject[selectkey], { selectkey: selectkey }),
-      })
-    }
-    if (loadedData.hasOwnProperty(selectkey)) {
-      this.setState({
-        selectdata: Object.assign(loadedData[selectkey], { selectkey: selectkey }),
-      })
-    }
-    if (this.state.classobjects === "") {
-      dispatch({
-        type: 'users/getLDAPClassList', callback: (data) => {
-          this.setState({
-            classobjects: data
-          });
-        }
-      })
-    }
+    
   }
   handleOnChange = (e) => {
     const value = e.target.value;
@@ -108,7 +75,6 @@ class CMDBLdapPermission extends PureComponent {
   render() {
     const { searchValue, width, classobjects, selectdata } = this.state
     const { userlist } = this.props
-    console.log(userlist)
     return (
       <Layout className={usercss.userbody}>
         <CMDBBreadcrumb route={{ '用户管理': "", '用户组列表': '/user/ldap/' }} title='用户组列表' />
@@ -122,6 +88,7 @@ class CMDBLdapPermission extends PureComponent {
                 <Search style={{ marginBottom: 8 }} placeholder="Search(Key Press)" onChange={this.handleOnChange.bind(this)} />
                 <Content className={usercss.ldap_content_box} >
                     <DirectoryTree 
+                      checkable
                       defaultSelectedKeys={[]}
                       onExpand={this.onExpand.bind(this)}
                       loadedKeys={this.state.loadedKeys}
@@ -129,13 +96,6 @@ class CMDBLdapPermission extends PureComponent {
                       {this.renderTreeNodes(Object.values(userlist), searchValue)}
                     </DirectoryTree>
                 </Content>
-                <Footer style={{ padding: 0, }}>
-                  <ButtonGroup size="small" >
-                    <Button title="添加" style={{ height: 22, fontSize: 10, borderRadius: 0 }} icon='plus' />
-                    <Button title="删除" disabled={selectdata ? false : true} style={{ height: 22, fontSize: 10, borderRadius: 0 }} icon='minus' />
-                    <Button title="刷新" onClick={this.handleFlushAndReset.bind(this)} style={{ height: 22, fontSize: 10, borderRadius: 0 }} icon='reload' />
-                  </ButtonGroup>
-                </Footer>
               </Layout>
             </Sider>
           </Resizable>
