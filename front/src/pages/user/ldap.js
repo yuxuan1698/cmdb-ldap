@@ -1,7 +1,7 @@
 'use strict'
 
 import {PureComponent} from 'react'
-import { Layout,Tree,Input,Button,Icon,Empty } from 'antd';
+import { Layout, Tree, Input, Button, Icon, Empty, Spin } from 'antd';
 import {connect} from 'dva';
 import { Resizable } from 'react-resizable';
 import { ContextMenuTrigger, ContextMenu,MenuItem } from 'react-contextmenu';
@@ -17,7 +17,7 @@ const ButtonGroup = Button.Group;
 const { TreeNode,DirectoryTree } = Tree;
 const {Search} = Input;
 
-@connect(({ldap})=>({groups:ldap.groups}))
+@connect(({ldap,loading})=>({loading,groups:ldap.groups}))
 class CMDBLdapGroups extends PureComponent {
   constructor(props){
     super(props)
@@ -168,9 +168,13 @@ class CMDBLdapGroups extends PureComponent {
       autoExpandParent: false,
     });
   }
+  handleNewDNItem=()=>{
+    this.setState({selectdata:[]})
+  }
   render(){
     const { searchValue, expandedKeys, autoExpandParent,width,classobjects,selectdata } = this.state
     const {treedata}=this.props.groups
+    const {loading}=this.props
     return (
     <Layout className={usercss.userbody}>
       <CMDBBreadcrumb route={{'用户管理':"",'用户组列表':'/user/ldap'}} title='用户组列表'  />
@@ -183,24 +187,29 @@ class CMDBLdapGroups extends PureComponent {
             <Layout style={{height:"100%",padding:5,boxShadow:"0px 0px 3px #dcd8d8"}} >
               <Search style={{ marginBottom: 8 }} placeholder="Search(Key Press)" onChange={this.handleOnChange.bind(this)}  />
               <Content className={usercss.ldap_content_box} >
-                <ContextMenuTrigger id='ldap_control_menu' >
-                  <DirectoryTree loadData={this.onLoadData} 
-                    expandedKeys={expandedKeys}
-                    autoExpandParent={autoExpandParent}
-                    defaultSelectedKeys={[]}
-                    onExpand={this.onExpand.bind(this)}
-                    loadedKeys={this.state.loadedKeys}
-                    onSelect={this.handleOnSelect.bind(this)}>
-                    {this.renderTreeNodes(treedata,searchValue)}
-                  </DirectoryTree>
-                </ContextMenuTrigger>
-                {this.handleRightMenu()}
+                  <Spin tip="Loading..." spinning={loading.effects['ldap/getLDAPGroupsList']}>
+                  <ContextMenuTrigger id='ldap_control_menu' >
+                    <DirectoryTree loadData={this.onLoadData} 
+                      expandedKeys={expandedKeys}
+                      autoExpandParent={autoExpandParent}
+                      defaultSelectedKeys={[]}
+                      onExpand={this.onExpand.bind(this)}
+                      loadedKeys={this.state.loadedKeys}
+                      onSelect={this.handleOnSelect.bind(this)}>
+                      {this.renderTreeNodes(treedata,searchValue)}
+                    </DirectoryTree>
+                  </ContextMenuTrigger>
+                  {this.handleRightMenu()}
+                  </Spin>
               </Content>
               <Footer style={{padding:0,}}>
                 <ButtonGroup size="small" >
-                    <Button title="添加"  style={{height:22,fontSize:10,borderRadius:0}} icon='plus' />
-                    <Button title="删除" disabled={selectdata?false:true} style={{height:22,fontSize:10,borderRadius:0}} icon='minus' />
-                    <Button title="刷新" onClick={this.handleFlushAndReset.bind(this)} style={{height:22,fontSize:10,borderRadius:0}} icon='reload' />
+                    <Button title="添加" 
+                      className={usercss.ldap_button_group} 
+                      icon='plus' 
+                      onClick={this.handleNewDNItem.bind(this)}/>
+                    <Button title="删除" disabled={selectdata ? false : true} className={usercss.ldap_button_group} icon='minus' />
+                    <Button title="刷新" onClick={this.handleFlushAndReset.bind(this)} className={usercss.ldap_button_group} icon='reload' />
                 </ButtonGroup>
               </Footer>
             </Layout>

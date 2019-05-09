@@ -1,7 +1,7 @@
 'use strict'
 
 import { PureComponent } from 'react'
-import { Layout, Tree, Input, Button, Icon, Empty } from 'antd';
+import { Layout, Tree, Input, Spin, Icon, Empty } from 'antd';
 import { connect } from 'dva';
 import { Resizable } from 'react-resizable';
 import PropTypes from 'prop-types';
@@ -15,7 +15,7 @@ const {
 const { TreeNode, DirectoryTree } = Tree;
 const { Search } = Input;
 
-@connect(({ users }) => ({ userlist: users.userlist }))
+@connect(({ loading,users }) => ({ loading,userlist: users.userlist }))
 class CMDBLdapPermission extends PureComponent {
   constructor(props) {
     super(props)
@@ -85,7 +85,7 @@ class CMDBLdapPermission extends PureComponent {
   }
   render() {
     const { searchValue, width, classobjects, selectdata } = this.state
-    const { userlist } = this.props
+    const { loading,userlist } = this.props
     return (
       <Layout className={usercss.userbody}>
         <CMDBBreadcrumb route={{ '用户管理': "", '用户权限管理': '/user/permission' }} title='用户权限管理' />
@@ -98,15 +98,15 @@ class CMDBLdapPermission extends PureComponent {
               <Layout style={{ height: "100%", padding: 5, boxShadow: "0px 0px 3px #dcd8d8" }} >
                 <Search style={{ marginBottom: 8 }} placeholder="Search(Key Press)" onChange={this.handleOnChange.bind(this)} />
                 <Content className={usercss.ldap_content_box} >
+                  <Spin tip="Loading..." spinning={loading.effects['users/getUserList']}>
                     <DirectoryTree 
-                      // checkable
-                      // blockNode
                       draggable
                       onExpand={this.onExpand.bind(this)}
                       loadedKeys={this.state.loadedKeys}
                       onSelect={this.handleOnSelect.bind(this)}>
                       {this.renderTreeNodes(Object.values(userlist), searchValue)}
                     </DirectoryTree>
+                  </Spin>
                 </Content>
               </Layout>
             </Sider>

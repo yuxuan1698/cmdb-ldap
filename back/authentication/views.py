@@ -117,7 +117,7 @@ class DeleteUserViewSet(APIView):
     """
     serializer = DeleteUserSerializer(instance=request, data=request.data)
     if serializer.is_valid():
-      changeStatus, errorMsg = cmdbldap['all'].delete_ldap_user(request.data)
+      changeStatus, errorMsg = cmdbldap['all'].delete_ldap_dn(request.data)
       if changeStatus:
         returnData = {"status": changeStatus}
         returnStatus = status.HTTP_200_OK

@@ -197,7 +197,7 @@ class CmdbLDAP(object):
     logger.info("create user %s success,dn:%s" % (dn_pre, newuserdn))
     return "添加用户%s成功" % dn_pre, None
 
-  def delete_ldap_user(self,data):
+  def delete_ldap_dn(self,data):
     """
     删除用户
     """
