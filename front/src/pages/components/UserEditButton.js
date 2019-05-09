@@ -73,7 +73,7 @@ export class UserBatchButton extends PureComponent {
     )
     return (
       <Dropdown overlay={menu}>
-        <Button >
+        <Button  {...this.props} >
           批量操作<Icon type="down" />
         </Button>
       </Dropdown>

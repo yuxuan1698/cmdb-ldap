@@ -173,7 +173,7 @@ class CMDBLdapGroups extends PureComponent {
     const {treedata}=this.props.groups
     return (
     <Layout className={usercss.userbody}>
-      <CMDBBreadcrumb route={{'用户管理':"",'用户组列表':'/user/ldap/'}} title='用户组列表'  />
+      <CMDBBreadcrumb route={{'用户管理':"",'用户组列表':'/user/ldap'}} title='用户组列表'  />
       <Layout style={{margin:"10px 0 0 0"}}>
         <Resizable axis="x"  minConstraints={[220,220]}
             maxConstraints={[520, 520]}

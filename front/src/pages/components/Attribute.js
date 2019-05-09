@@ -54,19 +54,16 @@ class CMDBLDAPAttribute extends PureComponent {
     this.handleClassObjectsChange(selectdata['objectClass'])
   }
   componentWillReceiveProps(nextProps){
-    // console.log(this.props.form)
     const { selectdata }=nextProps
-    const { setFieldsValue }=nextProps.form
-    if(this.props.selectdata!==selectdata){
+    if(!Object.is(this.props.selectdata,selectdata)){
       this.setState({
         currField:Object.keys(selectdata).filter(i=>!(i==='objectClass' || i==='selectkey')),
         selectedItems:selectdata['objectClass'],
-        currUserDn:selectdata['uniqueMember']
       })
       setTimeout(()=>{
         this.handleClassObjectsChange(selectdata['objectClass'])
         this.handleNewClassObject()
-      },100)
+      },50)
     }
   }
   initSelectedItems(arr){
@@ -103,6 +100,7 @@ class CMDBLDAPAttribute extends PureComponent {
   }
   handleNewClassObject=()=>{
     let { getFieldValue,setFieldsValue }=this.props.form
+    const {selectdata}=this.props
     let curSeleItem=getFieldValue('objectClass'),isIdent
     if(curSeleItem instanceof Array){
       if(curSeleItem.length>this.state.selectedItems.length){
@@ -116,6 +114,17 @@ class CMDBLDAPAttribute extends PureComponent {
         });
       }
     }
+    // 更新INPUT initalValue值
+    this.state.currField.filter(s=>s!=='userPassword').map(i=>{
+      if(selectdata.hasOwnProperty(i)){
+        if(getFieldValue(i)===selectdata[i]) return true
+        if(i==='gidNumber' || i==='uidNumber') {
+          setFieldsValue({[i]:parseInt(selectdata[i],10)})
+        }else{
+          setFieldsValue({[i]:selectdata[i]})
+        }
+      }
+    })
   }
   addInputField=(name)=>{
     this.setState({ currField:this.state.currField.concat(name.key)})
@@ -127,7 +136,7 @@ class CMDBLDAPAttribute extends PureComponent {
           return !this.state.currField.includes(it)
         }).map(it=>{
           return (<Menu.Item onClick={this.addInputField.bind(this)} key={it}>
-              <span>{it}</span>
+              <span>{filedToName.hasOwnProperty(it)?`${it}(${filedToName[it]})`:it}</span>
             </Menu.Item>)
         })
       }</Menu>)
@@ -193,8 +202,12 @@ class CMDBLDAPAttribute extends PureComponent {
                   <Divider dashed style={{margin:"10px 0px"}}/>
                   {this.state.currField.map((i)=>{
                     let inputField=<Input className={css.add_user_field_width}
-                                    type={i==='userPassword'?"password":"text"}
+                                    type="text"
                                     placeholder={(filedToName[i]?filedToName[i]:i)+`(${i})`}/>
+                    if(i==='userPassword'){
+                      inputField = <Input.Password 
+                        placeholder={(filedToName[i] ? filedToName[i] : i) + `(${i})`} />
+                    }
                     if(i==='gidNumber' || i==='uidNumber'){
                       inputField = <InputNumber 
                         placeholder={(filedToName[i] ? filedToName[i] : i) + `(${i})`}
@@ -224,7 +237,7 @@ class CMDBLDAPAttribute extends PureComponent {
                       <Col span={24} key={i} >
                       <Form.Item  labelCol={{ span: 7 }} wrapperCol={{ span: 13 }} label={filedToName[i]?`${filedToName[i]}(${i})`:i} hasFeedback required>
                         {getFieldDecorator(i, {
-                            initialValue: (selectdata.hasOwnProperty(i) && i!=='userPassword')?selectdata[i]:[],
+                            initialValue: (selectdata.hasOwnProperty(i) && i!=='userPassword')?(i==='gidNumber' || i==='uidNumber'?parseInt(selectdata[i],10):selectdata[i]):[],
                             rules: [{ required: i==='userPassword'?false:true, message: `请输入${filedToName[i]?filedToName[i]:i}(${i})` }],
                         })(inputField)}
                         {!this.state.mustField.includes(i)?<Tooltip placement="top" title="删除字段">

@@ -3,7 +3,7 @@
 import {connect} from 'dva';
 import {PureComponent} from 'react'
 import PropTypes from 'prop-types';
-import { Table, Icon, Button, Alert,message,Layout } from 'antd';
+import { Table, Icon, Button, Alert,message,Layout,Input } from 'antd';
 import usercss from "./user.less";
 import CMDBBreadcrumb from "../components/Breadcrumb";
 import dynamic from 'umi/dynamic';
@@ -44,6 +44,8 @@ class CMDBUserList extends PureComponent {
       classobjects:"",
       userinfo:{},
       displayuser:false,
+      searchWidth:150,
+      searchFilterVal:""
     }
   }
   showHideUserDrawer = (type,userdn) => {
@@ -125,6 +127,16 @@ class CMDBUserList extends PureComponent {
         userdn: userlist[it][0]
       })
     })
+    const tableData=data.filter(i=>{
+      return (i.uid.indexOf(this.state.searchFilterVal)>-1 ||
+        i.sn.indexOf(this.state.searchFilterVal)>-1 ||
+        i.ou.indexOf(this.state.searchFilterVal)>-1 ||
+        i.mobile.indexOf(this.state.searchFilterVal)>-1 ||
+        i.givenName.indexOf(this.state.searchFilterVal)>-1 ||
+        i.cn.indexOf(this.state.searchFilterVal)>-1 ||
+        i.mail.indexOf(this.state.searchFilterVal)>-1 ||
+        i.departmentNumber.indexOf(this.state.searchFilterVal)>-1 )
+    })
     const columns = [{
       title: '用户名',
       dataIndex: 'uid',
@@ -170,20 +182,36 @@ class CMDBUserList extends PureComponent {
     }];
     return (
       <Layout className={usercss.userbody}>
-        <CMDBBreadcrumb route={{'用户管理':"",'用户列表':'/user/'}} title='用户列表' />
+        <CMDBBreadcrumb route={{'用户管理':"",'用户列表':'/user'}} title='用户列表' />
         <Layout style={{margin:"10px 0 0 0"}}>
           <Content>
           <div className={usercss.tableContent}>
             <div className={usercss.usercontrol}>
               <div style={{float:"right"}}>
-                <Alert message={`当前选中${selectedRowKeys.length}个用户`} 
+                <Alert message={`当前选中[ ${selectedRowKeys.length} ]个用户`} 
+                style={{padding: "5px 30px 4px 37px"}}
+                icon={<Icon type='user' style={{top:9}} />}
                 type={selectedRowKeys.length > 0 ? "success" : "info"} showIcon />
               </div>
+            <Input.Search
+                allowClear
+                placeholder="请输入查询内容"
+                onChange={e => {
+                  this.setState({searchFilterVal:e.target.value})
+                }}
+                onBlur={()=>{
+                  this.setState({searchWidth:150})
+                }}
+                onFocus={()=>{
+                  this.setState({searchWidth:250})
+                }}
+                style={{ width: this.state.searchWidth,transition:"all .2s ease-out",float:"right",marginRight:15 }}
+              />
             <Button type="primary" 
               loading={loading.effects['users/getLDAPClassList']} 
               onClick={this.showHideUserDrawer.bind(this)} >
                 <Icon type="user-add" />添加用户
-              </Button>
+            </Button>
               { loadedDrawer?<DrawerAddUser 
                     showHideUserDrawer={this.showHideUserDrawer.bind(this)} 
                     dispatch={dispatch}
@@ -226,7 +254,7 @@ class CMDBUserList extends PureComponent {
                 }
               }}
               columns={columns} 
-              dataSource={data} />
+              dataSource={tableData} />
           </div>
           </Content>
           <UserInfo visible={this.state.displayuser} 

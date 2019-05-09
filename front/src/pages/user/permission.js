@@ -20,11 +20,11 @@ class CMDBLdapPermission extends PureComponent {
   constructor(props) {
     super(props)
     this.state = {
-      width: 250,
+      width: 280,
       searchValue: "",
       selectdata: "",
       loadedData: {},
-      loadedKeys: [],
+      // loadedKeys: [],
       classobjects: "",
     }
   }
@@ -33,24 +33,35 @@ class CMDBLdapPermission extends PureComponent {
       expandedKeys: [],
       autoExpandParent: false,
       selectdata: "",
-      loadedKeys: []
+      // loadedKeys: []
     })
   }
-  renderTreeNodes = (data, searchValue) => data.map((item) => {
-    let title = <span>{item[1].uid}</span>
+  componentWillMount(){
+    let {userlist,dispatch}=this.props
+    if(JSON.stringify(userlist) ==="{}"){
+      dispatch({type:'users/getUserList'})
+    }
+  }
+  renderTreeNodes = (data, searchValue) => data.filter(i=>{
+    let searchText=`${i[1].sn}(${i[1].uid})`
+    return searchText.indexOf(searchValue)>-1
+  }).map((item) => {
+    let searchText=`${item[1].sn}(${item[1].uid})`
+    let title = <span className={usercss.permission_user_style} >{searchText}</span>
     if (searchValue) {
-      const index = item[1].uid.indexOf(searchValue);
-      const beforeStr = item[1].uid.substr(0, index);
-      const afterStr = item[1].uid.substr(index + searchValue.length);
+      console.log(item)
+      const index = searchText.indexOf(searchValue);
+      const beforeStr = searchText.substr(0, index);
+      const afterStr = searchText.substr(index + searchValue.length);
       if (index > -1) {
-        title = (<span>
+        title = (<span className={usercss.permission_user_style}>
           {beforeStr}
           <span style={{ color: '#f50' }}>{searchValue}</span>
           {afterStr}
         </span>)
       }
     }
-    return <TreeNode icon={<Icon type='user' /> }
+    return <TreeNode icon={<Icon type='user' /> } isLeaf={true}
        key={item[0]} style={{padding:1}} title={title} dataRef={item} />;
   })
   onResize = (event, { size }) => {
@@ -77,9 +88,9 @@ class CMDBLdapPermission extends PureComponent {
     const { userlist } = this.props
     return (
       <Layout className={usercss.userbody}>
-        <CMDBBreadcrumb route={{ '用户管理': "", '用户组列表': '/user/ldap/' }} title='用户组列表' />
+        <CMDBBreadcrumb route={{ '用户管理': "", '用户权限管理': '/user/permission' }} title='用户权限管理' />
         <Layout style={{ margin: "10px 0 0 0" }}>
-          <Resizable axis="x" minConstraints={[220, 220]}
+          <Resizable axis="x" minConstraints={[260, 260]}
             maxConstraints={[520, 520]}
             height={100}
             width={width} onResize={this.onResize} >
@@ -88,8 +99,9 @@ class CMDBLdapPermission extends PureComponent {
                 <Search style={{ marginBottom: 8 }} placeholder="Search(Key Press)" onChange={this.handleOnChange.bind(this)} />
                 <Content className={usercss.ldap_content_box} >
                     <DirectoryTree 
-                      checkable
-                      defaultSelectedKeys={[]}
+                      // checkable
+                      // blockNode
+                      draggable
                       onExpand={this.onExpand.bind(this)}
                       loadedKeys={this.state.loadedKeys}
                       onSelect={this.handleOnSelect.bind(this)}>

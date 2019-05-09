@@ -22,15 +22,15 @@
       allow: true,
       submenu:[
         {
-          key: '/user/',
+          key: '/user',
           name:'用户列表',
         },
         {
-          key: '/user/permission/',
+          key: '/user/permission',
           name:'用户权限'
         },
         {
-          key: '/user/ldap/',
+          key: '/user/ldap',
           name:'LDAP管理'
         },
       ]
@@ -47,7 +47,7 @@
           // allow: false,
         },
         {
-          key: '/equipment/groups/',
+          key: '/equipment/groups',
           name:'设备监控',
         },
       ]

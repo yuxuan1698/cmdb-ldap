@@ -6,6 +6,7 @@ import {
     Drawer, Form, Button, Row, Input, Select, 
     Icon,Dropdown,Menu,InputNumber,Divider,Col,Tooltip,notification
 } from 'antd';
+import PropTypes from 'prop-types';
 
 const { Option } = Select;
 
@@ -98,6 +99,7 @@ class DrawerUpdateUser extends PureComponent {
     }
   }
   handleClose=()=>{
+    const { modifydata } = this.props;
     this.setState({visible:!this.state.visible})
     setTimeout(this.props.showHideUserDrawer,500,'update')
   }
@@ -111,7 +113,7 @@ class DrawerUpdateUser extends PureComponent {
           return !this.state.currField.includes(it)
         }).map(it=>{
           return (<Menu.Item onClick={this.addInputField.bind(this)} key={it}>
-              <span>{it}</span>
+              <span>{filedToName.hasOwnProperty(it)?`${it}(${filedToName[it]})`:it}</span>
             </Menu.Item>)
         })
       }</Menu>)
@@ -183,8 +185,12 @@ class DrawerUpdateUser extends PureComponent {
                   <Divider dashed style={{margin:"10px 0px"}}/>
                   {this.state.currField.map((i)=>{
                     let inputField=<Input className={css.add_user_field_width}
-                                    type={i==='userPassword'?"password":"text"}
+                                    type="text"
                                     placeholder={(filedToName[i]?filedToName[i]:i)+`(${i})`}/>
+                    if(i==='userPassword'){
+                      inputField = <Input.Password 
+                        placeholder={(filedToName[i] ? filedToName[i] : i) + `(${i})`} />
+                    }
                     if(i==='gidNumber' || i==='uidNumber'){
                       inputField = <InputNumber 
                         placeholder={(filedToName[i] ? filedToName[i] : i) + `(${i})`}
@@ -254,5 +260,8 @@ class DrawerUpdateUser extends PureComponent {
   }
 }
 
-  
+DrawerUpdateUser.propTypes = {
+  modifydata: PropTypes.object.isRequired,
+  userselect: PropTypes.array
+}; 
 export default DrawerUpdateUser

@@ -14,7 +14,7 @@ export default {
       setup({ dispatch, history }) {
         history.listen(location => {
           switch(location.pathname){
-            case '/user/ldap/':
+            case '/user/ldap':
               dispatch({
                 type: 'getLDAPGroupsList'
               })

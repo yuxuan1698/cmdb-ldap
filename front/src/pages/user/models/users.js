@@ -18,7 +18,7 @@ export default {
       setup({ dispatch, history }) {
         history.listen(location => {
           switch(location.pathname){
-            case '/user/':
+            case '/user':
               dispatch({
                 type: 'getUserList'
               })
