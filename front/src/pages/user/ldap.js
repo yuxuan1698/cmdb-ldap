@@ -8,7 +8,7 @@ import { ContextMenuTrigger, ContextMenu,MenuItem } from 'react-contextmenu';
 import PropTypes from 'prop-types';
 import usercss from "./user.less";
 import CMDBBreadcrumb from "../components/Breadcrumb";
-import CMDBLDAPAttribute from "../components/Attribute"
+import CMDBLDAPManager from "../components/ldapManager"
 
 const {
    Content, Sider,Footer
@@ -25,20 +25,13 @@ class CMDBLdapGroups extends PureComponent {
       width:250,
       searchValue:"",
       expandedKeys:[],
+      selectedKeys:[],
+      loadedKeys:[],
       autoExpandParent: true,
       selectdata:"",
       loadedData:{},
-      loadedKeys:[],
       classobjects:"",
     }
-  }
-  handleFlushAndReset=()=>{
-    this.setState({
-      expandedKeys:[],
-      autoExpandParent:false,
-      selectdata:"",
-      loadedKeys:[]
-    })
   }
   renderTreeNodes = (data,searchValue) => data.filter(i=>{
     if(i.children) return true
@@ -131,25 +124,23 @@ class CMDBLdapGroups extends PureComponent {
   onResize=(event, { size })=>{
     this.setState({ width: size.width });
   }
-  handleOnSelect=(selectkey)=>{
+  handleOnSelect=(selectdn)=>{
     const { treeobject }=this.props.groups
     const { loadedData }=this.state
     const { dispatch }=this.props
-    if (treeobject.hasOwnProperty(selectkey)){
-      this.setState({ 
-        selectdata: Object.assign(treeobject[selectkey],{selectkey:selectkey}),
-        })
+    let currState={selectedKeys:selectdn}
+    if (treeobject.hasOwnProperty(selectdn)){
+      currState=Object.assign(currState,{selectdata: Object.assign(treeobject[selectdn],{selectdn:selectdn})})
     }
-    if (loadedData.hasOwnProperty(selectkey)){
-      this.setState({ 
-        selectdata: Object.assign(loadedData[selectkey],{selectkey:selectkey}),
-        })
+    if (loadedData.hasOwnProperty(selectdn)){
+      currState=Object.assign(currState,{selectdata: Object.assign(loadedData[selectdn],{selectdn:selectdn})})
     }
+    this.setState(currState)
     if (this.state.classobjects === "") {
       dispatch({
         type: 'users/getLDAPClassList', callback: (data) => {
           this.setState({
-            classobjects: data
+            classobjects: data,
           });
         }
       })
@@ -157,6 +148,7 @@ class CMDBLdapGroups extends PureComponent {
   }
   handleOnChange = (e) => {
     const value = e.target.value;
+    console.log('111')
     this.setState({
       searchValue: value,
       autoExpandParent: true,
@@ -169,12 +161,37 @@ class CMDBLdapGroups extends PureComponent {
     });
   }
   handleNewDNItem=()=>{
-    this.setState({selectdata:[]})
+    this.setState({
+      selectdata:[],
+      selectedKeys:[]})
+  }
+  handleRemoveDn=()=>{
+    alert(this.state.selectedKeys)
+  }
+  handleFlushAndReset=()=>{
+    this.setState({
+      expandedKeys:[],
+      autoExpandParent:false,
+      selectedKeys:[],
+      selectdata:"",
+      loadedKeys:[],
+      searchValue:""
+    })
   }
   render(){
-    const { searchValue, expandedKeys, autoExpandParent,width,classobjects,selectdata } = this.state
+    const { 
+      searchValue, 
+      expandedKeys,
+      selectedKeys,
+      loadedKeys, 
+      autoExpandParent,
+      width,
+      classobjects,
+      selectdata 
+    } = this.state
     const {treedata}=this.props.groups
     const {loading}=this.props
+
     return (
     <Layout className={usercss.userbody}>
       <CMDBBreadcrumb route={{'用户管理':"",'用户组列表':'/user/ldap'}} title='用户组列表'  />
@@ -185,16 +202,16 @@ class CMDBLdapGroups extends PureComponent {
             width={width} onResize={this.onResize} >
           <Sider width={width} theme="light" >
             <Layout style={{height:"100%",padding:5,boxShadow:"0px 0px 3px #dcd8d8"}} >
-              <Search style={{ marginBottom: 8 }} placeholder="Search(Key Press)" onChange={this.handleOnChange.bind(this)}  />
+              <Search style={{ marginBottom: 8 }} placeholder="Search(Key Press)" value={searchValue} onChange={this.handleOnChange.bind(this)}  />
               <Content className={usercss.ldap_content_box} >
-                  <Spin tip="Loading..." spinning={loading.effects['ldap/getLDAPGroupsList']}>
+                <Spin tip="Loading..." spinning={loading.effects['ldap/getLDAPGroupsList']}>
                   <ContextMenuTrigger id='ldap_control_menu' >
                     <DirectoryTree loadData={this.onLoadData} 
                       expandedKeys={expandedKeys}
                       autoExpandParent={autoExpandParent}
-                      defaultSelectedKeys={[]}
+                      selectedKeys={selectedKeys}
+                      loadedKeys={loadedKeys}
                       onExpand={this.onExpand.bind(this)}
-                      loadedKeys={this.state.loadedKeys}
                       onSelect={this.handleOnSelect.bind(this)}>
                       {this.renderTreeNodes(treedata,searchValue)}
                     </DirectoryTree>
@@ -208,7 +225,9 @@ class CMDBLdapGroups extends PureComponent {
                       className={usercss.ldap_button_group} 
                       icon='plus' 
                       onClick={this.handleNewDNItem.bind(this)}/>
-                    <Button title="删除" disabled={selectdata ? false : true} className={usercss.ldap_button_group} icon='minus' />
+                    <Button title="删除" disabled={selectdata ? false : true} 
+                      onClick={this.handleRemoveDn.bind(this)}
+                      className={usercss.ldap_button_group} icon='minus' />
                     <Button title="刷新" onClick={this.handleFlushAndReset.bind(this)} className={usercss.ldap_button_group} icon='reload' />
                 </ButtonGroup>
               </Footer>
@@ -216,7 +235,7 @@ class CMDBLdapGroups extends PureComponent {
           </Sider>
         </Resizable>
         <Content className={usercss.right_content_class}>
-          {(classobjects && selectdata)?<CMDBLDAPAttribute 
+          {(classobjects && selectdata)?<CMDBLDAPManager 
             selectdata={this.state.selectdata}
             classobjects={classobjects} />:<Empty className={usercss.right_empty_center} />}
         </Content>

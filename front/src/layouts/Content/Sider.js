@@ -72,7 +72,8 @@
         let menuItem=""
         if(it.hasOwnProperty('submenu')){
           const childMenu=this.initSideMenu(it.submenu)
-          menuItem = (<SubMenu key={it.key.replace(/\//g, '')} title={
+          menuItem = (<SubMenu key={it.key.replace(/\//g, '')} 
+          title={
             <span>
               {it.icon?<Icon type={it.icon} />:""}
               <span>{it.name}</span>
@@ -93,6 +94,7 @@
       })
     }
     render(){
+      console.log(this.state.parentpath)
       let {collapsed,toggleSideMenu}=this.props
       return (
         <Sider className={css.sider}
@@ -102,13 +104,15 @@
                 >
           <div className={classnames({[css.logo]:true,[css.logoToggle]:collapsed})} />
           <Menu 
-                defaultSelectedKeys={this.state.subpath}
-                defaultOpenKeys={this.state.parentpath}
-                mode="inline"
-                theme="light"
-                inlineCollapsed={collapsed}
-                >
-              {this.initSideMenu(sideMenu)}
+            defaultSelectedKeys={this.state.subpath}
+            openKeys={this.state.parentpath}
+            mode="inline"
+            theme="light"
+            inlineCollapsed={collapsed}
+            onOpenChange={openKeys=>{
+              this.setState({parentpath:openKeys})
+            }} >
+            {this.initSideMenu(sideMenu)}
           </Menu>
         </Sider>)}
     }

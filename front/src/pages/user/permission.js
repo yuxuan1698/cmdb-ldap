@@ -7,7 +7,7 @@ import { Resizable } from 'react-resizable';
 import PropTypes from 'prop-types';
 import usercss from "./user.less";
 import CMDBBreadcrumb from "../components/Breadcrumb";
-import CMDBLDAPAttribute from "../components/Attribute"
+import CMDBLDAPManager from "../components/ldapManager"
 
 const {
   Content, Sider
@@ -112,7 +112,7 @@ class CMDBLdapPermission extends PureComponent {
             </Sider>
           </Resizable>
           <Content className={usercss.right_content_class}>
-            {(classobjects && selectdata) ? <CMDBLDAPAttribute
+            {(classobjects && selectdata) ? <CMDBLDAPManager
               selectdata={this.state.selectdata}
               classobjects={classobjects} /> : <Empty className={usercss.right_empty_center} />}
           </Content>

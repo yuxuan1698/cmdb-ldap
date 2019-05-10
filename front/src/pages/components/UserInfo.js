@@ -1,8 +1,8 @@
 'use strict'
 
-import {Fragment,PureComponent} from 'react';
+import {PureComponent} from 'react';
 import {
-  Modal,Row,Col,Divider,Tag, Icon
+  Modal,Row,Col,Divider,Tag, Spin
 } from 'antd';
 import css from './index.less'
 
@@ -122,21 +122,21 @@ class UserInfo extends PureComponent {
         width={1000}
         footer={null}
         bodyStyle={{padding:"15px 25px",overflow:"auto"}}
-        onCancel={this.props.handleDisplayModal}>
-        <Divider style={{margin:"20px 0px"}} orientation="left">基本属性</Divider>
+        onCancel={this.props.handleDisplayModal} >
+        <Spin tip="Loading..." spinning={loading}>
+          <Divider style={{margin:"20px 0px"}} orientation="left">基本属性</Divider>
           <Row style={{paddingLeft:20}}>
             {base_profile_html}
           </Row>
-          {loading?<Icon style={{fontSize:30,marginTop:30}} type="loading" />:(
-          <Fragment><Divider style={{margin:"20px 0px"}} orientation="left">扩展属性</Divider>
+          <Divider style={{margin:"20px 0px"}} orientation="left">扩展属性</Divider>
           <Row style={{paddingLeft:20}}>
             {extra_profile_html}
           </Row>
           <Divider style={{margin:"20px 0px"}} orientation="left">其它属性</Divider>
           <Row style={{paddingLeft:20}}>
             {other_profile_html}
-            </Row></Fragment>)}
-          
+          </Row>
+        </Spin>
       </Modal>
     );
   }
