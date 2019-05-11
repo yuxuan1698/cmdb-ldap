@@ -51,19 +51,33 @@ class CMDBLDAPManager extends PureComponent {
   }
   componentDidMount(){
     const { selectdata }=this.props
-    this.handleClassObjectsChange(selectdata['objectClass'])
+    if(selectdata.hasOwnProperty('objectClass')){
+      this.handleClassObjectsChange(selectdata['objectClass'])
+    }else{
+      this.setState({objectClass:['top']})
+    }
   }
   componentWillReceiveProps(nextProps){
     const { selectdata }=nextProps
+    const { setFieldsValue }=this.props.form
     if(!Object.is(this.props.selectdata,selectdata)){
-      this.setState({
-        currField:Object.keys(selectdata).filter(i=>!(i==='objectClass' || i==='selectdn')),
-        selectedItems:selectdata['objectClass'],
-      })
-      setTimeout(()=>{
-        this.handleClassObjectsChange(selectdata['objectClass'])
-        this.handleNewClassObject()
-      },50)
+      if (selectdata.hasOwnProperty('objectClass')) {
+        this.setState({
+          currField:Object.keys(selectdata).filter(i=>!(i==='objectClass' || i==='selectdn')),
+          selectedItems:selectdata['objectClass'],
+        })
+        setTimeout(()=>{
+          this.handleClassObjectsChange(selectdata['objectClass'])
+          this.handleNewClassObject()
+        },50)
+      }else{
+        this.setState({
+          selectedItems: ['top']
+        })
+        setFieldsValue({
+          objectClass: ['top'],
+        });
+      }
     }
   }
   initSelectedItems(arr){
@@ -170,14 +184,21 @@ class CMDBLDAPManager extends PureComponent {
   }
   render() {
     const { getFieldDecorator } = this.props.form;
-    const {loading, selectdata,userdnlist } = this.props;
+    const {
+      loading,
+      selectdata,
+      userdnlist,
+      isNewDn,
+      currentDn
+    } = this.props;
     const { selectedItems,options } = this.state;
     const loaded=loading.effects['ldap/getLDAPGroupsSecendList']
+    console.log(loaded)
     let { getFieldValue }=this.props.form
     return (
             <Fragment>
               <Content style={{overflow:"auto"}}>
-                <Spin tip="Loading..." spinning={loaded}>
+                <Spin tip="Loading..." spinning={Boolean(loaded)}>
                   <Form layout="horizontal" onSubmit={this.handleSubmit} >
                     <Row gutter={18} style={{margin:0}}>
                       <Col span={24} >
@@ -274,7 +295,12 @@ class CMDBLDAPManager extends PureComponent {
               <Footer style={{padding:10,textAlign:"center"}}>
                 <Button onClick={this.handleSubmit.bind(this)} 
                   loading={loaded}
-                  type="primary">{loaded?"加载中..":"保存"}</Button>
+                  icon = {
+                    isNewDn?'plus':"save"
+                  }
+                  type = "primary" > {
+                    loaded ? "加载中.." : (isNewDn ?"新建":"保存")
+                  } < /Button>
               </Footer>
           </Fragment>           
     );
@@ -286,6 +312,8 @@ CMDBLDAPManager.propTypes = {
   selectdata: PropTypes.object.isRequired,
   userdnlist: PropTypes.array,
   loading: PropTypes.object,
+  isNewDn: PropTypes.bool.isRequired,
+  currentDn: PropTypes.string,
   dispatch: PropTypes.func
 };
 

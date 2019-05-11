@@ -31,6 +31,7 @@ class CMDBLdapGroups extends PureComponent {
       selectdata:"",
       loadedData:{},
       classobjects:"",
+      isNewDn:false,
     }
   }
   renderTreeNodes = (data,searchValue) => data.filter(i=>{
@@ -63,15 +64,28 @@ class CMDBLdapGroups extends PureComponent {
   })
   handleRightMenu=()=>{
     let menu = (<ContextMenu id="ldap_control_menu" >
-      <MenuItem data={{foo: 'bar'}} >
-          新建节点(Entry)
+      < MenuItem onClick = {
+        this.handleNewDNItem.bind(this)
+      } >
+         < Icon type = "file-add"
+         theme = "twoTone" / > 新建节点
         </MenuItem>
-        <MenuItem data={{foo: 'bar'}} >
-          删除节点(Entry)
+        < MenuItem onClick = {
+          this.handleRemoveDn.bind(this)
+        } >
+          < Icon type = "delete"
+          theme = "twoTone" / > 删除节点
         </MenuItem>
         <MenuItem divider />
-        <MenuItem data={{foo: 'bar'}} >
-   	      重命名节点(Entry)
+        < MenuItem onClick = {
+          this.handleFlushAndReset.bind(this)
+        } >
+   	      < Icon type = "reload" / > 刷新节点
+        </MenuItem>
+        <MenuItem divider />
+        < MenuItem >
+   	      < Icon type = "edit"
+   	      theme = "twoTone" / > 重命名节点
         </MenuItem>
     </ContextMenu>)
     return menu
@@ -124,11 +138,29 @@ class CMDBLdapGroups extends PureComponent {
   onResize=(event, { size })=>{
     this.setState({ width: size.width });
   }
+  handleGetobjectClass=()=>{
+    const {
+      dispatch
+    } = this.props
+
+    if (this.state.classobjects === "") {
+      dispatch({
+        type: 'users/getLDAPClassList',
+        callback: (data) => {
+          this.setState({
+            classobjects: data,
+          });
+        }
+      })
+    }
+  }
   handleOnSelect=(selectdn)=>{
     const { treeobject }=this.props.groups
     const { loadedData }=this.state
-    const { dispatch }=this.props
-    let currState={selectedKeys:selectdn}
+    let currState = {
+      selectedKeys: selectdn,
+      isNewDn:false
+    }
     if (treeobject.hasOwnProperty(selectdn)){
       currState=Object.assign(currState,{selectdata: Object.assign(treeobject[selectdn],{selectdn:selectdn})})
     }
@@ -136,15 +168,7 @@ class CMDBLdapGroups extends PureComponent {
       currState=Object.assign(currState,{selectdata: Object.assign(loadedData[selectdn],{selectdn:selectdn})})
     }
     this.setState(currState)
-    if (this.state.classobjects === "") {
-      dispatch({
-        type: 'users/getLDAPClassList', callback: (data) => {
-          this.setState({
-            classobjects: data,
-          });
-        }
-      })
-    }
+    this.handleGetobjectClass()
   }
   handleOnChange = (e) => {
     const value = e.target.value;
@@ -162,8 +186,11 @@ class CMDBLdapGroups extends PureComponent {
   }
   handleNewDNItem=()=>{
     this.setState({
-      selectdata:[],
-      selectedKeys:[]})
+      selectdata:{},
+      selectedKeys:[],
+      isNewDn:true
+    })
+    this.handleGetobjectClass()
   }
   handleRemoveDn=()=>{
     alert(this.state.selectedKeys)
@@ -175,7 +202,8 @@ class CMDBLdapGroups extends PureComponent {
       selectedKeys:[],
       selectdata:"",
       loadedKeys:[],
-      searchValue:""
+      searchValue:"",
+      isNewDn:false,
     })
   }
   render(){
@@ -187,7 +215,8 @@ class CMDBLdapGroups extends PureComponent {
       autoExpandParent,
       width,
       classobjects,
-      selectdata 
+      selectdata,
+      isNewDn
     } = this.state
     const {treedata}=this.props.groups
     const {loading}=this.props
@@ -225,7 +254,10 @@ class CMDBLdapGroups extends PureComponent {
                       className={usercss.ldap_button_group} 
                       icon='plus' 
                       onClick={this.handleNewDNItem.bind(this)}/>
-                    <Button title="删除" disabled={selectdata ? false : true} 
+                    < Button title = "删除"
+                    disabled = {
+                      selectedKeys.length>0 ? false : true
+                    }
                       onClick={this.handleRemoveDn.bind(this)}
                       className={usercss.ldap_button_group} icon='minus' />
                     <Button title="刷新" onClick={this.handleFlushAndReset.bind(this)} className={usercss.ldap_button_group} icon='reload' />
@@ -236,7 +268,9 @@ class CMDBLdapGroups extends PureComponent {
         </Resizable>
         <Content className={usercss.right_content_class}>
           {(classobjects && selectdata)?<CMDBLDAPManager 
-            selectdata={this.state.selectdata}
+            selectdata={selectdata}
+            isNewDn={isNewDn}
+            currentDn = { selectedKeys }
             classobjects={classobjects} />:<Empty className={usercss.right_empty_center} />}
         </Content>
       </Layout>
