@@ -5,28 +5,28 @@ import {PureComponent} from 'react'
 import PropTypes from 'prop-types';
 import { Table, Icon, Button, Alert,message,Layout,Input } from 'antd';
 import usercss from "./user.less";
-import CMDBBreadcrumb from "../components/Breadcrumb";
+import CMDBBreadcrumb from "./components/Breadcrumb";
 import dynamic from 'umi/dynamic';
-import {UserEditButton,UserBatchButton} from '../components/UserEditButton'
+import {UserEditButton,UserBatchButton} from './components/UserEditButton'
 const {
   Content
 } = Layout;
 const DrawerAddUser = dynamic({
-  loader: () => import('../components/addUser'),
+  loader: () => import('./components/addUser'),
   loading: (e) => {
     return null
   },
 })
 
 let DrawerUpdateUser = dynamic({
-  loader: () => import('../components/modifyUser'),
+  loader: () => import('./components/modifyUser'),
   loading: (e) => {
     return null
   },
 })
 
 let UserInfo = dynamic({
-  loader: () => import('../components/UserInfo'),
+  loader: () => import('./components/UserInfo'),
   loading: (e) => {
     return null
   },

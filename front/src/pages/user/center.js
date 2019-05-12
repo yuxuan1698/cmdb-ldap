@@ -1,7 +1,6 @@
 'use strict'
 
 import {Fragment,PureComponent} from 'react'
-// import '../../../node_modules/react-resizable/css/styles.css';
 import React from 'react';
 import { Resizable } from 'react-resizable';
 class CMDBUserCenter extends PureComponent {

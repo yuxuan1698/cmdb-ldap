@@ -7,8 +7,8 @@ import { Resizable } from 'react-resizable';
 import { ContextMenuTrigger, ContextMenu,MenuItem } from 'react-contextmenu';
 import PropTypes from 'prop-types';
 import usercss from "./user.less";
-import CMDBBreadcrumb from "../components/Breadcrumb";
-import CMDBLDAPManager from "../components/ldapManager"
+import CMDBBreadcrumb from "./components/Breadcrumb";
+import dynamic from 'umi/dynamic';
 
 const {
    Content, Sider,Footer
@@ -16,6 +16,13 @@ const {
 const ButtonGroup = Button.Group;
 const { TreeNode,DirectoryTree } = Tree;
 const {Search} = Input;
+
+const CMDBLDAPManager = dynamic({
+  loader: () => import('./components/ldapManager'),
+  loading: (e) => {
+    return null
+  },
+})
 
 @connect(({ldap,loading})=>({loading,groups:ldap.groups}))
 class CMDBLdapGroups extends PureComponent {
@@ -162,10 +169,10 @@ class CMDBLdapGroups extends PureComponent {
       isNewDn:false
     }
     if (treeobject.hasOwnProperty(selectdn)){
-      currState=Object.assign(currState,{selectdata: Object.assign(treeobject[selectdn],{selectdn:selectdn})})
+      currState=Object.assign(currState,{selectdata: Object.assign(treeobject[selectdn])})
     }
     if (loadedData.hasOwnProperty(selectdn)){
-      currState=Object.assign(currState,{selectdata: Object.assign(loadedData[selectdn],{selectdn:selectdn})})
+      currState=Object.assign(currState,{selectdata: Object.assign(loadedData[selectdn])})
     }
     this.setState(currState)
     this.handleGetobjectClass()
@@ -187,7 +194,7 @@ class CMDBLdapGroups extends PureComponent {
   handleNewDNItem=()=>{
     this.setState({
       selectdata:{},
-      selectedKeys:[],
+      // selectedKeys:[],
       isNewDn:true
     })
     this.handleGetobjectClass()
@@ -205,6 +212,9 @@ class CMDBLdapGroups extends PureComponent {
       searchValue:"",
       isNewDn:false,
     })
+  }
+  handleRightButtonEvent=({event,node})=>{
+    this.setState({selectedKeys:[node.props.eventKey]})
   }
   render(){
     const { 
@@ -241,6 +251,7 @@ class CMDBLdapGroups extends PureComponent {
                       selectedKeys={selectedKeys}
                       loadedKeys={loadedKeys}
                       onExpand={this.onExpand.bind(this)}
+                      onRightClick={this.handleRightButtonEvent.bind(this)}
                       onSelect={this.handleOnSelect.bind(this)}>
                       {this.renderTreeNodes(treedata,searchValue)}
                     </DirectoryTree>

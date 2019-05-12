@@ -6,14 +6,22 @@ import { connect } from 'dva';
 import { Resizable } from 'react-resizable';
 import PropTypes from 'prop-types';
 import usercss from "./user.less";
-import CMDBBreadcrumb from "../components/Breadcrumb";
-import CMDBLDAPManager from "../components/ldapManager"
+import CMDBBreadcrumb from "./components/Breadcrumb";
+import dynamic from 'umi/dynamic';
+
 
 const {
   Content, Sider
 } = Layout;
 const { TreeNode, DirectoryTree } = Tree;
 const { Search } = Input;
+
+const CMDBSeletPermission = dynamic({
+  loader: () => import('./components/selectPermission'),
+  loading: (e) => {
+    return null
+  },
+})
 
 @connect(({ loading,users }) => ({ loading,userlist: users.userlist }))
 class CMDBLdapPermission extends PureComponent {
@@ -112,9 +120,20 @@ class CMDBLdapPermission extends PureComponent {
             </Sider>
           </Resizable>
           <Content className={usercss.right_content_class}>
-            {(classobjects && selectdata) ? <CMDBLDAPManager
+            {
+              (classobjects && selectdata) ? < CMDBSeletPermission
               selectdata={this.state.selectdata}
-              classobjects={classobjects} /> : <Empty className={usercss.right_empty_center} />}
+              classobjects={classobjects} /> : 
+              < CMDBSeletPermission
+              selectdata = {
+                this.state.selectdata
+              }
+              classobjects = {
+                classobjects
+              }
+              />
+              // <Empty className={usercss.right_empty_center} />
+              }
           </Content>
         </Layout>
       </Layout>
