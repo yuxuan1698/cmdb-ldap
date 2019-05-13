@@ -14,6 +14,7 @@ from .views import (
     UserChangerPasswordSet,
     CreateUserViewSet,
     UpdateUserViewSet,
+    UpdateDNViewSet,
     DeleteUserViewSet
 )
 from rest_framework_jwt.views import obtain_jwt_token
@@ -31,6 +32,7 @@ urlpatterns = [
     path('ldap/user/deleteuser/', DeleteUserViewSet.as_view(),name='ldap-deleteuser'),
     path('ldap/user/list/', UserListViewSet.as_view(),name='ldap-userlist'),
     url(r'ldap/user/attr/(?P<username>[^/]+)/', UserAttributeByViewSet.as_view(),name='ldap-userattr'),
+    url(r'ldap/dn/update/', UpdateDNViewSet.as_view(),name='ldap-dnupdate'),
     path('ldap/user/changepassword/', UserChangerPasswordSet.as_view(),name='ldap-changepassword'),
     path('logout/', obtain_jwt_token,name='auth-logout'),
     ]

@@ -1,12 +1,12 @@
 import uuid
 import ldap
 from ldap.ldapobject import ReconnectLDAPObject
-from ldap.schema import urlfetch
 from ldap.schema.subentry import SCHEMA_ATTRS
 from django.conf import settings
 from common.utils import CmdbLDAPLogger
 from django.contrib.auth import get_user_model
-from authentication.ldap.utils import (modifyModList,
+from authentication.ldap.utils import (
+  modifyModList,
   convert_dict_to_tuple_bytes, 
   generate_ldap_dn_prefix,
   convert_string_to_bytes
@@ -55,6 +55,23 @@ class CmdbLDAP(object):
     if self.connect():
       searchFilter="(&(%s))"%username
       result_id=self.conn.search(self.userDN, self.searchScope, searchFilter, retrieveAttributes)
+      result_set = []
+      while 1:
+        result_type, result_data = self.conn.result(result_id, 0)
+        if(result_data == []):
+          break
+        else:
+          if result_type == ldap.RES_SEARCH_ENTRY:
+            result_set.append(result_data[0])
+      return result_set,None
+    else:
+      return None,self.errorMsg
+
+  def get_dn_attribute(self,dn=settings.AUTH_LDAP_BASE_DN):
+    """ 返回所有LDAP DN属性 """
+    if self.connect():
+      searchFilter="(objectClass=*)"
+      result_id=self.conn.search(dn, ldap.SCOPE_BASE, searchFilter, None)
       result_set = []
       while 1:
         result_type, result_data = self.conn.result(result_id, 0)
@@ -232,6 +249,47 @@ class CmdbLDAP(object):
     if dndata:
       olddata=dndata[0][1]
       newdata = convert_string_to_bytes(data)
+      modlist=modifyModList(olddata,newdata)
+      if len(modlist):
+        logger.info("modlist:%s"%modlist)
+        try:
+          self.conn.modify_s(olddn,modlist)
+          return "更新用户成功",None
+        except ldap.NAMING_VIOLATION as e:
+          logger.error(e)
+          return False,"更新字段失败，失败内容:%s"%(e.args[0]['info'] if e.args[0]['info'] else "")
+        except ldap.CONSTRAINT_VIOLATION as e:
+          logger.error(e)
+          return False,"更新字段失败，失败内容:%s"%(e.args[0]['info'] if e.args[0]['info'] else "")
+      if modrdn!='':
+        try:
+          self.conn.modrdn_s(olddn,modrdn)
+          return "更新用户成功",None
+        except ldap.INVALID_DN_SYNTAX as e:
+          logger.error(e)
+          return False,"DN修改失败:%s"%(e.args[0]['info'] if e.args[0]['info'] else "")
+      return False,'字段没有发生变化，修改不成功。'
+
+  def update_ldap_dn(self,data,olddn):
+    """
+    更新用户属性用户
+    """
+    rdn_prefix=olddn.split(',')
+    rdn_field=rdn_prefix[0].split('=')
+    dndata,err=self.get_dn_attribute(olddn)
+    modrdn=""
+    if dndata:
+      if rdn_field[0]!='':
+        if data[rdn_field[0]]!=rdn_field[1]:
+          modrdn="{}={}".format(rdn_field[0],data[rdn_field[0]])
+        del dndata[0][1][rdn_field[0]]
+        del data[rdn_field[0]]
+    else:
+      return False,err
+    if dndata:
+      olddata=dndata[0][1]
+      newdata = convert_string_to_bytes(data)
+      logger.info(newdata)
       modlist=modifyModList(olddata,newdata)
       if len(modlist):
         logger.info("modlist:%s"%modlist)

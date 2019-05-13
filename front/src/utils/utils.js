@@ -1,7 +1,7 @@
 import { Store } from "./store";
 import { notification,message,Alert,Icon } from 'antd';
 import {formatMessage} from 'umi/locale';
-import { object } from "prop-types";
+// import { object, instanceOf } from "prop-types";
 // 生成认证请求头
 export function GenerateRequestAuthParams() {
   const header_info=Store.getLocal('userinfo');
@@ -50,4 +50,21 @@ export function formatReturnMsg(msgObj,status){
       message.error(`${errorMsg}${formatMessage({ id: 'request.status' })}${status}`)
   }
 
+}
+
+
+// 单个list值转string
+export function singleListToString(objval){
+  if(objval instanceof Object){
+    Object.keys(objval).map(i=>{
+      if(objval[i] instanceof Object && !objval[i] instanceof Array) objval[i]=singleListToString(objval[i])
+      if(objval[i] instanceof Array){
+        if(objval[i].length<=1){
+          objval[i]=objval[i][0]
+          console.log(objval[i])
+        }
+      }
+    })
+  }
+  return objval
 }

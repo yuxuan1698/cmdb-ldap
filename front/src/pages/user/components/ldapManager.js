@@ -49,14 +49,23 @@ class CMDBLDAPManager extends PureComponent {
       currData:{}
     }
   }
-  componentDidMount(){
+  componentWillMount=()=>{
     const { selectdata }=this.props
     if(selectdata.hasOwnProperty('objectClass')){
-      this.handleClassObjectsChange(selectdata['objectClass'])
+      this.setState({
+        currField:Object.keys(selectdata).filter(i=>i!='objectClass'),
+      })
     }else{
       this.setState({objectClass:['top']})
     }
   }
+  componentDidMount(){
+    const { selectdata }=this.props
+    if(selectdata.hasOwnProperty('objectClass')){
+      this.handleClassObjectsChange(selectdata['objectClass'])
+    }
+  }
+  
   componentWillReceiveProps(nextProps){
     const { selectdata }=nextProps
     const { setFieldsValue }=this.props.form
@@ -69,7 +78,7 @@ class CMDBLDAPManager extends PureComponent {
         setTimeout(()=>{
           this.handleClassObjectsChange(selectdata['objectClass'])
           this.handleNewClassObject()
-        },50)
+        },100)
       }else{
         this.setState({
           currField:[],
@@ -98,8 +107,7 @@ class CMDBLDAPManager extends PureComponent {
   handleClassObjectsChange=(e,v)=>{
     const {classobjects}=this.state
     const selectdn = this.props.currentDn
-    console.log(selectdn)
-    let defautlMustfield=(selectdn instanceof Array && selectdn!=='')?selectdn[0].split(',')[0].split('=')[0]:'uid'
+    let defautlMustfield=(selectdn!=='')?selectdn.split(',')[0].split('=')[0]:'uid'
     let supSet=this.initSelectedItems(e)
     let mayfiled=[], mustfiled=[]
     supSet.filter(i=>i!=='top').map(it=>{
@@ -137,7 +145,7 @@ class CMDBLDAPManager extends PureComponent {
         if(i==='gidNumber' || i==='uidNumber') {
           setFieldsValue({[i]:parseInt(selectdata[i],10)})
         }else{
-          setFieldsValue({[i]:selectdata[i]})
+          setFieldsValue({[i]:selectdata.hasOwnProperty(i)?selectdata[i]:""})
         }
       }
     })
@@ -159,9 +167,17 @@ class CMDBLDAPManager extends PureComponent {
   }
   handleSubmit = (e) => {
     e.preventDefault();
+    const {isNewDn,currentDn,dispatch}= this.props
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        
+        if(isNewDn){
+
+        }else{
+          console.log(values)
+          dispatch({type:'ldap/postLDAPDNUpdate',payload: {...values,currentDn},callback: ()=>{
+            alert()
+          }})
+        }
       }
     });
   }
@@ -190,16 +206,16 @@ class CMDBLDAPManager extends PureComponent {
       loading,
       selectdata,
       userdnlist,
-      isNewDn,
-      currentDn
+      isNewDn
     } = this.props;
     const { selectedItems,options } = this.state;
     const loaded=loading.effects['ldap/getLDAPGroupsSecendList']
+    const loaded_update=loading.effects['ldap/postLDAPDNUpdate']
     let { getFieldValue }=this.props.form
     return (
             <Fragment>
               <Content style={{overflow:"auto"}}>
-                <Spin tip="Loading..." spinning={Boolean(loaded)}>
+                <Spin tip="Loading..." spinning={Boolean(loaded||loaded_update)}>
                   <Form layout="horizontal" onSubmit={this.handleSubmit} >
                     <Row gutter={18} style={{margin:0}}>
                       <Col span={24} >
@@ -257,11 +273,12 @@ class CMDBLDAPManager extends PureComponent {
                                     ))}
                                   </Select>
                         }
+                        
                         return (
                           <Col span={24} key={i} >
                           <Form.Item  labelCol={{ span: 7 }} wrapperCol={{ span: 13 }} label={filedToName[i]?`${filedToName[i]}(${i})`:i} hasFeedback required>
                             {getFieldDecorator(i, {
-                                initialValue: (selectdata.hasOwnProperty(i) && i!=='userPassword')?(i==='gidNumber' || i==='uidNumber'?parseInt(selectdata[i],10):selectdata[i]):[],
+                                initialValue: (selectdata.hasOwnProperty(i) && i!=='userPassword')?(i==='gidNumber' || i==='uidNumber'?parseInt(selectdata[i],10):selectdata[i]):[""],
                                 rules: [{ required: i==='userPassword'?false:true, message: `请输入${filedToName[i]?filedToName[i]:i}(${i})` }],
                             })(inputField)}
                             {!this.state.mustField.includes(i)?<Tooltip placement="top" title="删除字段">
@@ -283,7 +300,7 @@ class CMDBLDAPManager extends PureComponent {
                           overlayStyle={{maxHeight:300,overflow:"auto",boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)"}}
                           disabled={this.state.selectedItems.filter(i=>i!=='top').length>0?false:true}
                           overlay={this.initAddFieldMenu.bind(this)} >
-                            <Button block type="dashed" loading={loaded}  >
+                            <Button block type="dashed" loading={loaded||loaded_update}  >
                               <Icon type="plus" /> 添加字段信息
                             </Button>
                           </Dropdown>
@@ -296,11 +313,12 @@ class CMDBLDAPManager extends PureComponent {
               <Footer style={{padding:10,textAlign:"center"}}>
                 <Button onClick={this.handleSubmit.bind(this)} 
                   loading={loaded}
+                  disabled={this.state.selectedItems.filter(i=>i!=='top').length>0?false:true}
                   icon = {
                     isNewDn?'plus':"save"
                   }
                   type = "primary" > {
-                    loaded ? "加载中.." : (isNewDn ?"新建":"保存")
+                    loaded||loaded_update ? "加载中.." : (isNewDn ?"新建":"保存")
                   } < /Button>
               </Footer>
           </Fragment>           
@@ -314,7 +332,7 @@ CMDBLDAPManager.propTypes = {
   userdnlist: PropTypes.array,
   loading: PropTypes.object,
   isNewDn: PropTypes.bool.isRequired,
-  currentDn: PropTypes.array.isRequired,
+  currentDn: PropTypes.string.isRequired,
   dispatch: PropTypes.func
 };
 

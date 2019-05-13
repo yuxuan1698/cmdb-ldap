@@ -7,6 +7,7 @@ from authentication.serializers import (
   ChangePasswordSerializer,
   DeleteUserSerializer,
   CreateUserSerializer,
+  UpdateDNSerializer,
   UpdateUserSerializer
 )
 from authentication.ldap.ldapsearch import CmdbLDAP
@@ -34,6 +35,7 @@ cmdbldap={
   "getClasses":CmdbLDAP(),
   "getUsers":CmdbLDAP(),
   "getOUDN":CmdbLDAP(),
+  "updateDN":CmdbLDAP(),
   "all":CmdbLDAP()
 }
 # threadlock=False
@@ -217,3 +219,29 @@ class GroupViewSet(APIView):
   """
   queryset = Group.objects.all()
   serializer_class = GroupSerializer
+
+
+class UpdateDNViewSet(APIView):
+  """
+  更新用户
+  """
+  serializer_class = UpdateDNSerializer
+  def post(self,request, *args, **kwargs):
+    """
+    提交用户数据
+    """
+    serializer = UpdateDNSerializer(instance=request, data=request.data)
+    if serializer.is_valid():
+      olddn=request.data['currentDn']
+      request.data.pop('currentDn')
+      changeStatus, errorMsg = cmdbldap['updateDN'].update_ldap_dn(request.data,olddn)
+      if changeStatus:
+        returnData = {"status": changeStatus}
+        returnStatus = status.HTTP_200_OK
+      else:
+        returnData = {"error": errorMsg}
+        returnStatus = status.HTTP_400_BAD_REQUEST
+    else:
+      returnData = serializer.errors
+      returnStatus = status.HTTP_400_BAD_REQUEST
+    return JsonResponse(returnData, status=returnStatus, safe=False)

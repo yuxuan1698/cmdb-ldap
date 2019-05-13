@@ -1,5 +1,6 @@
 import { 
-  getGroupList
+  getGroupList,
+  PostLDAPDNUpdate
 } from '../../../services/api';
 
 export default {
@@ -43,6 +44,12 @@ export default {
       },
       *getLDAPGroupsSecendList({ payload,callback }, { call }) {
         const data = yield call(getGroupList, payload)
+        if (data) {
+          callback(data)
+        }
+      },
+      *postLDAPDNUpdate({ payload,callback }, { call }) {
+        const data = yield call(PostLDAPDNUpdate, payload)
         if (data) {
           callback(data)
         }

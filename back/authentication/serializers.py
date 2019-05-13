@@ -223,3 +223,61 @@ class ChangePasswordSerializer(Serializer):
         raise ValidationError("两次输入的密码不一致！")
       return data
 
+class UpdateDNSerializer(Serializer):
+  """
+    效验更新用户的字段
+  """
+  uid = CharField(
+      required=False,
+      min_length=4,
+      allow_blank=False,
+      error_messages={
+        'min_length': '用户名(uid)不能小于4个字符',
+        'blank': "字段(uid)不能为空。"
+      })
+  currentDn = CharField(
+      required=True,
+      min_length=4,
+      allow_blank=False,
+      error_messages={
+        'required':"用户(currentDn)字段为空，提交非法。",
+        'min_length': '用户名(currentDn)不能小于4个字符',
+        'blank': "字段(currentDn)不能为空。"
+      })
+  sn = CharField(
+      required=False,
+      error_messages={
+        'required': '请填写用户姓名(sn)字段'
+      })
+  cn = CharField(
+      required=False,
+      allow_blank=False,
+      error_messages={
+        'required': '请填写用户别名(cn)字段',
+        'blank':"字段(cn)不能为空。"
+      })
+  mail = EmailField(
+      required=False,
+      error_messages={
+        'required': '请填写用户姓名(mail)字段'
+      })
+  userPassword = CharField(
+      required=False,
+      allow_blank=True,
+      min_length=6,
+      error_messages={
+        'min_length': '用户密码(userPassword)不能小于6个字符',
+        'required': '请填写用户密码(userPassword)字段'
+      })
+  uidNumber = IntegerField(
+    required       = False, 
+  )
+  gidNumber = IntegerField(
+    required       = False, 
+  )
+  objectClass = ListField(
+      child=CharField(),
+      required=True,
+      error_messages={
+        'required': '请填写字段归属(objectClass)字段'
+      })

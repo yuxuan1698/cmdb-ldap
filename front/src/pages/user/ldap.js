@@ -1,11 +1,11 @@
 'use strict'
 
 import {PureComponent} from 'react'
-import { Layout, Tree, Input, Button, Icon, Empty, Spin } from 'antd';
+import { Layout, Tree, Input, Button, Icon, Empty, Spin,Modal } from 'antd';
 import {connect} from 'dva';
 import { Resizable } from 'react-resizable';
 import { ContextMenuTrigger, ContextMenu,MenuItem } from 'react-contextmenu';
-import PropTypes from 'prop-types';
+import PropTypes, { instanceOf } from 'prop-types';
 import usercss from "./user.less";
 import CMDBBreadcrumb from "./components/Breadcrumb";
 import dynamic from 'umi/dynamic';
@@ -200,7 +200,20 @@ class CMDBLdapGroups extends PureComponent {
     this.handleGetobjectClass()
   }
   handleRemoveDn=()=>{
-    alert(this.state.selectedKeys)
+    const {selectedKeys}=this.state
+    if(selectedKeys){
+      Modal.confirm({
+        title:"删除提示",
+        content:`你确定要删除这个DN:${selectedKeys},删除后将无法恢复？`,
+        onOk: ()=>{
+          this.setState({
+            selectedKeys:[],
+            selectdata:""
+          })
+        }
+      })
+    }
+    
   }
   handleFlushAndReset=()=>{
     this.setState({
@@ -281,7 +294,7 @@ class CMDBLdapGroups extends PureComponent {
           {(classobjects && selectdata)?<CMDBLDAPManager 
             selectdata={selectdata}
             isNewDn={isNewDn}
-            currentDn = { selectedKeys }
+            currentDn = { selectedKeys.length>0?selectedKeys[0]:"" }
             classobjects={classobjects} />:<Empty className={usercss.right_empty_center} />}
         </Content>
       </Layout>
