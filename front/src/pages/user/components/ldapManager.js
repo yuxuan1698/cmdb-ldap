@@ -3,8 +3,8 @@
 
 import {Fragment,PureComponent} from 'react'
 import {
-  Form, Button, Row, Input, Select, Layout,Spin,
-  Icon,Dropdown,Menu,InputNumber,Divider,Col,Tooltip,notification
+  Form, Button, Input, Select, Layout,Spin,Row,Col,Alert,
+  Icon,Dropdown,Menu,InputNumber,Divider,Tooltip,notification
 } from 'antd';
 import {connect} from 'dva';
 import PropTypes from 'prop-types';
@@ -216,98 +216,116 @@ class CMDBLDAPManager extends PureComponent {
             <Fragment>
               <Content style={{overflow:"auto"}}>
                 <Spin tip="Loading..." spinning={Boolean(loaded||loaded_update)}>
-                  <Form layout="horizontal" onSubmit={this.handleSubmit} >
-                    <Row gutter={18} style={{margin:0}}>
-                      <Col span={24} >
-                        <Form.Item label='字段归属(objectClass)' >
-                          {getFieldDecorator('objectClass', {
-                            initialValue:this.state.selectedItems,
-                            rules: [{ required: true, message: '请选择属性归属类(objectClass)' }],
-                          })(<Select
-                              mode="multiple" showArrow autoFocus allowClear
-                              placeholder="请选择属性归属类(objectClass)"
-                              onChange={this.handleClassObjectsChange.bind(this)}
-                              loading={loading.effects['users/getLDAPClassList']}
-                              onMouseLeave={this.handleNewClassObject.bind(this)}
-                              onBlur={this.handleNewClassObject.bind(this)} >
-                              {options.filter(e=>!selectedItems.includes(e)).map(item => (
-                                <Option key={item} value={item}>
-                                  {item}
-                                </Option>
-                              ))}
-                            </Select>
-                          )}
-                        </Form.Item>
-                      </Col>
-                      <Divider dashed style={{margin:"10px 0px"}}/>
-                      {this.state.currField.map((i)=>{
-                        let inputField=<Input className={css.add_user_field_width}
-                                        type="text"
-                                        placeholder={(filedToName[i]?filedToName[i]:i)+`(${i})`}/>
-                        if(i==='userPassword'){
-                          inputField = <Input.Password 
-                            placeholder={(filedToName[i] ? filedToName[i] : i) + `(${i})`} />
-                        }
-                        if(i==='gidNumber' || i==='uidNumber'){
-                          inputField = <InputNumber 
-                            placeholder={(filedToName[i] ? filedToName[i] : i) + `(${i})`}
-                            className={css.add_user_field_width}  min={1000} max={65535} />
-                        }
-                        if(i==='sshPublicKey' || i==='description'){
-                          inputField = <Input.TextArea 
-                            placeholder={(filedToName[i] ? filedToName[i] : i) + `(${i})`} 
-                            autosize={{ minRows: 2, maxRows: 5 }} />
-                        }
-                        if(i==='manager' || i==='member' || i==='uniqueMember'){
-                          let curval=getFieldValue(i)
-                          inputField=<Select
-                                    mode="multiple" showArrow autoFocus allowClear
-                                    loading={loading.effects['users/getUserList']}
-                                    notFoundContent={<div style={{textAlign:"center"}}><Icon type='loading' style={{ fontSize: 60 }} /></div>}
-                                    onDropdownVisibleChange={this.handelOnSyncLoadUserDn.bind(this)}
-                                    placeholder={`请选择属性领导/上级(${i})`} >
-                                    {userdnlist.filter(s=>!(curval && curval.includes(s))).map(item => (
-                                      <Option key={item} value={item}>
-                                        {item}
-                                      </Option>
-                                    ))}
-                                  </Select>
-                        }
-                        
-                        return (
-                          <Col span={24} key={i} >
-                          <Form.Item  labelCol={{ span: 7 }} wrapperCol={{ span: 13 }} label={filedToName[i]?`${filedToName[i]}(${i})`:i} hasFeedback required>
-                            {getFieldDecorator(i, {
-                                initialValue: (selectdata.hasOwnProperty(i) && i!=='userPassword')?(i==='gidNumber' || i==='uidNumber'?parseInt(selectdata[i],10):selectdata[i]):[""],
-                                rules: [{ required: i==='userPassword'?false:true, message: `请输入${filedToName[i]?filedToName[i]:i}(${i})` }],
-                            })(inputField)}
-                            {!this.state.mustField.includes(i)?<Tooltip placement="top" title="删除字段">
-                                  <Icon className={css.delete_field_icon}
-                                    type="minus-circle-o"
-                                    theme="twoTone"
-                                    onClick={this.removeField.bind(this,i)} />
-                                  </Tooltip>:""}
+                <Row gutter={38} style={{margin:0}}>
+                  <Col span={16} >
+                    <Form layout="horizontal" onSubmit={this.handleSubmit} >
+                      <Row gutter={18} >
+                        <Col span={24} >
+                          <Form.Item label='字段归属(objectClass)' >
+                            {getFieldDecorator('objectClass', {
+                              initialValue:this.state.selectedItems,
+                              rules: [{ required: true, message: '请选择属性归属类(objectClass)' }],
+                            })(<Select
+                                mode="multiple" showArrow autoFocus allowClear
+                                placeholder="请选择属性归属类(objectClass)"
+                                onChange={this.handleClassObjectsChange.bind(this)}
+                                loading={loading.effects['users/getLDAPClassList']}
+                                onMouseLeave={this.handleNewClassObject.bind(this)}
+                                onBlur={this.handleNewClassObject.bind(this)} >
+                                {options.filter(e=>!selectedItems.includes(e)).map(item => (
+                                  <Option key={item} value={item}>
+                                    {item}
+                                  </Option>
+                                ))}
+                              </Select>
+                            )}
                           </Form.Item>
-                          </Col>
-                        )
-                      })}
-                    </Row>
-                    <Row align='middle' >
-                      <div style={{width:"80%",margin: "0 auto"}} >
-                        <Form.Item >
-                          <Dropdown trigger={['click']} 
-                          loading={loading.effects['users/getLDAPClassList']}
-                          overlayStyle={{maxHeight:300,overflow:"auto",boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)"}}
-                          disabled={this.state.selectedItems.filter(i=>i!=='top').length>0?false:true}
-                          overlay={this.initAddFieldMenu.bind(this)} >
-                            <Button block type="dashed" loading={loaded||loaded_update}  >
-                              <Icon type="plus" /> 添加字段信息
-                            </Button>
-                          </Dropdown>
-                        </Form.Item>
-                      </div>
-                    </Row>
-                  </Form>
+                        </Col>
+                        <Divider dashed style={{margin:"10px 0px"}}/>
+                        {this.state.currField.map((i)=>{
+                          let inputField=<Input className={css.add_user_field_width}
+                                          type="text"
+                                          placeholder={(filedToName[i]?filedToName[i]:i)+`(${i})`}/>
+                          if(i==='userPassword'){
+                            inputField = <Input.Password 
+                              placeholder={(filedToName[i] ? filedToName[i] : i) + `(${i})`} />
+                          }
+                          if(i==='gidNumber' || i==='uidNumber'){
+                            inputField = <InputNumber 
+                              placeholder={(filedToName[i] ? filedToName[i] : i) + `(${i})`}
+                              className={css.add_user_field_width}  min={1000} max={65535} />
+                          }
+                          if(i==='sshPublicKey' || i==='description'){
+                            inputField = <Input.TextArea 
+                              placeholder={(filedToName[i] ? filedToName[i] : i) + `(${i})`} 
+                              autosize={{ minRows: 2, maxRows: 5 }} />
+                          }
+                          if(i==='manager' || i==='member' || i==='uniqueMember'){
+                            let curval=getFieldValue(i)
+                            inputField=<Select
+                                      mode="multiple" showArrow autoFocus allowClear
+                                      loading={loading.effects['users/getUserList']}
+                                      notFoundContent={<div style={{textAlign:"center"}}><Icon type='loading' style={{ fontSize: 60 }} /></div>}
+                                      onDropdownVisibleChange={this.handelOnSyncLoadUserDn.bind(this)}
+                                      placeholder={`请选择属性领导/上级(${i})`} >
+                                      {userdnlist.filter(s=>!(curval && curval.includes(s))).map(item => (
+                                        <Option key={item} value={item}>
+                                          {item}
+                                        </Option>
+                                      ))}
+                                    </Select>
+                          }
+                          
+                          return (
+                            <Col span={24} key={i} >
+                            <Form.Item  labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label={filedToName[i]?`${filedToName[i]}(${i})`:i} hasFeedback required>
+                              {getFieldDecorator(i, {
+                                  initialValue: (selectdata.hasOwnProperty(i) && i!=='userPassword')?(i==='gidNumber' || i==='uidNumber'?parseInt(selectdata[i],10):selectdata[i]):[""],
+                                  rules: [{ required: i==='userPassword'?false:true, message: `请输入${filedToName[i]?filedToName[i]:i}(${i})` }],
+                              })(inputField)}
+                              {!this.state.mustField.includes(i)?<Tooltip placement="top" title="删除字段">
+                                    <Icon className={css.delete_field_icon}
+                                      type="minus-circle-o"
+                                      theme="twoTone"
+                                      onClick={this.removeField.bind(this,i)} />
+                                    </Tooltip>:""}
+                            </Form.Item>
+                            </Col>
+                          )
+                        })}
+                      </Row>
+                      <Row align='middle' >
+                        <div style={{width:"96%",margin: "0 auto"}} >
+                          <Form.Item >
+                            <Dropdown trigger={['click']} 
+                            loading={loading.effects['users/getLDAPClassList']}
+                            overlayStyle={{maxHeight:300,overflow:"auto",boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)"}}
+                            disabled={this.state.selectedItems.filter(i=>i!=='top').length>0?false:true}
+                            overlay={this.initAddFieldMenu.bind(this)} >
+                              <Button block type="dashed" loading={loaded||loaded_update}  >
+                                <Icon type="plus" /> 添加字段信息
+                              </Button>
+                            </Dropdown>
+                          </Form.Item>
+                        </div>
+                      </Row>
+                    </Form>
+                  </Col>
+                  <Col span={8} >
+                    <Alert
+                      style={{margin:"42px 0px 0px 0px",padding:"15px 15px 15px 44px"}}
+                      message="温馨提示"
+                      description={<ui style={{listStyle: "initial"}}>
+                        <li>在新建DN时，必须选择objectClass,所有字段规属objectClass。</li>
+                        <li>在新建DN时，字段以uid,cn,o为顺序，做为dn 字段，优先级以从前到后。</li>
+                        <li>密码字段默认不显示密码，如果不修改密码就留空但不要删除字段。</li>
+                      </ui>}
+                      type="info"
+                      icon={<Icon type="warning" style={{left:10}} theme="twoTone" /> }
+                      showIcon
+                    />
+                  </Col>
+                </Row>
                 </Spin>
               </Content>
               <Footer style={{padding:10,textAlign:"center"}}>
