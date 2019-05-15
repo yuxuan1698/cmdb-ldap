@@ -9,6 +9,7 @@ from authentication.serializers import (
   CreateUserSerializer,
   UpdateDNSerializer,
   CreateDNSerializer,
+  DeleteDNSerializer,
   UpdateUserSerializer
 )
 from authentication.ldap.ldapsearch import CmdbLDAP
@@ -38,6 +39,7 @@ cmdbldap={
   "getOUDN":CmdbLDAP(),
   "updateDN":CmdbLDAP(),
   "createDN":CmdbLDAP(),
+  "deleteDN":CmdbLDAP(),
   "all":CmdbLDAP()
 }
 # threadlock=False
@@ -117,11 +119,11 @@ class DeleteUserViewSet(APIView):
   serializer_class = DeleteUserSerializer
   def post(self,request, *args, **kwargs):
     """
-    提交用户数据
+    删除用户
     """
     serializer = DeleteUserSerializer(instance=request, data=request.data)
     if serializer.is_valid():
-      changeStatus, errorMsg = cmdbldap['all'].delete_ldap_dn(request.data)
+      changeStatus, errorMsg = cmdbldap['all'].delete_ldap_userdn(request.data)
       if changeStatus:
         returnData = {"status": changeStatus}
         returnStatus = status.HTTP_200_OK
@@ -262,6 +264,32 @@ class CreateDNViewSet(APIView):
       parentDn=request.data['currentDn']
       request.data.pop('currentDn')
       changeStatus, errorMsg = cmdbldap['createDN'].create_ldap_entry_dn(request.data,parentDn)
+      if changeStatus:
+        returnData = {"status": changeStatus}
+        returnStatus = status.HTTP_200_OK
+      else:
+        returnData = {"error": errorMsg}
+        returnStatus = status.HTTP_400_BAD_REQUEST
+    else:
+      returnData = serializer.errors
+      returnStatus = status.HTTP_400_BAD_REQUEST
+    return JsonResponse(returnData, status=returnStatus, safe=False)
+
+
+class DeleteDNViewSet(APIView):
+  """
+  删除用户
+  """
+  serializer_class = DeleteDNSerializer
+
+  def post(self, request, *args, **kwargs):
+    """
+    删除用户
+    """
+    serializer = DeleteDNSerializer(instance=request, data=request.data)
+    if serializer.is_valid():
+      changeStatus, errorMsg = cmdbldap['deleteDN'].delete_ldap_dn(
+          request.data)
       if changeStatus:
         returnData = {"status": changeStatus}
         returnStatus = status.HTTP_200_OK

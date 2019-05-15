@@ -16,12 +16,20 @@ export function PostLDAPUpdateDN (data) {
         data: singleListToString(data),
     })
 }
-// 更新LDAP DN 接口
+// 创建LDAP DN 接口
 export function PostLDAPCreateDN (data) {
     return request({
         method: "post",
         url: '/v1/ldap/dn/create/',
         data: singleListToString(data),
+    })
+}
+// 删除LDAP DN 接口
+export function PostLDAPDeleteDN (data) {
+    return request({
+        method: "post",
+        url: '/v1/ldap/dn/delete/',
+        data: data,
     })
 }
 // 添加用户接口

@@ -214,7 +214,7 @@ class CmdbLDAP(object):
     logger.info("create user %s success,dn:%s" % (dn_pre, newuserdn))
     return "添加用户%s成功" % dn_pre, None
 
-  def delete_ldap_dn(self,data):
+  def delete_ldap_userdn(self,data):
     """
     删除用户
     """
@@ -337,3 +337,18 @@ class CmdbLDAP(object):
           return False,e.args[0]
       logger.info("create user %s success,dn:%s" % (dn_pre, newdn))
       return "添加用户%s成功" % dn_pre, None
+
+  def delete_ldap_dn(self, data):
+      """
+      删除用户
+      """
+      if self.connect():
+        logger.info(data)
+        try:
+          for dn in data['currentDn']:
+            self.conn.delete_s(dn)
+        except ldap.NO_SUCH_OBJECT as e:
+          return False, "没有找到此EntryDN信息,无法删除。"
+        except ldap.LDAPError as e:
+          return False, e.args[0]
+      return "删除用户%s成功" % (';'.join(data['currentDn'])), None

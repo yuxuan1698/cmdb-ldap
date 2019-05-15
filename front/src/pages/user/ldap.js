@@ -200,11 +200,16 @@ class CMDBLdapGroups extends PureComponent {
   }
   handleRemoveDn=()=>{
     const {selectedKeys}=this.state
+    const {dispatch}=this.props
     if(selectedKeys){
       Modal.confirm({
         title:"删除提示",
         content:`你确定要删除这个DN:${selectedKeys},删除后将无法恢复？`,
         onOk: ()=>{
+          dispatch({
+            type: 'ldap/deleteEntryDn',
+            payload: selectedKeys
+          })
           this.setState({
             selectedKeys:[],
             selectdata:""

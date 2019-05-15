@@ -339,3 +339,23 @@ class CreateDNSerializer(Serializer):
       error_messages={
         'required': '请填写字段归属(objectClass)字段'
       })
+
+
+class DeleteDNSerializer(Serializer):
+  """
+    效验删除用户的字段
+  """
+  currentDn = ListField(
+      required=True,
+      child=CharField(
+          allow_blank=False,
+          min_length=4,
+          error_messages={
+              'min_length': 'DN不能小于4个字符,或者格式不正确。',
+              'blank': "DN不允许为空"
+
+          }
+      ),
+      error_messages={
+          'required': '请填写用户名(currentDn)字段'
+      })

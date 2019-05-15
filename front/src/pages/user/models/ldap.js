@@ -1,6 +1,7 @@
 import { 
   getGroupList,
   PostLDAPUpdateDN,
+  PostLDAPDeleteDN,
   PostLDAPCreateDN
 } from '../../../services/api';
 
@@ -26,6 +27,7 @@ export default {
       },
     },
     effects: {
+      // 获取组列表
       *getLDAPGroupsList({ payload }, { call,put }) {
         const data = yield call(getGroupList, payload)
         if (data) {
@@ -63,6 +65,30 @@ export default {
           callback(data)
         }
       },
+      // 删除DN
+      * deleteEntryDn({ payload, callback }, { put, call, select }) {
+        let treedata = yield select(({ ldap }) => ldap.groups.treedata)
+        
+        const resp = yield call(PostLDAPDeleteDN, {
+          currentDn: payload
+        })
+        if(resp){
+          const newtreedata = treedata.filter(i => {
+            return i.key != payload ? true : false
+          })
+          if(newtreedata){
+            yield put({
+              type: 'ldapdeletedn',
+              payload: {
+                groups: {
+                  treedata: newtreedata
+                },
+              }
+            })
+          }
+          callback(resp)
+        }
+      },
       *addNewEntryDN({ payload }, { put,select }) {
         let tempList = yield select(({ldap}) => ldap.groups.treedata)
         if(payload){
@@ -89,6 +115,10 @@ export default {
       },
       // 新建/添加dn
       ldapcreatedn(state, {payload} ) {
+        return {...state,...payload}
+      },
+      // 删除dn
+      ldapdeletedn(state, {payload} ) {
         console.log(payload)
         return {...state,...payload}
       },
