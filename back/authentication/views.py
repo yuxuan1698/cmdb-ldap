@@ -8,6 +8,7 @@ from authentication.serializers import (
   DeleteUserSerializer,
   CreateUserSerializer,
   UpdateDNSerializer,
+  CreateDNSerializer,
   UpdateUserSerializer
 )
 from authentication.ldap.ldapsearch import CmdbLDAP
@@ -36,6 +37,7 @@ cmdbldap={
   "getUsers":CmdbLDAP(),
   "getOUDN":CmdbLDAP(),
   "updateDN":CmdbLDAP(),
+  "createDN":CmdbLDAP(),
   "all":CmdbLDAP()
 }
 # threadlock=False
@@ -235,6 +237,31 @@ class UpdateDNViewSet(APIView):
       olddn=request.data['currentDn']
       request.data.pop('currentDn')
       changeStatus, errorMsg = cmdbldap['updateDN'].update_ldap_dn(request.data,olddn)
+      if changeStatus:
+        returnData = {"status": changeStatus}
+        returnStatus = status.HTTP_200_OK
+      else:
+        returnData = {"error": errorMsg}
+        returnStatus = status.HTTP_400_BAD_REQUEST
+    else:
+      returnData = serializer.errors
+      returnStatus = status.HTTP_400_BAD_REQUEST
+    return JsonResponse(returnData, status=returnStatus, safe=False)
+
+class CreateDNViewSet(APIView):
+  """
+  更新用户
+  """
+  serializer_class = CreateDNSerializer
+  def post(self,request, *args, **kwargs):
+    """
+    提交用户数据
+    """
+    serializer = CreateDNSerializer(instance=request, data=request.data)
+    if serializer.is_valid():
+      parentDn=request.data['currentDn']
+      request.data.pop('currentDn')
+      changeStatus, errorMsg = cmdbldap['createDN'].create_ldap_entry_dn(request.data,parentDn)
       if changeStatus:
         returnData = {"status": changeStatus}
         returnStatus = status.HTTP_200_OK

@@ -310,3 +310,30 @@ class CmdbLDAP(object):
           logger.error(e)
           return False,"DN修改失败:%s"%(e.args[0]['info'] if e.args[0]['info'] else "")
       return False,'字段没有发生变化，修改不成功。'
+
+  def create_ldap_entry_dn(self,data,parentDn=settings.AUTH_LDAP_BASE_DN):
+      """
+      创建DN
+      """
+    
+      dn_pre , newdata = generate_ldap_dn_prefix(data)
+      modlist=""
+      if not dn_pre:
+        return False, newdata
+      else:
+        modlist = convert_dict_to_tuple_bytes(newdata)
+      newdn="%s,%s"%(dn_pre,parentDn if parentDn!="" else settings.AUTH_LDAP_BASE_DN )
+      if self.connect():
+        try:
+          self.conn.add_s(newdn,modlist)
+        except ldap.ALREADY_EXISTS as e:
+          logger.error(e)
+          return False,"用户已经存在。"
+        except ldap.INVALID_SYNTAX as e:
+          logger.error(e)
+          return False,"字段值不合法。%s"%e
+        except ldap.LDAPError as e:
+          logger.error(e)
+          return False,e.args[0]
+      logger.info("create user %s success,dn:%s" % (dn_pre, newdn))
+      return "添加用户%s成功" % dn_pre, None

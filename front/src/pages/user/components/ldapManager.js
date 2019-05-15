@@ -107,11 +107,16 @@ class CMDBLDAPManager extends PureComponent {
   handleClassObjectsChange=(e,v)=>{
     const {classobjects}=this.state
     const selectdn = this.props.currentDn
+    const isNewDn = this.props.isNewDn
     let defautlMustfield=(selectdn!=='')?selectdn.split(',')[0].split('=')[0]:'uid'
     let supSet=this.initSelectedItems(e)
     let mayfiled=[], mustfiled=[]
     supSet.filter(i=>i!=='top').map(it=>{
-      mustfiled=mustfiled.concat([it==='simpleSecurityObject'?"cn":defautlMustfield],classobjects[it][1].must)
+      if(isNewDn){
+        mustfiled=mustfiled.concat(classobjects[it][1].must)
+      }else{
+        mustfiled=mustfiled.concat([it==='simpleSecurityObject'?"cn":defautlMustfield],classobjects[it][1].must)
+      }
       mayfiled=mayfiled.concat(classobjects[it][2].may)
     }) 
     this.setState({
@@ -151,7 +156,7 @@ class CMDBLDAPManager extends PureComponent {
     })
   }
   addInputField=(name)=>{
-    this.setState({ currField:this.state.currField.concat(name.key)})
+    this.setState({ currField:this.state.currField.concat(name.key).sort((a,b)=>a==='uid'?-1:1)})
   }
   initAddFieldMenu=()=>{
     return (<Menu>
@@ -171,10 +176,11 @@ class CMDBLDAPManager extends PureComponent {
     this.props.form.validateFields((err, values) => {
       if (!err) {
         if(isNewDn){
-
+          dispatch({type:'ldap/postLDAPCreateDN',payload: {...values,currentDn},callback: ()=>{
+            alert()
+          }})
         }else{
-          console.log(values)
-          dispatch({type:'ldap/postLDAPDNUpdate',payload: {...values,currentDn},callback: ()=>{
+          dispatch({type:'ldap/postLDAPUpdateDN',payload: {...values,currentDn},callback: ()=>{
             alert()
           }})
         }
@@ -210,7 +216,7 @@ class CMDBLDAPManager extends PureComponent {
     } = this.props;
     const { selectedItems,options } = this.state;
     const loaded=loading.effects['ldap/getLDAPGroupsSecendList']
-    const loaded_update=loading.effects['ldap/postLDAPDNUpdate']
+    const loaded_update=loading.effects['ldap/postLDAPUpdateDN']
     let { getFieldValue }=this.props.form
     return (
             <Fragment>
@@ -315,11 +321,11 @@ class CMDBLDAPManager extends PureComponent {
                     <Alert
                       style={{margin:"42px 0px 0px 0px",padding:"15px 15px 15px 44px"}}
                       message="温馨提示"
-                      description={<ui style={{listStyle: "initial"}}>
+                      description={<ul style={{listStyle: "initial",padding:"5px 0px 0 5px"}}>
                         <li>在新建DN时，必须选择objectClass,所有字段规属objectClass。</li>
                         <li>在新建DN时，字段以uid,cn,o为顺序，做为dn 字段，优先级以从前到后。</li>
                         <li>密码字段默认不显示密码，如果不修改密码就留空但不要删除字段。</li>
-                      </ui>}
+                      </ul>}
                       type="info"
                       icon={<Icon type="warning" style={{left:10}} theme="twoTone" /> }
                       showIcon
@@ -329,6 +335,7 @@ class CMDBLDAPManager extends PureComponent {
                 </Spin>
               </Content>
               <Footer style={{padding:10,textAlign:"center"}}>
+                {isNewDn?<Button icon='rollback' type="dashed" onClick={this.props.handleFlushAndReset} style={{marginRight:10}}>返回</Button>:""}
                 <Button onClick={this.handleSubmit.bind(this)} 
                   loading={loaded}
                   disabled={this.state.selectedItems.filter(i=>i!=='top').length>0?false:true}
@@ -338,6 +345,7 @@ class CMDBLDAPManager extends PureComponent {
                   type = "primary" > {
                     loaded||loaded_update ? "加载中.." : (isNewDn ?"新建":"保存")
                   } < /Button>
+                 
               </Footer>
           </Fragment>           
     );
@@ -351,6 +359,7 @@ CMDBLDAPManager.propTypes = {
   loading: PropTypes.object,
   isNewDn: PropTypes.bool.isRequired,
   currentDn: PropTypes.string.isRequired,
+  handleFlushAndReset: PropTypes.func,
   dispatch: PropTypes.func
 };
 

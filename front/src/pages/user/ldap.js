@@ -62,12 +62,12 @@ class CMDBLdapGroups extends PureComponent {
 
     if (item.children) {
       return (
-        <TreeNode title={title} key={item.key} dataRef={item}>
+        <TreeNode  disabled={this.state.isNewDn} title={title} key={item.key} dataRef={item}>
           {this.renderTreeNodes(item.children,searchValue)}
         </TreeNode>
       );
     }
-    return <TreeNode icon={item.isLeaf?<Icon  type='bars' />:""}  key={item.key} title={title}  dataRef={item} />;
+    return <TreeNode  disabled={this.state.isNewDn} icon={item.isLeaf?<Icon  type='bars' />:""}  key={item.key} title={title}  dataRef={item} />;
   })
   handleRightMenu=()=>{
     let menu = (<ContextMenu id="ldap_control_menu" >
@@ -163,7 +163,8 @@ class CMDBLdapGroups extends PureComponent {
   }
   handleOnSelect=(selectdn)=>{
     const { treeobject }=this.props.groups
-    const { loadedData }=this.state
+    const { loadedData,isNewDn }=this.state
+    if(isNewDn) return false
     let currState = {
       selectedKeys: selectdn,
       isNewDn:false
@@ -177,9 +178,7 @@ class CMDBLdapGroups extends PureComponent {
     this.setState(currState)
     this.handleGetobjectClass()
   }
-  handleOnChange = (e) => {
-    const value = e.target.value;
-    console.log('111')
+  handleOnChange = (value) => {
     this.setState({
       searchValue: value,
       autoExpandParent: true,
@@ -213,7 +212,6 @@ class CMDBLdapGroups extends PureComponent {
         }
       })
     }
-    
   }
   handleFlushAndReset=()=>{
     this.setState({
@@ -254,12 +252,18 @@ class CMDBLdapGroups extends PureComponent {
             width={width} onResize={this.onResize} >
           <Sider width={width} theme="light" >
             <Layout style={{height:"100%",padding:5,boxShadow:"0px 0px 3px #dcd8d8"}} >
-              <Search style={{ marginBottom: 8 }} placeholder="Search(Key Press)" value={searchValue} onChange={this.handleOnChange.bind(this)}  />
+              <Search style={{ marginBottom: 8 }} placeholder="Search(Key Press)" onSearch={this.handleOnChange.bind(this)}  />
               <Content className={usercss.ldap_content_box} >
-                <Spin tip="Loading..." spinning={loading.effects['ldap/getLDAPGroupsList']}>
-                  <ContextMenuTrigger id='ldap_control_menu' >
+                {/* {isNewDn?<div className={usercss.tree_not_control_div}>新建DN中，无法选择操作。</div>:""} */}
+                <Spin tip={isNewDn?"新建DN中,无法选择操作.":"Loading..." }
+                  wrapperClassName={usercss.tree_not_control_div}
+                  indicator={isNewDn?<Icon type="message" theme="twoTone" />:null} 
+                  size='large'
+                  spinning={loading.effects['ldap/getLDAPGroupsList']||isNewDn}>
+                  <ContextMenuTrigger id='ldap_control_menu'  disabled={this.state.isNewDn} >
                     <DirectoryTree loadData={this.onLoadData} 
                       expandedKeys={expandedKeys}
+                      disabled={this.state.isNewDn}
                       autoExpandParent={autoExpandParent}
                       selectedKeys={selectedKeys}
                       loadedKeys={loadedKeys}
@@ -295,6 +299,7 @@ class CMDBLdapGroups extends PureComponent {
             selectdata={selectdata}
             isNewDn={isNewDn}
             currentDn = { selectedKeys.length>0?selectedKeys[0]:"" }
+            handleFlushAndReset={this.handleFlushAndReset.bind(this)}
             classobjects={classobjects} />:<Empty className={usercss.right_empty_center} />}
         </Content>
       </Layout>

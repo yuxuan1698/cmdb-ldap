@@ -1,6 +1,7 @@
 import { 
   getGroupList,
-  PostLDAPDNUpdate
+  PostLDAPUpdateDN,
+  PostLDAPCreateDN
 } from '../../../services/api';
 
 export default {
@@ -48,16 +49,47 @@ export default {
           callback(data)
         }
       },
-      *postLDAPDNUpdate({ payload,callback }, { call }) {
-        const data = yield call(PostLDAPDNUpdate, payload)
+      // 更新DN
+      *postLDAPUpdateDN({ payload,callback }, { call }) {
+        const data = yield call(PostLDAPUpdateDN, payload)
         if (data) {
           callback(data)
         }
+      },
+      // 创建DN
+      *postLDAPCreateDN({ payload,callback }, { call }) {
+        const data = yield call(PostLDAPCreateDN, payload)
+        if (data) {
+          callback(data)
+        }
+      },
+      *addNewEntryDN({ payload }, { put,select }) {
+        let tempList = yield select(({ldap}) => ldap.groups.treedata)
+        if(payload){
+          tempList.map(i=>{
+            if(i.key===payload){
+              i['children']=[{title:"newDn",key:"newDn"}]
+            }
+          })
+        }else{
+          tempList.unshift({title:"newDn",key:"newDn"})
+        }
+        yield put({
+          type:'ldapcreatedn', 
+          payload: {
+            groups: {treedata:tempList},
+          }
+        })
       },
     },
     reducers: {
       // 组列表
       ldapgroupslist(state, {payload} ) {
+        return {...state,...payload}
+      },
+      // 新建/添加dn
+      ldapcreatedn(state, {payload} ) {
+        console.log(payload)
         return {...state,...payload}
       },
     },

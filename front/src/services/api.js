@@ -9,11 +9,18 @@ export function UserChangePassword (data) {
     })
 }
 // 更新LDAP DN 接口
-export function PostLDAPDNUpdate (data) {
-    console.log(data)
+export function PostLDAPUpdateDN (data) {
     return request({
         method: "post",
         url: '/v1/ldap/dn/update/',
+        data: singleListToString(data),
+    })
+}
+// 更新LDAP DN 接口
+export function PostLDAPCreateDN (data) {
+    return request({
+        method: "post",
+        url: '/v1/ldap/dn/create/',
         data: singleListToString(data),
     })
 }

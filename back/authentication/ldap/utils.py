@@ -31,15 +31,15 @@ def generate_ldap_dn_prefix(data):
   """
   dn_prefix = ""
   popid = ""
-  if 'cn' in data.keys():
-    dn_prefix = "cn=%s" % data['cn']
-    popid = 'cn'
-  if 'ou' in data.keys():
-    dn_prefix = "ou=%s" % data['ou']
-    popid = 'ou'
   if 'uid' in data.keys():
     dn_prefix = "uid=%s" % data['uid']
     popid = 'uid'
+  elif 'cn' in data.keys():
+    dn_prefix = "cn=%s" % data['cn']
+    popid = 'cn'
+  elif 'ou' in data.keys():
+    dn_prefix = "ou=%s" % data['ou']
+    popid = 'ou'
   data.pop(popid)
   return dn_prefix,data
 
