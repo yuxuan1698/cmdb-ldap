@@ -174,6 +174,9 @@ class CMDBLDAPManager extends PureComponent {
           dispatch({type:'ldap/postLDAPUpdateDN',payload: {...values,currentDn},callback: (data)=>{
             if(data.status.hasOwnProperty('newdn')){
               this.props.handleUpdateLocalDn(values,data.status.newdn)
+              dispatch({
+                type: 'ldap/getLDAPGroupsList'
+              })
             }else{
               this.props.handleUpdateLocalDn(values)
             }

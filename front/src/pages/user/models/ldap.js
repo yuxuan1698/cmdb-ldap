@@ -92,36 +92,11 @@ export default {
         }
       },
       // 更新DN
-      *postLDAPUpdateDN({ payload,callback }, { put,call,select }) {
-        let treedata = yield select(({ ldap }) => ldap.groups.treedata)
-        let treeobject = yield select(({ ldap }) => ldap.groups.treeobject)
-        let {currentDn}=payload
+      *postLDAPUpdateDN({ payload,callback }, { call }) {
         const resp = yield call(PostLDAPUpdateDN, payload)
         if (resp) {
           if(resp.hasOwnProperty('status')){
             callback(resp)
-            function deldn(data,currDn){
-              let newtreedata=data.map((v,i) => {
-                let newvalue={title:'',key:''}
-                if(v.hasOwnProperty('children')){
-                  v['children']=deldn(v['children'],currDn)
-                }
-                if(v.key===currDn){
-                  // if()
-                  data.splice(i,0,{title:,key:})
-                }
-              })
-              return newtreedata
-            }
-            yield put({
-              type: 'ldapupdatedn',
-              payload: {
-                groups: {
-                  treedata: treedata,
-                  treeobject
-                },
-              }
-            })
           }
         }
       },
@@ -159,9 +134,9 @@ export default {
         return {...state,...payload}
       },
       // 更新dn
-      ldapupdatedn(state, {payload} ) {
-        console.log(payload)
-        return {...state,...payload}
-      },
+      // ldapupdatedn(state, {payload} ) {
+      //   console.log(payload)
+      //   return {...state,...payload}
+      // },
     },
   }
