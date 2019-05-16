@@ -7,10 +7,6 @@ export const dva = {
       err.preventDefault();
       console.error(err.message);
     },
-    // initialState:{
-    //   login:{islogin:false,userinfo:"",failtime:""},
-    //   global:{smallSideBar:false,isAdmin:false,collapse}
-    // },
   },
   plugins: [
     require('dva-logger')(),

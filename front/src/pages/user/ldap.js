@@ -74,24 +74,24 @@ class CMDBLdapGroups extends PureComponent {
       < MenuItem onClick = {
         this.handleNewDNItem.bind(this)
       } >
-         < Icon type = "file-add"
+         <Icon style={{margin:"0 5px 0 -7px"}}  type = "file-add"
          theme = "twoTone" / > 新建节点
         </MenuItem>
         < MenuItem onClick = {
           this.handleRemoveDn.bind(this)
         } >
-          < Icon type = "delete"
+          < Icon style={{margin:"0 5px 0 -7px"}} type = "delete"
           theme = "twoTone" / > 删除节点
         </MenuItem>
         <MenuItem divider />
         < MenuItem onClick = {
           this.handleFlushAndReset.bind(this)
         } >
-   	      < Icon type = "reload" / > 刷新节点
+   	      < Icon style={{margin:"0 5px 0 -7px"}} type = "reload" / > 刷新节点
         </MenuItem>
         <MenuItem divider />
         < MenuItem >
-   	      < Icon type = "edit"
+   	      < Icon style={{margin:"0 5px 0 -7px"}} type = "edit"
    	      theme = "twoTone" / > 重命名节点
         </MenuItem>
     </ContextMenu>)
@@ -159,6 +159,25 @@ class CMDBLdapGroups extends PureComponent {
           });
         }
       })
+    }
+  }
+  handleUpdateLocalDn=(value,newdn)=>{
+    let {selectedKeys,loadedData,loadedKeys}=this.state
+    if(loadedData.hasOwnProperty(selectedKeys)){
+      let nextState={
+        selectdata: value,
+      }
+      // 如果DN变更，就删除之前的DN,添加新的dn,数据更新
+      if(newdn){
+        delete loadedData[selectedKeys]
+        loadedKeys.splice(loadedKeys.findIndex(i=>i===selectedKeys),0,newdn)
+        nextState['loadedData']=Object.assign(loadedData,{[newdn]:value})
+        nextState['selectedKeys']=[newdn]
+        nextState['loadedKeys']=loadedKeys
+      }else{
+        nextState['loadedData']=Object.assign(loadedData,{[selectedKeys]:value})
+      }
+      this.setState(nextState)
     }
   }
   handleOnSelect=(selectdn)=>{
@@ -304,6 +323,7 @@ class CMDBLdapGroups extends PureComponent {
             selectdata={selectdata}
             isNewDn={isNewDn}
             currentDn = { selectedKeys.length>0?selectedKeys[0]:"" }
+            handleUpdateLocalDn={this.handleUpdateLocalDn.bind(this)}
             handleFlushAndReset={this.handleFlushAndReset.bind(this)}
             classobjects={classobjects} />:<Empty className={usercss.right_empty_center} />}
         </Content>

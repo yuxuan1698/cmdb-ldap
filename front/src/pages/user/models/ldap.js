@@ -51,13 +51,6 @@ export default {
           callback(data)
         }
       },
-      // 更新DN
-      *postLDAPUpdateDN({ payload,callback }, { call }) {
-        const data = yield call(PostLDAPUpdateDN, payload)
-        if (data) {
-          callback(data)
-        }
-      },
       // 创建DN
       *postLDAPCreateDN({ payload,callback }, { call }) {
         const data = yield call(PostLDAPCreateDN, payload)
@@ -68,20 +61,29 @@ export default {
       // 删除DN
       * deleteEntryDn({ payload, callback }, { put, call, select }) {
         let treedata = yield select(({ ldap }) => ldap.groups.treedata)
+        let treeobject = yield select(({ ldap }) => ldap.groups.treeobject)
         
+        if(treeobject.hasOwnProperty(payload)) delete treedata[payload]
         const resp = yield call(PostLDAPDeleteDN, {
           currentDn: payload
         })
-        if(resp){
-          const newtreedata = treedata.filter(i => {
-            return i.key != payload ? true : false
+        function deldn(data,currentDn){
+          return data.filter(i => {
+            if(i.hasOwnProperty('children')){
+              i['children']=deldn(i['children'],currentDn)
+            }
+            return i.key != currentDn?true:false
           })
+        }
+        if(resp){
+          const newtreedata =deldn(treedata,payload)
           if(newtreedata){
             yield put({
               type: 'ldapdeletedn',
               payload: {
                 groups: {
-                  treedata: newtreedata
+                  treedata: newtreedata,
+                  treeobject
                 },
               }
             })
@@ -89,6 +91,41 @@ export default {
           callback(resp)
         }
       },
+      // 更新DN
+      *postLDAPUpdateDN({ payload,callback }, { put,call,select }) {
+        let treedata = yield select(({ ldap }) => ldap.groups.treedata)
+        let treeobject = yield select(({ ldap }) => ldap.groups.treeobject)
+        let {currentDn}=payload
+        const resp = yield call(PostLDAPUpdateDN, payload)
+        if (resp) {
+          if(resp.hasOwnProperty('status')){
+            callback(resp)
+            function deldn(data,currDn){
+              let newtreedata=data.map((v,i) => {
+                let newvalue={title:'',key:''}
+                if(v.hasOwnProperty('children')){
+                  v['children']=deldn(v['children'],currDn)
+                }
+                if(v.key===currDn){
+                  // if()
+                  data.splice(i,0,{title:,key:})
+                }
+              })
+              return newtreedata
+            }
+            yield put({
+              type: 'ldapupdatedn',
+              payload: {
+                groups: {
+                  treedata: treedata,
+                  treeobject
+                },
+              }
+            })
+          }
+        }
+      },
+
       *addNewEntryDN({ payload }, { put,select }) {
         let tempList = yield select(({ldap}) => ldap.groups.treedata)
         if(payload){
@@ -119,6 +156,10 @@ export default {
       },
       // 删除dn
       ldapdeletedn(state, {payload} ) {
+        return {...state,...payload}
+      },
+      // 更新dn
+      ldapupdatedn(state, {payload} ) {
         console.log(payload)
         return {...state,...payload}
       },

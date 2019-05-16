@@ -60,8 +60,7 @@ export function singleListToString(objval){
       if(objval[i] instanceof Object && !objval[i] instanceof Array) objval[i]=singleListToString(objval[i])
       if(objval[i] instanceof Array){
         if(objval[i].length<=1){
-          objval[i]=objval[i][0]
-          console.log(objval[i])
+          objval[i]=objval[i][0]||""
         }
       }
     })

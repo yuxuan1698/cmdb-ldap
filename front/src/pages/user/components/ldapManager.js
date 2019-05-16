@@ -3,12 +3,14 @@
 
 import {Fragment,PureComponent} from 'react'
 import {
-  Form, Button, Input, Select, Layout,Spin,Row,Col,Alert,
-  Icon,Dropdown,Menu,InputNumber,Divider,Tooltip,notification
+  Form, Button, Input, Select, Layout,Spin,Row,Col,Alert,message,
+  Icon,Dropdown,Menu,InputNumber,Divider,Tooltip,notification,Empty
 } from 'antd';
 import {connect} from 'dva';
 import PropTypes from 'prop-types';
 import css from './index.less'
+import SelectFieldButton from "./SelectFieldButton";
+
 const { Option } = Select;
 const { Content,Footer } = Layout;
 
@@ -150,25 +152,13 @@ class CMDBLDAPManager extends PureComponent {
         if(i==='gidNumber' || i==='uidNumber') {
           setFieldsValue({[i]:parseInt(selectdata[i],10)})
         }else{
-          setFieldsValue({[i]:selectdata.hasOwnProperty(i)?selectdata[i]:""})
+          setFieldsValue({[i]:selectdata.hasOwnProperty(i)?selectdata[i]:[]})
         }
       }
     })
   }
   addInputField=(name)=>{
     this.setState({ currField:this.state.currField.concat(name.key).sort((a,b)=>a==='uid'?-1:1)})
-  }
-  initAddFieldMenu=()=>{
-    return (<Menu>
-      {this.state.mayField
-        .filter(it=>{
-          return !this.state.currField.includes(it)
-        }).map(it=>{
-          return (<Menu.Item onClick={this.addInputField.bind(this)} key={it}>
-              <span>{filedToName.hasOwnProperty(it)?`${it}(${filedToName[it]})`:it}</span>
-            </Menu.Item>)
-        })
-      }</Menu>)
   }
   handleSubmit = (e) => {
     e.preventDefault();
@@ -177,11 +167,17 @@ class CMDBLDAPManager extends PureComponent {
       if (!err) {
         if(isNewDn){
           dispatch({type:'ldap/postLDAPCreateDN',payload: {...values,currentDn},callback: ()=>{
-            alert()
+            // alert()
+            message.success('Entry创建成功！',5)
           }})
         }else{
-          dispatch({type:'ldap/postLDAPUpdateDN',payload: {...values,currentDn},callback: ()=>{
-            alert()
+          dispatch({type:'ldap/postLDAPUpdateDN',payload: {...values,currentDn},callback: (data)=>{
+            if(data.status.hasOwnProperty('newdn')){
+              this.props.handleUpdateLocalDn(values,data.status.newdn)
+            }else{
+              this.props.handleUpdateLocalDn(values)
+            }
+            message.success('数据保存成功！',5)
           }})
         }
       }
@@ -214,12 +210,11 @@ class CMDBLDAPManager extends PureComponent {
       userdnlist,
       isNewDn
     } = this.props;
-    const { selectedItems,options } = this.state;
+    const { selectedItems,options,currField,mayField } = this.state;
     const loaded=loading.effects['ldap/getLDAPGroupsSecendList']
     const loaded_update=loading.effects['ldap/postLDAPUpdateDN']
     let { getFieldValue }=this.props.form
-    return (
-            <Fragment>
+    return (<Fragment>
               <Content style={{overflow:"auto"}}>
                 <Spin tip="Loading..." spinning={Boolean(loaded||loaded_update)}>
                 <Row gutter={38} style={{margin:0}}>
@@ -266,7 +261,7 @@ class CMDBLDAPManager extends PureComponent {
                               placeholder={(filedToName[i] ? filedToName[i] : i) + `(${i})`} 
                               autosize={{ minRows: 2, maxRows: 5 }} />
                           }
-                          if(i==='manager' || i==='member' || i==='uniqueMember'){
+                          if(['member','manager','uniqueMember','seeAlso'].includes(i)){
                             let curval=getFieldValue(i)
                             inputField=<Select
                                       mode="multiple" showArrow autoFocus allowClear
@@ -281,12 +276,11 @@ class CMDBLDAPManager extends PureComponent {
                                       ))}
                                     </Select>
                           }
-                          
                           return (
                             <Col span={24} key={i} >
                             <Form.Item  labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label={filedToName[i]?`${filedToName[i]}(${i})`:i} hasFeedback required>
                               {getFieldDecorator(i, {
-                                  initialValue: (selectdata.hasOwnProperty(i) && i!=='userPassword')?(i==='gidNumber' || i==='uidNumber'?parseInt(selectdata[i],10):selectdata[i]):[""],
+                                  initialValue: (selectdata.hasOwnProperty(i) && i!=='userPassword')?(i==='gidNumber' || i==='uidNumber'?parseInt(selectdata[i],10):selectdata[i]):[],
                                   rules: [{ required: i==='userPassword'?false:true, message: `请输入${filedToName[i]?filedToName[i]:i}(${i})` }],
                               })(inputField)}
                               {!this.state.mustField.includes(i)?<Tooltip placement="top" title="删除字段">
@@ -303,15 +297,11 @@ class CMDBLDAPManager extends PureComponent {
                       <Row align='middle' >
                         <div style={{width:"96%",margin: "0 auto"}} >
                           <Form.Item >
-                            <Dropdown trigger={['click']} 
-                            loading={loading.effects['users/getLDAPClassList']}
-                            overlayStyle={{maxHeight:300,overflow:"auto",boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)"}}
-                            disabled={this.state.selectedItems.filter(i=>i!=='top').length>0?false:true}
-                            overlay={this.initAddFieldMenu.bind(this)} >
-                              <Button block type="dashed" loading={loaded||loaded_update}  >
-                                <Icon type="plus" /> 添加字段信息
-                              </Button>
-                            </Dropdown>
+                            <SelectFieldButton addInputField={this.addInputField.bind(this)}
+                              selectedItems={selectedItems} 
+                              currField={currField}
+                              mayField={mayField}
+                              filedToName={filedToName}/>
                           </Form.Item>
                         </div>
                       </Row>
@@ -338,7 +328,7 @@ class CMDBLDAPManager extends PureComponent {
                 {isNewDn?<Button icon='rollback' type="dashed" onClick={this.props.handleFlushAndReset} style={{marginRight:10}}>返回</Button>:""}
                 <Button onClick={this.handleSubmit.bind(this)} 
                   loading={loaded}
-                  disabled={this.state.selectedItems.filter(i=>i!=='top').length>0?false:true}
+                  disabled={selectedItems.filter(i=>i!=='top').length>0?false:true}
                   icon = {
                     isNewDn?'plus':"save"
                   }

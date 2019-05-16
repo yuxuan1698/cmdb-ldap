@@ -4,6 +4,7 @@ import {PureComponent} from 'react';
 import {
   Modal,Row,Col,Divider,Tag, Spin
 } from 'antd';
+import moment from 'moment'
 import css from './index.less'
 
 const color=["blue","cyan","geekblue","magenta","red","volcano","green","orange","gold","lime","purple"];
@@ -14,8 +15,14 @@ const DescriptionItem = ({ title, content,keyval }) => {
         if(index>color.length) index=0
         index+=1
         if(keyval==='memberOf') return <Tag key={i} color={color[index-1]}>{i}</Tag>
-        return content.length>1?<Tag key={i} color={color[index-1]}>{i.replace(/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})Z$/g,`$1/$2/$3 $4:$5:$6`)}</Tag>:
-        <Tag key={i} style={{ background: '#fff', borderStyle: 'dashed' }} >{i.replace(/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})Z$/g,`$1/$2/$3 $4:$5:$6`)}</Tag>
+        let datavalue=""
+        if(i.match(/^(\d{8})(\d{6}Z)$/g)===null){
+          datavalue=i
+        }else{
+          datavalue=moment(i.replace(/^(\d{8})(\d{6}Z)$/g,"$1T$2")).format("YYYY/MM/DD HH:mm:ss")
+        }
+        return content.length>1?<Tag key={i} color={color[index-1]}>{datavalue}</Tag>:
+        <Tag key={i} style={{ background: '#fff', borderStyle: 'dashed' }} >{datavalue}</Tag>
         }):<Tag style={{ background: '#fff', borderStyle: 'dashed' }} >{content}</Tag>}</div>)
   if(keyval==='sshPublicKey'){
     formatcontent=<div className={css.userinfo_sshpublickey}>{content}</div>

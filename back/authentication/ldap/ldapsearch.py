@@ -302,10 +302,18 @@ class CmdbLDAP(object):
         except ldap.CONSTRAINT_VIOLATION as e:
           logger.error(e)
           return False,"更新字段失败，失败内容:%s"%(e.args[0]['info'] if e.args[0]['info'] else "")
+        except ldap.INVALID_SYNTAX as e:
+          logger.error(e)
+          return False,"更新字段失败,字段格式不对:%s"%(e.args[0]['info'] if e.args[0]['info'] else "")
+        except ldap.LDAPError as e:
+          logger.error(e)
+          return False,"更新字段失败，失败内容:%s"%(e.args[0]['info'] if e.args[0]['info'] else "")
       if modrdn!='':
         try:
           self.conn.modrdn_s(olddn,modrdn)
-          return "更新用户成功",None
+          newrdn=rdn_prefix
+          newrdn[0]=modrdn
+          return {'newdn':','.join(newrdn),'status':"更新用户成功"},None
         except ldap.INVALID_DN_SYNTAX as e:
           logger.error(e)
           return False,"DN修改失败:%s"%(e.args[0]['info'] if e.args[0]['info'] else "")

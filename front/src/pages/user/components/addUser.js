@@ -1,11 +1,12 @@
 'use strict'
 
-import { PureComponent } from 'react';
+import {Fragment, PureComponent } from 'react';
 import css from './index.less'
 import {
-    Drawer, Form, Button, Radio, Row, Input, Select, 
-    Icon,Dropdown,Menu,InputNumber,Divider,Col,Tooltip,notification
+    Drawer, Form, Button, Radio, Row, Input, Select,
+    Icon,InputNumber,Divider,Col,Tooltip,notification
 } from 'antd';
+import SelectFieldButton from "./SelectFieldButton";
 
 const { Option } = Select;
 
@@ -111,18 +112,6 @@ class DrawerAddUser extends PureComponent {
   addInputField=(name)=>{
     this.setState({ currField:this.state.currField.concat(name.key)})
   }
-  initAddFieldMenu=()=>{
-    return (<Menu>
-      {this.state.mayField
-        .filter(it=>{
-          return !this.state.currField.includes(it)
-        }).map(it=>{
-          return (<Menu.Item onClick={this.addInputField.bind(this)} key={it}>
-              <span>{filedToName.hasOwnProperty(it)?`${it}(${filedToName[it]})`:it}</span>
-            </Menu.Item>)
-        })
-      }</Menu>)
-  }
   handleSubmit = (e) => {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
@@ -153,7 +142,7 @@ class DrawerAddUser extends PureComponent {
   render() {
     const { getFieldDecorator,getFieldValue } = this.props.form;
     const { loading,userselect } = this.props;
-    const { selectedItems,options } = this.state;
+    const { selectedItems,options,currField,mayField } = this.state;
     return (<Drawer
             destroyOnClose={true}
             title="添加新用户"
@@ -250,14 +239,11 @@ class DrawerAddUser extends PureComponent {
                 <Row align='middle' >
                   <div style={{width:"85%",margin: "0 auto"}} >
                     <Form.Item >
-                      <Dropdown trigger={['click']} 
-                      overlayStyle={{maxHeight:300,overflow:"auto",boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)"}}
-                      disabled={this.state.selectedItems.filter(i=>i!=='top').length>0?false:true}
-                      overlay={this.initAddFieldMenu.bind(this)} >
-                        <Button block type="dashed"  >
-                          <Icon type="plus" /> 添加字段信息
-                        </Button>
-                      </Dropdown>
+                      <SelectFieldButton addInputField={this.addInputField.bind(this)}
+                          selectedItems={selectedItems} 
+                          currField={currField}
+                          mayField={mayField}
+                          filedToName={filedToName}/>
                     </Form.Item>
                   </div>
                 </Row>
