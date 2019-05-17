@@ -5,6 +5,7 @@ import {
   PostLDAPCreateUser,
   PostLDAPUpdateUser,
   getLDAPUserAttribute,
+  PostLDAPLockUnLockUser,
   getLDAPObjectClassList
 } from '../../../services/api';
 
@@ -72,6 +73,12 @@ export default {
       },
       *postLDAPDeleteUser({ payload,callback }, { call }) {
         const data = yield call(PostLDAPDeleteUser,payload)
+        if (data) {
+          callback(data)
+        }
+      },
+      *postLDAPLockUnlockUser({ payload,callback }, { call }) {
+        const data = yield call(PostLDAPLockUnLockUser,payload)
         if (data) {
           callback(data)
         }

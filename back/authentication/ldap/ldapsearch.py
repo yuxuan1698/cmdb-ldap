@@ -50,7 +50,7 @@ class CmdbLDAP(object):
       return False
     return True
 
-  def get_user_list(self,username='uid=*',retrieveAttributes=["*"]):
+  def get_user_list(self,username='uid=*',retrieveAttributes=["*","pwdAccountLockedTime"]):
     """ 返回所有LDAP用户列表 """
     if self.connect():
       searchFilter="(&(%s))"%username
@@ -227,6 +227,13 @@ class CmdbLDAP(object):
       except ldap.LDAPError as e:
         return False,e.args[0]
     return "删除用户%s成功" % (';'.join(data['userdn'])), None
+
+  def lock_unlock_ldap_user(self,data):
+    """
+    锁定/解锁用户
+    """
+    logger.info(data)
+    return "2",None
 
   def update_ldap_user(self,data,olddn):
     """

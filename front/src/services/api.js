@@ -48,6 +48,14 @@ export function PostLDAPDeleteUser (data) {
         data: data,
     })
 }
+// 删除用户接口
+export function PostLDAPLockUnLockUser (data) {
+    return request({
+        method: "post",
+        url: '/v1/ldap/user/lockunlock/',
+        data: data,
+    })
+}
 // 更新用户接口
 export function PostLDAPUpdateUser (data) {
     return request({

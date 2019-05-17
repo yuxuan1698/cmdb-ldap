@@ -5,7 +5,7 @@ import { Layout, Tree, Input, Button, Icon, Empty, Spin,Modal } from 'antd';
 import {connect} from 'dva';
 import { Resizable } from 'react-resizable';
 import { ContextMenuTrigger, ContextMenu,MenuItem } from 'react-contextmenu';
-import PropTypes, { instanceOf } from 'prop-types';
+import PropTypes from 'prop-types';
 import usercss from "./user.less";
 import CMDBBreadcrumb from "./components/Breadcrumb";
 import dynamic from 'umi/dynamic';
@@ -59,7 +59,6 @@ class CMDBLdapGroups extends PureComponent {
           </span>)
       }
     }
-
     if (item.children) {
       return (
         <TreeNode  disabled={this.state.isNewDn} title={title} key={item.key} dataRef={item}>
@@ -67,7 +66,11 @@ class CMDBLdapGroups extends PureComponent {
         </TreeNode>
       );
     }
-    return <TreeNode  disabled={this.state.isNewDn} icon={item.isLeaf?<Icon  type='bars' />:""}  key={item.key} title={title}  dataRef={item} />;
+    return <TreeNode  
+          disabled={this.state.isNewDn} 
+          icon={item.isLeaf?<Icon  type='bars' />:""}  
+          key={item.key} title={title}  
+          dataRef={item} />;
   })
   handleRightMenu=()=>{
     let menu = (<ContextMenu id="ldap_control_menu" >
@@ -173,7 +176,6 @@ class CMDBLdapGroups extends PureComponent {
         loadedKeys.splice(loadedKeys.findIndex(i=>i===selectedKeys),0,newdn)
         nextState['loadedData']=Object.assign(loadedData,{[newdn]:value})
         nextState['selectedKeys']=[newdn]
-        nextState['loadedKeys']=loadedKeys
       }else{
         nextState['loadedData']=Object.assign(loadedData,{[selectedKeys]:value})
       }
@@ -212,7 +214,6 @@ class CMDBLdapGroups extends PureComponent {
   handleNewDNItem=()=>{
     this.setState({
       selectdata:{},
-      // selectedKeys:[],
       isNewDn:true
     })
     this.handleGetobjectClass()
@@ -324,6 +325,7 @@ class CMDBLdapGroups extends PureComponent {
             isNewDn={isNewDn}
             currentDn = { selectedKeys.length>0?selectedKeys[0]:"" }
             handleUpdateLocalDn={this.handleUpdateLocalDn.bind(this)}
+            handleNewDNItem={this.handleNewDNItem.bind(this)}
             handleFlushAndReset={this.handleFlushAndReset.bind(this)}
             classobjects={classobjects} />:<Empty className={usercss.right_empty_center} />}
         </Content>

@@ -8,7 +8,7 @@ const ButtonGroup = Button.Group;
 
 export class UserEditButton extends PureComponent {
   onDeleteUser=(delkey)=>{
-    const modal = Modal.confirm({
+    Modal.confirm({
       title: '删除用户提示',
       content: `你确定要删除用户[${delkey}]吗？删除后无法恢复！`,
       onCancel: ()=>{Modal.destroyAll()},
@@ -16,7 +16,8 @@ export class UserEditButton extends PureComponent {
     })
   }
   render(){
-    const delkey=this.props.delkey
+    const {delkey,pwdAccountLockedTime}=this.props
+ 
     return (
       <div>
         <ButtonGroup size="small">
@@ -24,17 +25,34 @@ export class UserEditButton extends PureComponent {
             <Button type="Default" icon="bars" onClick={()=>{
            this.props.showHideUserDrawer('update',delkey)
           }}/>
-          </Tooltip>
-          <Tooltip placement="top" title='锁定用户' getPopupContainer={trigger => trigger.parentNode} >
-            <Button type="Default" icon="lock"onClick={()=>{
-           const modal = Modal.confirm({
-            title: '貌似有此功能',
-            content: `你确定要锁定用户[${delkey}]吗？`,
-            onCancel: ()=>{Modal.destroyAll()},
-            onOk: ()=>{Modal.destroyAll()}
-          })
-          }} />
-          </Tooltip>
+          </Tooltip>{
+            pwdAccountLockedTime===""?(
+            <Tooltip placement="top" title='锁定用户' getPopupContainer={trigger => trigger.parentNode} >
+              <Button type="Default" icon="lock"onClick={()=>{
+                Modal.confirm({
+                  title: '锁定用户',
+                  content: `你确定要锁定用户[${delkey}]吗？`,
+                  onCancel: ()=>{Modal.destroyAll()},
+                  onOk: ()=>{
+                    this.props.onLockUnLockUser({dn:delkey,lock:true})
+                    Modal.destroyAll()
+                  }
+                })
+              }} />
+            </Tooltip>):(
+            <Tooltip placement="top" title='解锁用户' getPopupContainer={trigger => trigger.parentNode} >
+              <Button type="Default" icon="unlock"onClick={()=>{
+                Modal.confirm({
+                  title: '解锁用户',
+                  content: `你确定要解锁用户[${delkey}]吗？`,
+                  onCancel: ()=>{Modal.destroyAll()},
+                  onOk: ()=>{
+                    this.props.onLockUnLockUser({dn:delkey,lock:false})
+                    Modal.destroyAll()}
+                })
+              }} />
+            </Tooltip>)
+          }
           <Tooltip placement="topRight" title='删除用户' getPopupContainer={trigger => trigger.parentNode} >
             <Button type="danger" icon="delete" onClick={this.onDeleteUser.bind(this,delkey)} />
           </Tooltip>
@@ -47,7 +65,7 @@ export class UserEditButton extends PureComponent {
 export class UserBatchButton extends PureComponent {
 
   onDeleteUser=(userkeys)=>{
-    const modal = Modal.confirm({
+    Modal.confirm({
       title: '删除用户提示',
       content: `你确定要删除这些用户吗？删除后无法恢复哦！`,
       onCancel: ()=>{Modal.destroyAll()},

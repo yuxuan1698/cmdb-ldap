@@ -10,7 +10,8 @@ from authentication.serializers import (
   UpdateDNSerializer,
   CreateDNSerializer,
   DeleteDNSerializer,
-  UpdateUserSerializer
+  UpdateUserSerializer,
+  LockUnLockUserSerializer
 )
 from authentication.ldap.ldapsearch import CmdbLDAP
 from common.utils import LDAPJSONEncoder
@@ -290,6 +291,30 @@ class DeleteDNViewSet(APIView):
     if serializer.is_valid():
       changeStatus, errorMsg = cmdbldap['deleteDN'].delete_ldap_dn(
           request.data)
+      if changeStatus:
+        returnData = {"status": changeStatus}
+        returnStatus = status.HTTP_200_OK
+      else:
+        returnData = {"error": errorMsg}
+        returnStatus = status.HTTP_400_BAD_REQUEST
+    else:
+      returnData = serializer.errors
+      returnStatus = status.HTTP_400_BAD_REQUEST
+    return JsonResponse(returnData, status=returnStatus, safe=False)
+
+
+class LockUnLockUserViewSet(APIView):
+  """
+  锁定/解锁用户
+  """
+  serializer_class = LockUnLockUserSerializer
+  def post(self,request, *args, **kwargs):
+    """
+    锁定/解锁用户
+    """
+    serializer = LockUnLockUserSerializer(instance=request, data=request.data)
+    if serializer.is_valid():
+      changeStatus, errorMsg = cmdbldap['all'].lock_unlock_ldap_user(request.data)
       if changeStatus:
         returnData = {"status": changeStatus}
         returnStatus = status.HTTP_200_OK

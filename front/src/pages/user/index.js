@@ -3,7 +3,7 @@
 import {connect} from 'dva';
 import {PureComponent} from 'react'
 import PropTypes from 'prop-types';
-import { Table, Icon, Button, Alert,message,Layout,Input } from 'antd';
+import { Table, Icon, Button, Alert,message,Layout,Input,Tag,Tooltip } from 'antd';
 import usercss from "./user.less";
 import CMDBBreadcrumb from "./components/Breadcrumb";
 import dynamic from 'umi/dynamic';
@@ -89,6 +89,14 @@ class CMDBUserList extends PureComponent {
       this.setState({selectedRowKeys:[]})
     }})
   }
+  onLockUnLockUser=(lock)=>{
+    alert()
+    const {dispatch}=this.props
+    dispatch({type:'users/postLDAPLockUnlockUser',payload: {...lock},callback:(data)=>{
+      message.info(data.status)
+      dispatch({type:'users/getUserList'})
+    }})
+  }
   handleDisplayModal=(record)=>{
     const {dispatch}=this.props
     if(!this.state.displayuser){
@@ -108,7 +116,6 @@ class CMDBUserList extends PureComponent {
         userinfo:{}
         })
     }
-
   }
   render(){
     const {selectedRowKeys,loadedDrawer,modifyDrawer,modifydata,classobjects}=this.state
@@ -124,6 +131,7 @@ class CMDBUserList extends PureComponent {
         cn: userlist[it][1].cn ? userlist[it][1].cn[0]:"",
         mail: userlist[it][1].mail ? userlist[it][1].mail[0]:"",
         departmentNumber: userlist[it][1].departmentNumber ? userlist[it][1].departmentNumber[0]:"",
+        pwdAccountLockedTime:userlist[it][1].pwdAccountLockedTime?userlist[it][1].pwdAccountLockedTime:"",
         userdn: userlist[it][0]
       })
     })
@@ -167,6 +175,18 @@ class CMDBUserList extends PureComponent {
       dataIndex: 'mail',
       key: 'mail',
     },{
+      title: '状态',
+      dataIndex: 'pwdAccountLockedTime',
+      key: 'pwdAccountLockedTime',
+      width: 50,
+      align:"center",
+      render:(text)=>{
+          return <Tooltip placement="top" title={`锁定时间:${text}`} arrowPointAtCenter>
+                  {text===""?(<Icon className={usercss.user_list_unlock} type="check-circle" />):
+                  (<Icon className={usercss.user_list_lock} type="issues-close" />)}
+              </Tooltip>
+      }
+    },{
       title: "动作",
       key: 'action',
       align: 'center',
@@ -175,6 +195,8 @@ class CMDBUserList extends PureComponent {
         return (
           <UserEditButton 
             delkey={record['userdn']} 
+            pwdAccountLockedTime={record.pwdAccountLockedTime}
+            onLockUnLockUser={this.onLockUnLockUser.bind(this)}
             showHideUserDrawer={this.showHideUserDrawer.bind(this)} 
             confirmDeletion={this.confirmDeletion} />
         )

@@ -59,10 +59,9 @@ export default {
         }
       },
       // 删除DN
-      * deleteEntryDn({ payload, callback }, { put, call, select }) {
+      *deleteEntryDn({ payload, callback }, { put, call, select }) {
         let treedata = yield select(({ ldap }) => ldap.groups.treedata)
         let treeobject = yield select(({ ldap }) => ldap.groups.treeobject)
-        
         if(treeobject.hasOwnProperty(payload)) delete treedata[payload]
         const resp = yield call(PostLDAPDeleteDN, {
           currentDn: payload
@@ -72,11 +71,12 @@ export default {
             if(i.hasOwnProperty('children')){
               i['children']=deldn(i['children'],currentDn)
             }
-            return i.key != currentDn?true:false
+            return i.key !== currentDn?true:false
           })
         }
         if(resp){
-          const newtreedata =deldn(treedata,payload)
+          const newtreedata =deldn(treedata,payload[0])
+          console.log(newtreedata)
           if(newtreedata){
             yield put({
               type: 'ldapdeletedn',
@@ -88,15 +88,39 @@ export default {
               }
             })
           }
-          callback(resp)
+          // callback(resp)
         }
       },
       // 更新DN
-      *postLDAPUpdateDN({ payload,callback }, { call }) {
+      *postLDAPUpdateDN({ payload,callback }, {put, call, select }) {
+        let treedata = yield select(({ ldap }) => ldap.groups.treedata)
+        let treeobject = yield select(({ ldap }) => ldap.groups.treeobject)
+        let {currentDn}=payload
         const resp = yield call(PostLDAPUpdateDN, payload)
         if (resp) {
           if(resp.hasOwnProperty('status')){
             callback(resp)
+            if(resp.status.hasOwnProperty('newdn')){
+              if(treeobject.hasOwnProperty(currentDn)){
+                delete payload['currentDn']
+                treeobject[resp.status.newdn]=payload
+                delete treeobject[currentDn]
+              }
+              function updatedn(data,olddn,newdn){
+                data.map((v,i)=>{
+                  if(v.key===olddn){
+                    Object.assign(data[i],{key:newdn,title:newdn.split(',')[0].split('=')[1]})
+                  }else{
+                    v.key=v.key.replace(olddn,newdn)
+                  }
+                  if(v.hasOwnProperty('children')){
+                    v.children=updatedn(v.children,olddn,newdn)
+                  }
+                })
+                return data
+              }
+              updatedn(treedata,currentDn,resp.status.newdn)
+            }
           }
         }
       },
@@ -133,7 +157,7 @@ export default {
       ldapdeletedn(state, {payload} ) {
         return {...state,...payload}
       },
-      // 更新dn
+      // // 更新dn
       // ldapupdatedn(state, {payload} ) {
       //   console.log(payload)
       //   return {...state,...payload}

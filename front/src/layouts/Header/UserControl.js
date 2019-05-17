@@ -20,7 +20,7 @@ class CMDBUserControl extends PureComponent{
   userMenuAction({key}){
     switch(key){
       case 'logout':
-        const modal = Modal.confirm({
+        Modal.confirm({
           title: '退出登陆提示',
           content: `${this.props.login.userinfo.nickname}-您确定要退出系统吗？`,
           // centered:true,

@@ -4,6 +4,7 @@ from rest_framework.serializers import (
   EmailField,
   ListField,
   IntegerField,
+  NullBooleanField,
   Serializer,
   HyperlinkedModelSerializer)
 from rest_framework.exceptions import ValidationError
@@ -60,6 +61,20 @@ class DeleteUserSerializer(Serializer):
       error_messages={
         'required': '请填写用户名(uid)字段'
       })
+
+class LockUnLockUserSerializer(Serializer):
+  """
+    效验创建用户的字段
+  """
+  dn = CharField(
+      required=True,
+      min_length=4,
+      allow_blank=False,
+      error_messages={
+        'min_length': '用户名(dn)不能小于4个字符',
+        'blank': "字段(dn)不能为空。"
+      })
+  lock = NullBooleanField(required=True)
 
 class CreateUserSerializer(Serializer):
   """

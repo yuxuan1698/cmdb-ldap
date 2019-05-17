@@ -16,10 +16,13 @@ const DescriptionItem = ({ title, content,keyval }) => {
         index+=1
         if(keyval==='memberOf') return <Tag key={i} color={color[index-1]}>{i}</Tag>
         let datavalue=""
-        if(i.match(/^(\d{8})(\d{6}Z)$/g)===null){
+        if(i.match(/^\d{8}\d{6}Z$|^\d{8}\d{6}.\d+Z$/g)===null){
           datavalue=i
         }else{
-          datavalue=moment(i.replace(/^(\d{8})(\d{6}Z)$/g,"$1T$2")).format("YYYY/MM/DD HH:mm:ss")
+          datavalue=moment(i
+            .replace(/^(\d{8})(\d{6})Z$/g,"$1T$2")
+            .replace(/^(\d{8})(\d{6})\.\d+Z$/g,"$1T$2")
+          ).format("YYYY/MM/DD HH:mm:ss")
         }
         return content.length>1?<Tag key={i} color={color[index-1]}>{datavalue}</Tag>:
         <Tag key={i} style={{ background: '#fff', borderStyle: 'dashed' }} >{datavalue}</Tag>
@@ -63,6 +66,7 @@ const extra_profile={
   'sshPublicKey':{name:"用户公钥",col:24}
 }
 const other_profile={
+  'pwdAccountLockedTime':{name:"用户锁定时间",col:12},
   'description':{name:"备注/描述",col:12},
   'structuralObjectClass':{name:"结构对象类",col:12},
   'subschemaSubentry':{name:"subschemaSubentry",col:12},
@@ -73,7 +77,7 @@ class UserInfo extends PureComponent {
     super(props)
   }
   onDeleteUser=(delkey)=>{
-    const modal = Modal.confirm({
+    Modal.confirm({
       title: '删除用户提示',
       content: `你确定要删除用户[${delkey}]吗？删除后无法恢复！`,
       onCancel: ()=>{Modal.destroyAll()},

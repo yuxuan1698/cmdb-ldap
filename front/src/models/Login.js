@@ -25,7 +25,7 @@ export default {
       },
       setup({ dispatch,history }) {
         const data = Store.getLocal('userinfo');
-        if (!data || !(data.hasOwnProperty('token') && data.token!="")) {
+        if (!data || !(data.hasOwnProperty('token') && data.token!=="")) {
           dispatch({
             type: 'logout',
             payload: {userinfo:""},

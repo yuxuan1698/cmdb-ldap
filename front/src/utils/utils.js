@@ -31,7 +31,7 @@ export function formatReturnMsg(msgObj,status){
                     if(msgObj[i][v] instanceof Array){
                       return <div key={v}><Icon type="exclamation-circle" theme="twoTone" />{msgObj[i][v][0]} </div>
                     }
-                    return <div key={v}><Icon type="exclamation-circle" theme="twoTone" />{msgObj[i][v]} </div>
+                    return <div key={v}><Icon type="exclamation-circle" theme="twoTone" />{v.toLocaleUpperCase()}:{msgObj[i][v]} </div>
                   })
         }
         return <Alert key={i} message={msgObj[i]} type="error" />

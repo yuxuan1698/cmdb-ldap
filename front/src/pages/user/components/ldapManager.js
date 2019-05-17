@@ -169,14 +169,13 @@ class CMDBLDAPManager extends PureComponent {
           dispatch({type:'ldap/postLDAPCreateDN',payload: {...values,currentDn},callback: ()=>{
             // alert()
             message.success('Entry创建成功！',5)
+            dispatch({type:'ldap/getLDAPGroupsList'})
+            this.props.handleFlushAndReset()
           }})
         }else{
           dispatch({type:'ldap/postLDAPUpdateDN',payload: {...values,currentDn},callback: (data)=>{
             if(data.status.hasOwnProperty('newdn')){
               this.props.handleUpdateLocalDn(values,data.status.newdn)
-              dispatch({
-                type: 'ldap/getLDAPGroupsList'
-              })
             }else{
               this.props.handleUpdateLocalDn(values)
             }
@@ -353,6 +352,7 @@ CMDBLDAPManager.propTypes = {
   isNewDn: PropTypes.bool.isRequired,
   currentDn: PropTypes.string.isRequired,
   handleFlushAndReset: PropTypes.func,
+  handleNewDNItem: PropTypes.func,
   dispatch: PropTypes.func
 };
 
