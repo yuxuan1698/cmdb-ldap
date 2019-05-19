@@ -34,7 +34,13 @@ export default {
           let newdata = { treedata:[],treeobject:{}}
           Object.keys(data).map(i => {
             let titlefield=data[i][1].split(',')[0].split('=')[0]
-            newdata['treedata'].push({ title: data[i][0][titlefield][0], key: data[i][1] })
+            newdata['treedata'].push({ 
+              title: data[i][0][titlefield][0], 
+              key: data[i][1],
+              isLeaf: data[i][0].hasOwnProperty('hasSubordinates') ?
+              (data[i][0]['hasSubordinates'][0]==="TRUE"?false:true)
+              :false
+             })
             newdata['treeobject'][data[i][1]] = data[i][0]
           })
           yield put({

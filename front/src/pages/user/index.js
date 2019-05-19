@@ -90,7 +90,6 @@ class CMDBUserList extends PureComponent {
     }})
   }
   onLockUnLockUser=(lock)=>{
-    alert()
     const {dispatch}=this.props
     dispatch({type:'users/postLDAPLockUnlockUser',payload: {...lock},callback:(data)=>{
       message.info(data.status)
@@ -181,7 +180,11 @@ class CMDBUserList extends PureComponent {
       width: 50,
       align:"center",
       render:(text)=>{
-          return <Tooltip placement="top" title={`锁定时间:${text}`} arrowPointAtCenter>
+          return <Tooltip placement = "top"
+          title = {
+            text===""?"正常":`锁定时间:${text}`
+          }
+          arrowPointAtCenter >
                   {text===""?(<Icon className={usercss.user_list_unlock} type="check-circle" />):
                   (<Icon className={usercss.user_list_lock} type="issues-close" />)}
               </Tooltip>

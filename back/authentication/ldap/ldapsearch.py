@@ -11,7 +11,7 @@ from authentication.ldap.utils import (
   generate_ldap_dn_prefix,
   convert_string_to_bytes
   )
-
+from datetime import datetime
 logger=CmdbLDAPLogger().get_logger('cmdb_ldap')
 Users = get_user_model()
 
@@ -163,7 +163,8 @@ class CmdbLDAP(object):
     获取Base OU信息
     """
     if self.connect():
-      result_id=self.conn.search(queryOU, ldapType, "(objectClass=*)", None)
+      result_id = self.conn.search(
+          queryOU, ldapType, "(objectClass=*)", ["*", "hasSubordinates"])
       result_set = []
       while 1:
         try:
@@ -232,8 +233,25 @@ class CmdbLDAP(object):
     """
     锁定/解锁用户
     """
-    logger.info(data)
-    return "2",None
+    
+    dn=data['dn']
+    now=datetime.now().strftime("%Y%m%d%H%M%SZ")
+    # now=datetime.utcnow().strftime("%Y%m%d%H%M%S.%fZ")
+    if data['lock']:
+      msg="用户锁定成功，此用户将无法登陆！"
+      bytesValue = convert_string_to_bytes(
+          {'pwdAccountLockedTime': [now]})
+      lockUnlockModList=modifyModList({},bytesValue)
+    else:
+      msg="用户解锁成功，用户恢复可登陆状态！"
+      lockUnlockModList = modifyModList({'pwdAccountLockedTime': ''}, {})
+    if self.connect():
+      try:
+        logger.info(lockUnlockModList)
+        self.conn.modify_s(dn, lockUnlockModList)
+      except ldap.LDAPError as e:
+        return False, e.args[0]
+    return msg,None
 
   def update_ldap_user(self,data,olddn):
     """

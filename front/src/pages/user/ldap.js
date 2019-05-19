@@ -61,12 +61,21 @@ class CMDBLdapGroups extends PureComponent {
     }
     if (item.children) {
       return (
-        <TreeNode  disabled={this.state.isNewDn} title={title} key={item.key} dataRef={item}>
+        <TreeNode  
+          isLeaf = {
+            item.isLeaf
+          }
+          disabled={this.state.isNewDn} 
+          title={title} key={item.key} dataRef={item}>
           {this.renderTreeNodes(item.children,searchValue)}
         </TreeNode>
       );
     }
+    console.log(item.isLeaf)
     return <TreeNode  
+          isLeaf = {
+            item.isLeaf
+          }
           disabled={this.state.isNewDn} 
           icon={item.isLeaf?<Icon  type='bars' />:""}  
           key={item.key} title={title}  
@@ -129,7 +138,9 @@ class CMDBLdapGroups extends PureComponent {
             list.push({
               'title':tt.split(',')[0].split('=')[1],
               'key':`${tt}`,
-              'isLeaf': false
+              'isLeaf': data[i][0].hasOwnProperty('hasSubordinates') ?
+                (data[i][0]['hasSubordinates'][0] === "TRUE" ? false : true) :
+                false
             })
           })
           treeNode.props.dataRef.children = list

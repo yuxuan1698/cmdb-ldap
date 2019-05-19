@@ -314,6 +314,7 @@ class LockUnLockUserViewSet(APIView):
     """
     serializer = LockUnLockUserSerializer(instance=request, data=request.data)
     if serializer.is_valid():
+      logger.info(request.data)
       changeStatus, errorMsg = cmdbldap['all'].lock_unlock_ldap_user(request.data)
       if changeStatus:
         returnData = {"status": changeStatus}
