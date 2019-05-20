@@ -3,6 +3,9 @@ from hashlib import sha1
 from base64 import (b64encode as encode,
                    b64encode as decode)
 import os
+# from django.core.mail import send_mail
+from django.core.mail import EmailMultiAlternatives
+from django.conf import settings
 
 from common.utils import CmdbLDAPLogger
 
@@ -44,3 +47,14 @@ def check_ldap_password(ldap_password, password):
 
 
       
+def sendmail(to):
+    from_email = settings.DEFAULT_FROM_EMAIL
+    subject='帐号建立成功'
+    content="你的帐号已经创建成功。。。。。"
+    # subject 主题 content 内容 to_addr 是一个列表，发送给哪些人
+    msg = EmailMultiAlternatives(subject, content, from_email, to)
+    
+    msg.content_subtype = "html"
+    msg.send()
+    # 添加附件（可选）
+    # msg.attach_file('./twz.pdf')

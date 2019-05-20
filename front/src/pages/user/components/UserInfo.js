@@ -19,11 +19,13 @@ const DescriptionItem = ({ title, content,keyval }) => {
         if(i.match(/^\d{8}\d{6}Z$|^\d{8}\d{6}.\d+Z$/g)===null){
           datavalue=i
         }else{
+          const timezone=moment().utcOffset()
           datavalue=moment(i
             .replace(/^(\d{8})(\d{6})Z$/g,"$1T$2")
             .replace(/^(\d{8})(\d{6})\.\d+Z$/g,"$1T$2")
-          ).format("YYYY/MM/DD HH:mm:ss")
+          ).add(timezone,"minutes").format("YYYY/MM/DD HH:mm:ss")
         }
+        console.log(datavalue)
         return content.length>1?<Tag key={i} color={color[index-1]}>{datavalue}</Tag>:
         <Tag key={i} style={{ background: '#fff', borderStyle: 'dashed' }} >{datavalue}</Tag>
         }):<Tag style={{ background: '#fff', borderStyle: 'dashed' }} >{content}</Tag>}</div>)

@@ -235,7 +235,7 @@ class CmdbLDAP(object):
     """
     
     dn=data['dn']
-    now=datetime.now().strftime("%Y%m%d%H%M%SZ")
+    now=datetime.utcnow().strftime("%Y%m%d%H%M%SZ")
     # now=datetime.utcnow().strftime("%Y%m%d%H%M%S.%fZ")
     if data['lock']:
       msg="用户锁定成功，此用户将无法登陆！"

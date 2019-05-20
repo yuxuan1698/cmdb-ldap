@@ -71,7 +71,6 @@ class CMDBLdapGroups extends PureComponent {
         </TreeNode>
       );
     }
-    console.log(item.isLeaf)
     return <TreeNode  
           isLeaf = {
             item.isLeaf

@@ -14,8 +14,10 @@ import os
 import ldap,datetime
 from django_auth_ldap.config import LDAPSearch 
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR                                  = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 
 
 # Quick-start development settings - unsuitable for production
@@ -45,7 +47,9 @@ INSTALLED_APPS                            = [
     'api.apps.ApiConfig',
     'authentication.apps.AuthenticationConfig',
     'common.apps.CommonConfig',
+    'crontasks.apps.CrontasksConfig',
     'rest_framework_swagger',
+    'django_celery_results',
 ]
 
 MIDDLEWARE                                = [
@@ -89,7 +93,24 @@ DATABASES                                 = {
         'NAME'                            : os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+# CELERY 设置段
+CELERY_BROKER_URL                         = 'redis://:%(password)s@%(host)s:%(port)s/%(db)s' % {
+    'password'                            : 'jbg@123',
+    'host'                                : '192.168.1.250',
+    'port'                                : 6379,
+    'db'                                  : 8,
+}
+CELERY_RESULT_BACKEND                     = 'django_celery_results.backends.database:DatabaseBackend' #ji结果存储，我配置的是存储到数据库
+CELERY_CACHE_BACKEND                      = CELERY_RESULT_BACKEND
+# CELERY_CACHE_BACKEND                    = 'django-cache'
+CELERY_ACCEPT_CONTENT                     = ['application/json']
+CELERY_TASK_SERIALIZER                    = 'json'
+CELERY_RESULT_SERIALIZER                  = 'json'
+CELERY_TASK_RESULT_EXPIRES                = 3600  # celery任务执行结果的超时时间，
+CELERYD_CONCURRENCY                       = 15  # celery worker的并发数 也是命令行-c指定的数目,事实上实践发现并不是worker也多越好,保证任务不堆积,加上一定新增任务的预留就可以
 
+# 时区
+CELERY_TIMEZONE                           = 'Asia/Shanghai'
 
 # Password validation
 # https                                   : //docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
@@ -168,18 +189,18 @@ EMAIL_BACKEND                             = 'django.core.mail.backends.smtp.Emai
   
 EMAIL_USE_TLS                             = False
 # EMAIL_USE_SSL                           = True
-EMAIL_HOST                                = 'smtp.tuweizhong.com'
-EMAIL_PORT                                = 25
-EMAIL_HOST_USER                           = 'mail@tuweizhong.com'
-EMAIL_HOST_PASSWORD                       = 'xxxx'
-DEFAULT_FROM_EMAIL                        = 'mail@tuweizhong.com'
+EMAIL_HOST                                = '172.18.207.238'
+EMAIL_PORT                                = 465
+EMAIL_HOST_USER                           = 'dev@iwubida.com'
+EMAIL_HOST_PASSWORD                       = 'Wubida@123'
+DEFAULT_FROM_EMAIL                        = 'dev@iwubida.com'
 
 CACHES                                    = {
     'default'                             : {
-        # 'BACKEND'                         : 'django.core.cache.backends.filebased.FileBasedCache',
-        'BACKEND'                       : 'django.core.cache.backends.db.DatabaseCache',
-        # 'LOCATION'                        : '/tmp/django_cache',
-        'LOCATION'                      : 'ldap_cache_table',
+        # 'BACKEND'                       : 'django.core.cache.backends.filebased.FileBasedCache',
+        'BACKEND'                         : 'django.core.cache.backends.db.DatabaseCache',
+        # 'LOCATION'                      : '/tmp/django_cache',
+        'LOCATION'                        : 'ldap_cache_table',
         'TIMEOUT'                         : 3600,
     }
 }

@@ -190,7 +190,7 @@ class DrawerUpdateUser extends PureComponent {
                         placeholder={(filedToName[i] ? filedToName[i] : i) + `(${i})`} 
                         autosize={{ minRows: 2, maxRows: 5 }} />
                     }
-                    if(i==='manager'){
+                    if(['member','manager','uniqueMember','seeAlso'].includes(i)){
                       inputField=<Select
                                 showArrow autoFocus allowClear showSearch
                                 placeholder={`请选择属性领导/上级(${i})`} >

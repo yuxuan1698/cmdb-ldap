@@ -14,7 +14,6 @@ from authentication.serializers import (
   LockUnLockUserSerializer
 )
 from authentication.ldap.ldapsearch import CmdbLDAP
-from common.utils import LDAPJSONEncoder
 
 # from rest_framework_jwt.utils import jwt_decode_handler
 from django.contrib.auth import get_user_model
@@ -26,7 +25,8 @@ from rest_framework.views import APIView
 from rest_framework import status
 from django.core.cache import cache
 
-from common.utils import CmdbLDAPLogger
+from common.utils import CmdbLDAPLogger,LDAPJSONEncoder,generateQRCode
+from crontasks.tasks import send_register_email
 
 
 logger=CmdbLDAPLogger().get_logger('cmdb_ldap')
@@ -79,6 +79,10 @@ class CreateUserViewSet(APIView):
       changeStatus, errorMsg = cmdbldap['all'].create_ldap_user(request.data)
       if changeStatus:
         returnData = {"status": changeStatus}
+        reqdata=request.data
+        if 'mail' in reqdata and changeStatus :
+          send_register_email.delay(reqdata['mail'],"用户添加成功，提示信息",{"username":'test',"password":"duanbai"})
+          logger.info(generateQRCode())
         returnStatus = status.HTTP_200_OK
       else:
         returnData = {"error": errorMsg}
