@@ -3,9 +3,9 @@
 import {connect} from 'dva';
 import {PureComponent} from 'react'
 import PropTypes from 'prop-types';
-import { Table, Icon, Button, Alert,message,Layout,Input,Tag,Tooltip } from 'antd';
+import { Table, Icon, Button, Alert,message,Layout,Input,Tooltip } from 'antd';
 import usercss from "./user.less";
-import CMDBBreadcrumb from "./components/Breadcrumb";
+import CMDBBreadcrumb from "../components/Breadcrumb";
 import dynamic from 'umi/dynamic';
 import {UserEditButton,UserBatchButton} from './components/UserEditButton'
 const {

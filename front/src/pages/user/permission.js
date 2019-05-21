@@ -6,7 +6,7 @@ import { connect } from 'dva';
 import { Resizable } from 'react-resizable';
 import PropTypes from 'prop-types';
 import usercss from "./user.less";
-import CMDBBreadcrumb from "./components/Breadcrumb";
+import CMDBBreadcrumb from "../components/Breadcrumb";
 import dynamic from 'umi/dynamic';
 
 

@@ -55,7 +55,7 @@ class CMDBLDAPManager extends PureComponent {
     const { selectdata }=this.props
     if(selectdata.hasOwnProperty('objectClass')){
       this.setState({
-        currField:Object.keys(selectdata).filter(i=>i!='objectClass'),
+        currField:Object.keys(selectdata).filter(i=>!(i==='objectClass' || i==='hasSubordinates') ),
       })
     }else{
       this.setState({objectClass:['top']})
@@ -74,7 +74,7 @@ class CMDBLDAPManager extends PureComponent {
     if(!Object.is(this.props.selectdata,selectdata)){
       if (selectdata.hasOwnProperty('objectClass')) {
         this.setState({
-          currField:Object.keys(selectdata).filter(i=>i!='objectClass'),
+          currField:Object.keys(selectdata).filter(i=>!(i==='objectClass' || i==='hasSubordinates')),
           selectedItems:selectdata['objectClass'],
         })
         setTimeout(()=>{
@@ -167,7 +167,6 @@ class CMDBLDAPManager extends PureComponent {
       if (!err) {
         if(isNewDn){
           dispatch({type:'ldap/postLDAPCreateDN',payload: {...values,currentDn},callback: ()=>{
-            // alert()
             message.success('Entry创建成功！',5)
             dispatch({type:'ldap/getLDAPGroupsList'})
             this.props.handleFlushAndReset()

@@ -25,7 +25,6 @@ const DescriptionItem = ({ title, content,keyval }) => {
             .replace(/^(\d{8})(\d{6})\.\d+Z$/g,"$1T$2")
           ).add(timezone,"minutes").format("YYYY/MM/DD HH:mm:ss")
         }
-        console.log(datavalue)
         return content.length>1?<Tag key={i} color={color[index-1]}>{datavalue}</Tag>:
         <Tag key={i} style={{ background: '#fff', borderStyle: 'dashed' }} >{datavalue}</Tag>
         }):<Tag style={{ background: '#fff', borderStyle: 'dashed' }} >{content}</Tag>}</div>)
@@ -68,6 +67,7 @@ const extra_profile={
   'sshPublicKey':{name:"用户公钥",col:24}
 }
 const other_profile={
+  'pwdFailureTime':{name:"密码认证失败时间",col:12},
   'pwdAccountLockedTime':{name:"用户锁定时间",col:12},
   'description':{name:"备注/描述",col:12},
   'structuralObjectClass':{name:"结构对象类",col:12},

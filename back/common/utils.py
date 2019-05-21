@@ -1,29 +1,30 @@
 import logging,json
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.mail import EmailMultiAlternatives
-from django.template.loader import render_to_string
-from django.template import Context
 from django.conf import settings
+from email.header import make_header
 import base64
 import io
 import qrcode
 
-def SendEMail(to,subject,data):
+def SendEMail(to,subject,html_content,attack_file):
     logger=CmdbLDAPLogger().get_logger('django.server')
-    # try:
-    # content=Context({'username': 'username'})
-    text_content = render_to_string('add_user.html',{'username': 'username'})
-    html_content = render_to_string('add_user.html',{'username': 'username'})
-    msg = EmailMultiAlternatives(subject, text_content, settings.EMAIL_HOST_USER, [to])
-    msg.attach_alternative(html_content, "text/html")
-    msg.send()
-    # except Exception as e:
-    #   logger.error(e)
-    #   logger.error("邮件发送失败！")
-    #   return False
+    if not to or not subject or not html_content:
+      return False
+    try:
+      msg = EmailMultiAlternatives(subject, html_content, settings.EMAIL_HOST_USER, [to])
+      msg.attach_alternative(html_content, "text/html")
+      # filename = make_header([(attack_file, 'utf-8')]).encode('utf-8')
+      if attack_file:
+        msg.attach_file(attack_file)
+      msg.send()
+    except Exception as e:
+      logger.error(e)
+      logger.error("邮件发送失败！")
+      return False
     return True
 
-def generateQRCode(encodedata='https://www.baidu.com'):
+def generateQRCode(encodedata=''):
   qr = qrcode.QRCode(     
       version=1,     
       error_correction=qrcode.constants.ERROR_CORRECT_L,     
@@ -31,7 +32,7 @@ def generateQRCode(encodedata='https://www.baidu.com'):
       border=1, 
   )
   qr.make(fit=True) 
-  qr.add_data(encodedata)
+  qr.add_data("{}/{}".format(settings.CMDB_BASE_URL,encodedata))
   img = qr.make_image()
 
   buf = io.BytesIO()

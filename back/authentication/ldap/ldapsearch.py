@@ -22,7 +22,7 @@ class CmdbLDAP(object):
     self.bindDN=settings.AUTH_LDAP_BIND_DN
     self.bindDNPassword=settings.AUTH_LDAP_BIND_PASSWORD
     # self.conn=ldap.initialize(settings.AUTH_LDAP_SERVER_URI)
-    self.conn=ReconnectLDAPObject(settings.AUTH_LDAP_SERVER_URI,trace_level=1)
+    self.conn=ReconnectLDAPObject(settings.AUTH_LDAP_SERVER_URI,trace_level=0)
     self.searchScope = ldap.SCOPE_ONELEVEL
     self.conn.set_option(ldap.OPT_REFERRALS,0)
     self.conn.set_option(ldap.OPT_PROTOCOL_VERSION,ldap.VERSION3)
@@ -37,8 +37,7 @@ class CmdbLDAP(object):
   # @classmethod
   def connect(self,dn=None,password=None):
     try:
-      aa=self.conn.simple_bind_s(dn or self.bindDN,password or self.bindDNPassword)
-      logger.info(aa)
+      self.conn.simple_bind_s(dn or self.bindDN,password or self.bindDNPassword)
     except ldap.SERVER_DOWN:
       self.errorMsg="无法连接到LDAP"
     except ldap.INVALID_CREDENTIALS as e:
@@ -205,15 +204,15 @@ class CmdbLDAP(object):
         self.conn.add_s(newuserdn,modlist)
       except ldap.ALREADY_EXISTS as e:
         logger.error(e)
-        return False,"用户已经存在。"
+        return False,"用户已经存在。",None
       except ldap.INVALID_SYNTAX as e:
         logger.error(e)
-        return False,"字段值不合法。%s"%e
+        return False,"字段值不合法。%s"%e,None
       except ldap.LDAPError as e:
         logger.error(e)
-        return False,e.args[0]
+        return False,e.args[0],None
     logger.info("create user %s success,dn:%s" % (dn_pre, newuserdn))
-    return "添加用户%s成功" % dn_pre, None
+    return "添加用户%s成功" % dn_pre, None,dn_pre
 
   def delete_ldap_userdn(self,data):
     """
@@ -247,7 +246,6 @@ class CmdbLDAP(object):
       lockUnlockModList = modifyModList({'pwdAccountLockedTime': ''}, {})
     if self.connect():
       try:
-        logger.info(lockUnlockModList)
         self.conn.modify_s(dn, lockUnlockModList)
       except ldap.LDAPError as e:
         return False, e.args[0]
@@ -314,7 +312,6 @@ class CmdbLDAP(object):
     if dndata:
       olddata=dndata[0][1]
       newdata = convert_string_to_bytes(data)
-      logger.info(newdata)
       modlist=modifyModList(olddata,newdata)
       if len(modlist):
         logger.info("modlist:%s"%modlist)
@@ -376,7 +373,6 @@ class CmdbLDAP(object):
       删除用户
       """
       if self.connect():
-        logger.info(data)
         try:
           for dn in data['currentDn']:
             self.conn.delete_s(dn)

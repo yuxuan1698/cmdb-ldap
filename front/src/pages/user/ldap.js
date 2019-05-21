@@ -7,7 +7,7 @@ import { Resizable } from 'react-resizable';
 import { ContextMenuTrigger, ContextMenu,MenuItem } from 'react-contextmenu';
 import PropTypes from 'prop-types';
 import usercss from "./user.less";
-import CMDBBreadcrumb from "./components/Breadcrumb";
+import CMDBBreadcrumb from "../components/Breadcrumb";
 import dynamic from 'umi/dynamic';
 
 const {

@@ -37,7 +37,7 @@
     },
     {
       key:'equipment',
-      name: 'IT资源管理',
+      name: '资源管理',
       icon: 'edit',
       allow: true,
       submenu:[
@@ -52,6 +52,28 @@
         },
       ]
     },
+    {
+      key:'system',
+      name: '系统管理',
+      icon: 'exception',
+      allow: true,
+      submenu:[
+        {
+          key: '/system/setting',
+          name:'系统设置',
+          // allow: false,
+        },
+        {
+          key: '/system/systemlog',
+          name:'系统日志',
+          // allow: false,
+        },
+        {
+          key: '/system/mailresults',
+          name:'邮件通知',
+        },
+      ]
+    },
   ]
   class CMDBSider extends PureComponent {
     constructor(props){
@@ -59,7 +81,7 @@
       const {pathname}=this.props.location
       this.state={
         parentpath:[pathname==='/'?pathname:pathname.split('/')[1]],
-        subpath: [pathname.replace(/\//g, '')]
+        subpath: [pathname]
       }
     }
     initSideMenu=(arr)=>{
@@ -72,7 +94,7 @@
         let menuItem=""
         if(it.hasOwnProperty('submenu')){
           const childMenu=this.initSideMenu(it.submenu)
-          menuItem = (<SubMenu key={it.key.replace(/\//g, '')} 
+          menuItem = (<SubMenu key={it.key} 
           title={
             <span>
               {it.icon?<Icon type={it.icon} />:""}
@@ -81,7 +103,7 @@
             {childMenu}
           </SubMenu>)
         }else{
-          menuItem = (<Menu.Item key={it.key.replace(/\//g, '')}>
+          menuItem = (<Menu.Item key={it.key}>
             <Link to={it.key}>
               {it.icon?<Icon type={it.icon} />:""}
               <span>
@@ -93,6 +115,16 @@
         return menuItem
       })
     }
+    componentWillReceiveProps(nextProps){
+      let {pathname}=this.props.location
+      let nextpathname=nextProps.location.pathname
+      if(pathname!==nextpathname && nextpathname!==''){
+        this.setState({
+          parentpath:[nextpathname==='/'?nextpathname:nextpathname.split('/')[1]],
+          subpath: [nextpathname]
+        })
+      }
+    }
     render(){
       let {collapsed,toggleSideMenu}=this.props
       return (
@@ -103,7 +135,7 @@
                 >
           <div className={classnames({[css.logo]:true,[css.logoToggle]:collapsed})} />
           <Menu 
-            defaultSelectedKeys={this.state.subpath}
+            selectedKeys={this.state.subpath}
             openKeys={this.state.parentpath}
             mode="inline"
             theme="light"

@@ -23,7 +23,6 @@ class CMDBUserControl extends PureComponent{
         Modal.confirm({
           title: '退出登陆提示',
           content: `${this.props.login.userinfo.nickname}-您确定要退出系统吗？`,
-          // centered:true,
           onCancel: ()=>{Modal.destroyAll()},
           onOk:this.onLogoutHandle.bind(this)
         });

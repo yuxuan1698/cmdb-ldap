@@ -31,7 +31,7 @@ DEBUG                                     = True
 
 ALLOWED_HOSTS                             = ['127.0.0.1']
 
-
+CMDB_BASE_URL                             = "http://cmdb.iwubid.com"
 # Application definition
 
 INSTALLED_APPS                            = [

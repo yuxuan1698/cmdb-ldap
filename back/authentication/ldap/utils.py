@@ -40,6 +40,9 @@ def generate_ldap_dn_prefix(data):
   elif 'ou' in data.keys():
     dn_prefix = "ou=%s" % data['ou']
     popid = 'ou'
+  elif 'o' in data.keys():
+    dn_prefix = "o=%s" % data['o']
+    popid = 'o'
   data.pop(popid)
   return dn_prefix,data
 
