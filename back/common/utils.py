@@ -7,22 +7,45 @@ import base64
 import io
 import qrcode
 
-def SendEMail(to,subject,html_content,attack_file):
-    logger=CmdbLDAPLogger().get_logger('django.server')
-    if not to or not subject or not html_content:
-      return False
+
+
+class SendEMail(EmailMultiAlternatives):
+  """docstring for SendEMail"""
+  def __init__(self):
+    super().__init__(
+      subject='', 
+      body='', 
+      from_email=None, 
+      to=None,
+      bcc=None,
+      connection=None,
+      attachments=None,
+      headers=None,
+      cc=None,
+      reply_to=None)
+  def title(self,val):
+    self.subject=val
+    return self
+  def content(self,val):
+    self.body=val
+    self.attach_alternative(self.body, "text/html")
+    return self
+  def attach(self,val):
+    self.attach_file=val
+    return self
+  def mailto(self,val):
+    self.to=val
+    return self
+  def mailcc(self,val):
+    self.cc=val
+    return self
+  def send(self):
     try:
-      msg = EmailMultiAlternatives(subject, html_content, settings.EMAIL_HOST_USER, [to])
-      msg.attach_alternative(html_content, "text/html")
-      # filename = make_header([(attack_file, 'utf-8')]).encode('utf-8')
-      if attack_file:
-        msg.attach_file(attack_file)
-      msg.send()
+      status=super().send()
+      return status
     except Exception as e:
-      logger.error(e)
-      logger.error("邮件发送失败！")
-      return False
-    return True
+      raise e
+
 
 def generateQRCode(encodedata=''):
   qr = qrcode.QRCode(     
