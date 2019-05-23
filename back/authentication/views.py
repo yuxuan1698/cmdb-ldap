@@ -28,7 +28,6 @@ from django.core.cache import cache
 from common.utils import CmdbLDAPLogger,LDAPJSONEncoder
 from crontasks.tasks import send_register_email
 
-
 logger=CmdbLDAPLogger().get_logger('cmdb_ldap')
 
 

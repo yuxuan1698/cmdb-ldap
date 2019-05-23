@@ -4,7 +4,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
 from email.header import make_header
 import base64
-import io
+import io,os
 import qrcode
 
 
@@ -30,14 +30,19 @@ class SendEMail(EmailMultiAlternatives):
     self.body=val
     self.attach_alternative(self.body, "text/html")
     return self
-  def attach(self,val):
-    self.attach_file=val
-    return self
   def mailto(self,val):
     self.to=val
     return self
   def mailcc(self,val):
     self.cc=val
+    return self
+
+  def attach_file(self,files):
+    if isinstance(files,list):
+      for file in files:
+        super().attach_file(os.path.realpath(file))
+    else:
+        super().attach_file(os.path.realpath(files))
     return self
   def send(self):
     try:

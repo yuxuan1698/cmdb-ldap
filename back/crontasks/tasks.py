@@ -16,5 +16,6 @@ def send_register_email(to,data):
   status=mail.mailto([to])\
     .title("Hi,{},您的用户信息添加成功。".format(data['sn']))\
     .content(html_content)\
+    .attach_file(['crontasks/public/iwubida.ovpn', 'crontasks/public/ca.crt'])\
     .send()
   return status
