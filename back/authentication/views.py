@@ -78,6 +78,13 @@ class CreateUserViewSet(APIView):
       changeStatus, errorMsg,newDnPre = cmdbldap['all'].create_ldap_user(request.data)
       if changeStatus:
         returnData = {"status": changeStatus}
+        dbdata={
+            "username": newDnPre.split('=')[1],
+            "nickname": request.data.get('sn') or '',
+            "email": request.data.get('mail') or '',
+        }
+        dbUsers = Users(**dbdata)
+        dbUsers.save()
         if 'mail' in request.data and changeStatus :
           reqdata={
             "mail":request.data['mail'],
@@ -133,6 +140,10 @@ class DeleteUserViewSet(APIView):
     if serializer.is_valid():
       changeStatus, errorMsg = cmdbldap['all'].delete_ldap_userdn(request.data)
       if changeStatus:
+        usernames = []
+        for udn in request.data.get('userdn'):
+          usernames.append(udn.split(',')[0].split("=")[1])
+        Users.objects.filter(username__in=usernames).delete()
         returnData = {"status": changeStatus}
         returnStatus = status.HTTP_200_OK
       else:
