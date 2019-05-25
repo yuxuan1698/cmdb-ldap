@@ -216,15 +216,15 @@ AUTH_LDAP_BIND_DN                         = 'cn=admin,ou=SystemUser,dc=iwubida,d
 AUTH_LDAP_BASE_DN                         = 'dc=iwubida,dc=com'
 AUTH_LDAP_BIND_PASSWORD                   = 'Wubida@123'
 AUTH_LDAP_SEARCH_OU                       = 'ou=Users,dc=iwubida,dc=com'
-# AUTH_LDAP_SEARCH_FILTER                 = '(uid=%(user)s)'
+AUTH_LDAP_SEARCH_FILTER                   = '(&(uid=%(user)s))'
 AUTH_LDAP_START_TLS                       = False
 AUTH_LDAP_USER_ATTR_MAP                   = {"username": "cn", "name": "sn", "email": "mail","nickname":"sn"}
 # AUTH_LDAP_GROUP_SEARCH_OU               = ""
 # AUTH_LDAP_GROUP_SEARCH_FILTER           = ""
-AUTH_LDAP_USER_SEARCH                     = LDAPSearch(AUTH_LDAP_SEARCH_OU, ldap.SCOPE_SUBTREE, "(&(uid=%(user)s))")
-# AUTH_LDAP_CONNECTION_OPTIONS            = {
-#     ldap.OPT_TIMEOUT                    : 5
-# }
+AUTH_LDAP_USER_SEARCH                     = LDAPSearch(AUTH_LDAP_SEARCH_OU, ldap.SCOPE_SUBTREE, AUTH_LDAP_SEARCH_FILTER)
+AUTH_LDAP_CONNECTION_OPTIONS              = {
+    ldap.OPT_TIMEOUT                      : 20
+}
 
 # AUTH_LDAP_MIRROR_GROUPS                 = True
 # AUTH_LDAP_GROUP_TYPE_STRING             = ''
@@ -243,7 +243,7 @@ AUTH_LDAP_BACKEND                         = 'authentication.ldap.backend.LDAPBac
 
 if AUTH_LDAP                              : 
     AUTHENTICATION_BACKENDS.insert(0, AUTH_LDAP_BACKEND)
-# AUTH_USER_MODEL                         = "authentication.UserProfile"
+    
 AUTH_USER_MODEL                           = "authentication.Users"
 
 

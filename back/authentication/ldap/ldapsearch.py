@@ -204,15 +204,15 @@ class CmdbLDAP(object):
         self.conn.add_s(newuserdn,modlist)
       except ldap.ALREADY_EXISTS as e:
         logger.error(e)
-        return False,"用户已经存在。",None
+        return False,"用户已经存在。",None,None
       except ldap.INVALID_SYNTAX as e:
         logger.error(e)
-        return False,"字段值不合法。%s"%e,None
+        return False,"字段值不合法。%s"%e,None,None
       except ldap.LDAPError as e:
         logger.error(e)
-        return False,e.args[0],None
+        return False,e.args[0],None,None
     logger.info("create user %s success,dn:%s" % (dn_pre, newuserdn))
-    return "添加用户%s成功" % dn_pre, None,dn_pre
+    return "添加用户%s成功" % dn_pre, None, newuserdn, dn_pre.split('=')[1]
 
   def delete_ldap_userdn(self,data):
     """

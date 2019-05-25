@@ -23,7 +23,7 @@ import { GenerateRequestAuthParams,formatReturnMsg } from "../utils/utils";
  */
 
 // 设置全局参数，如响应超市时间，请求前缀等。
-axios.defaults.timeout = 5000
+axios.defaults.timeout = 20000
 axios.defaults.baseURL = '/api/';
 axios.defaults.withCredentials = true;
 

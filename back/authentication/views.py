@@ -26,6 +26,7 @@ from rest_framework import status
 from django.core.cache import cache
 
 from common.utils import CmdbLDAPLogger,LDAPJSONEncoder
+from authentication.utils import user_payload_handler
 from crontasks.tasks import send_register_email
 
 logger=CmdbLDAPLogger().get_logger('cmdb_ldap')
@@ -75,14 +76,10 @@ class CreateUserViewSet(APIView):
     serializer = CreateUserSerializer(instance=request, data=request.data)
     if serializer.is_valid():
       # serializer.validated_data
-      changeStatus, errorMsg,newDnPre = cmdbldap['all'].create_ldap_user(request.data)
+      changeStatus,errorMsg,newUserDn,newUser = cmdbldap['all'].create_ldap_user(request.data)
       if changeStatus:
         returnData = {"status": changeStatus}
-        dbdata={
-            "username": newDnPre.split('=')[1],
-            "nickname": request.data.get('sn') or '',
-            "email": request.data.get('mail') or '',
-        }
+        dbdata=user_payload_handler(request.data,newUserDn,newUser)
         dbUsers = Users(**dbdata)
         dbUsers.save()
         if 'mail' in request.data and changeStatus :
@@ -90,9 +87,9 @@ class CreateUserViewSet(APIView):
             "mail":request.data['mail'],
             "sn":request.data['sn'],
             "userPassword":request.data['userPassword'],
-            "username":newDnPre.split('=')[1]
+            "username": newUser
             }
-          send_register_email.delay(reqdata['mail'],reqdata)
+          send_register_email.delay(reqdata['mail'],reqdata,newUser)
         returnStatus = status.HTTP_200_OK
       else:
         returnData = {"error": errorMsg}

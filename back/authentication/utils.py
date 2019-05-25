@@ -24,7 +24,17 @@ def jwt_response_payload_handler(token,users=None,request=None):
 def reflush_secretkey(userModel):
     """返回用户UUID"""
     return userModel.secretkey 
-
+    
+def user_payload_handler(data,newUserDn,newUser):
+    dbdata = {
+        "username": newUser,
+        "nickname": data.get('sn') or '',
+        "email": data.get('mail') or '',
+        "department":data.get('ou') or '',
+        "mobile":data.get('mobile') or '',
+        "userdn": newUserDn
+    }
+    return dbdata
 def generate_ldap_password(password):
     """
     SSHA密码生成
@@ -45,16 +55,3 @@ def check_ldap_password(ldap_password, password):
     hr.update(salt)
     return digest == hr.digest()
 
-
-      
-def sendmail(to):
-    from_email = settings.DEFAULT_FROM_EMAIL
-    subject='帐号建立成功'
-    content="你的帐号已经创建成功。。。。。"
-    # subject 主题 content 内容 to_addr 是一个列表，发送给哪些人
-    msg = EmailMultiAlternatives(subject, content, from_email, to)
-    
-    msg.content_subtype = "html"
-    msg.send()
-    # 添加附件（可选）
-    # msg.attach_file('./twz.pdf')

@@ -1,7 +1,6 @@
 import logging,json
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.mail import EmailMultiAlternatives
-from django.conf import settings
 from email.header import make_header
 import base64
 import io,os
@@ -60,7 +59,7 @@ def generateQRCode(encodedata=''):
       border=1, 
   )
   qr.make(fit=True) 
-  qr.add_data("{}/{}".format(settings.CMDB_BASE_URL,encodedata))
+  qr.add_data(encodedata)
   img = qr.make_image()
 
   buf = io.BytesIO()
@@ -105,3 +104,8 @@ class CmdbJson(LDAPJSONEncoder):
       return json.loads(data)
     def decode(self,data):
       return json.loads(self.default(data))
+
+def hash_md5(data):
+  import hashlib
+  m5=hashlib.md5()
+  m5.update()
