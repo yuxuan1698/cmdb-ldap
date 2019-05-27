@@ -174,6 +174,16 @@ class CMDBUserList extends PureComponent {
       dataIndex: 'mail',
       key: 'mail',
     },{
+      title: '通知',
+      dataIndex: 'mail_notification',
+      key: 'mail_notification',
+      width:50,
+      align:"center",
+      render:(text)=>{
+        return <Button size='small' type="default" block icon='mail'/>
+
+      }
+    },{
       title: '状态',
       dataIndex: 'pwdAccountLockedTime',
       key: 'pwdAccountLockedTime',

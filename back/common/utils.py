@@ -105,7 +105,16 @@ class CmdbJson(LDAPJSONEncoder):
     def decode(self,data):
       return json.loads(self.default(data))
 
-def hash_md5(data):
+def Sign_Url_By_MD5(data):
   import hashlib
   m5=hashlib.md5()
-  m5.update()
+  md5str=""
+  if isinstance(data,dict):
+    keys=sorted(data.keys())
+    for n in keys:
+      md5str="{}{}={}&".format(md5str,n,data.get(n))
+  else:
+    md5str=data
+  m5.update(md5str.encode('utf-8'))
+  md5str="{}{}={}".format(md5str,'sign',m5.hexdigest())
+  return md5str

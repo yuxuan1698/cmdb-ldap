@@ -7,7 +7,7 @@ class CMDBBase extends PureComponent {
     super(props)
   }
   render(){
-    return <div>1</div>
+    return <div style={{width:"100%"}}><h1 class="company_info">物必达运维管理平台</h1></div>
   }
 }
 

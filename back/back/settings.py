@@ -12,7 +12,7 @@ https                                     : //docs.djangoproject.com/en/2.1/ref/
 
 import os
 import ldap,datetime
-from django_auth_ldap.config import LDAPSearch 
+from django_auth_ldap.config import LDAPSearch,GroupOfUniqueNamesType
 
 BASE_DIR                                  = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -31,7 +31,7 @@ DEBUG                                     = True
 
 ALLOWED_HOSTS                             = ['127.0.0.1']
 
-CMDB_BASE_URL                             = "http://cmdb.iwubid.com"
+CMDB_BASE_URL                             = "http://127.0.0.1:8081"
 # Application definition
 
 INSTALLED_APPS                            = [
@@ -219,7 +219,13 @@ AUTH_LDAP_SEARCH_OU                       = 'ou=Users,dc=iwubida,dc=com'
 AUTH_LDAP_SEARCH_FILTER                   = '(&(uid=%(user)s))'
 AUTH_LDAP_START_TLS                       = False
 AUTH_LDAP_USER_ATTR_MAP                   = {"username": "cn", "name": "sn", "email": "mail","nickname":"sn"}
-# AUTH_LDAP_GROUP_SEARCH_OU               = ""
+
+AUTH_LDAP_MIRROR_GROUPS                   = True
+AUTH_LDAP_FIND_GROUP_PERMS                = True
+AUTH_LDAP_GROUP_TYPE                      = GroupOfUniqueNamesType(name_attr="cn")
+AUTH_LDAP_GROUP_SEARCH_OU                 = "ou=Cmdb,ou=Groups,dc=iwubida,dc=com"
+AUTH_LDAP_GROUP_SEARCH                    = LDAPSearch(AUTH_LDAP_GROUP_SEARCH_OU,ldap.SCOPE_SUBTREE, "(objectClass=*)" )  
+
 # AUTH_LDAP_GROUP_SEARCH_FILTER           = ""
 AUTH_LDAP_USER_SEARCH                     = LDAPSearch(AUTH_LDAP_SEARCH_OU, ldap.SCOPE_SUBTREE, AUTH_LDAP_SEARCH_FILTER)
 AUTH_LDAP_CONNECTION_OPTIONS              = {
@@ -245,6 +251,7 @@ if AUTH_LDAP                              :
     AUTHENTICATION_BACKENDS.insert(0, AUTH_LDAP_BACKEND)
     
 AUTH_USER_MODEL                           = "authentication.Users"
+# AUTH_GROUP_MODEL                          = "authentication.UserGroups"
 
 
 
