@@ -18,7 +18,7 @@ class LDAPBackendAuthentication(LDAPBackend):
     else:
         logger.debug("Rejecting empty password for {}".format(username))
         user = None
-    logger.error(dir(user))
+    # logger.error(user.groups)
     return user
 
   def get_user(self, user_id):
@@ -48,6 +48,40 @@ class LDAPBackendAuthentication(LDAPBackend):
       return user
 
 class LDAPUser(_LDAPUser):
+
+  def authenticate(self, password):
+    """
+    Authenticates against the LDAP directory and returns the corresponding
+    User object if successful. Returns None on failure.
+    """
+    user = None
+
+    try:
+        self._authenticate_user_dn(password)
+        self._check_requirements()
+        self._get_or_create_user()
+        if self.group_names:
+            user = self._user
+    except self.AuthenticationFailed as e:
+        logger.debug(
+            "Authentication failed for {}: {}".format(self._username, e))
+    except ldap.LDAPError as e:
+        results = ldap_error.send(self.backend.__class__,
+                                  context='authenticate', user=self._user,
+                                  exception=e)
+        if len(results) == 0:
+            logger.warning(
+                "Caught LDAPError while authenticating {}: {}".format(
+                    self._username, pprint.pformat(e)
+                )
+            )
+    except Exception as e:
+        logger.warning(
+            "{} while authenticating {}".format(e, self._username)
+        )
+        raise
+
+    return user
   def _mirror_groups(self):
     """
     Mirrors the user's LDAP groups in the Django database and updates the
@@ -79,7 +113,7 @@ class LDAPUser(_LDAPUser):
         existing_groups = list(UserGroups.objects.filter(name__in=target_group_names).iterator())
         existing_group_names = frozenset(group.name for group in existing_groups)
 
-        new_groups = [UserGroups.objects.get_or_create(name=name)[0] for name
+        new_groups = [UserGroups.objects.get_or_create(name=name,created_by='LDAP',comment="Sync by LDAP")[0] for name
                         in target_group_names if name not in existing_group_names]
 
         self._user.groups.set(existing_groups + new_groups)
