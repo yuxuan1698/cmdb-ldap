@@ -6,18 +6,19 @@ import os
 # from django.core.mail import send_mail
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
-
 from common.utils import CmdbLDAPLogger
-
+from authentication.models import Users
+from django.contrib.auth import backends
 logger=CmdbLDAPLogger().get_logger('cmdb_ldap')
 
-def jwt_response_payload_handler(token,users=None,request=None):
+def jwt_response_payload_handler(token,userobj=None,request=None):
     """为返回的结果添加用户相关信息"""
-    
+    logger.info(userobj.get_all_permissions())
+    logger.info(userobj.is_superuser)
     return {
-             'nickname':users.nickname,
-             'username':users.username,
-             'email':users.email,
+             'nickname':userobj.nickname,
+             'username':userobj.username,
+             'email':userobj.email,
              'token_prefix': settings.JWT_AUTH.get('JWT_AUTH_HEADER_PREFIX') or 'JWT',
              'token':token
             }

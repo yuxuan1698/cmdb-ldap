@@ -21,9 +21,17 @@ class Users(AbstractUser):
     mobile = models.CharField(null=True, blank=True,max_length=16, verbose_name='用户手机')
     userdn = models.CharField(max_length=254, null=True, blank=True,verbose_name='用户DN')
     groups = models.ManyToManyField(
-        to=UserGroups, related_name='usergroups',
-        blank=True, verbose_name=_('User group')
+        UserGroups,
+        verbose_name=_('User groups'),
+        blank=True,
+        help_text=_(
+            'The groups this user belongs to. A user will get all permissions '
+            'granted to each of their groups.'
+        ),
+        related_name="user_set",
+        related_query_name="user",
     )
+
     class Meta(AbstractUser.Meta):
         ordering = ['username']
         verbose_name = _("Users")

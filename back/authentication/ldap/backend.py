@@ -2,11 +2,15 @@ from django_auth_ldap.backend import _LDAPUser, LDAPBackend
 from django_auth_ldap.config import _LDAPConfig
 from authentication.models import UserGroups
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
-
+import django.dispatch
+import ldap 
 # LDAPSearch, LDAPSearchUnion, PosixGroupType, GroupOfNamesType, GroupOfUniqueNamesType, OrganizationalRoleGroupType, NestedGroupOfNamesType, NestedGroupOfUniqueNamesType, NestedOrganizationalRoleGroupType
 
 logger = _LDAPConfig.get_logger()
-        
+
+# Allows clients to perform custom user population.
+populate_user = django.dispatch.Signal(providing_args=["user", "ldap_user"])
+
 class LDAPBackendAuthentication(LDAPBackend):
   """docstring for LDAPBackendAuthentication"""
 
@@ -30,16 +34,32 @@ class LDAPBackendAuthentication(LDAPBackend):
         pass
 
     return user
-  def get_group_permissions(self, user, obj=None):
-      if not hasattr(user, 'ldap_user') and self.settings.AUTHORIZE_ALL_USERS:
-          LDAPUser(self, user=user)  # This sets user.ldap_user
+  # def get_group_permissions(self, user, obj=None):
+  #     if not hasattr(user, 'ldap_user') and self.settings.AUTHORIZE_ALL_USERS:
+  #         LDAPUser(self, user=user)  # This sets user.ldap_user
 
-      if hasattr(user, 'ldap_user'):
-          permissions = user.ldap_user.get_group_permissions()
-      else:
-          permissions = set()
+  #     if hasattr(user, 'ldap_user'):
+  #         permissions = user.ldap_user.get_group_permissions()
+  #     else:
+  #         permissions = set()
 
-      return permissions
+  #     return permissions
+  # def get_group_permissions(self, user_obj, obj=None):
+  #   """
+  #   Return a set of permission strings the user `user_obj` has from the
+  #   groups they belong.
+  #   """
+  #   return self._get_permissions(user_obj, obj, 'group')
+
+  # def get_all_permissions(self, user_obj, obj=None):
+  #   if not user_obj.is_active or user_obj.is_anonymous or obj is not None:
+  #       return set()
+  #   if not hasattr(user_obj, '_perm_cache'):
+  #       user_obj._perm_cache = {
+  #           *self.get_user_permissions(user_obj),
+  #           *self.get_group_permissions(user_obj),
+  #       }
+  #   return user_obj._perm_cache
 
   def populate_user(self, username):
       ldap_user = LDAPUser(self, username=username)
@@ -117,3 +137,42 @@ class LDAPUser(_LDAPUser):
                         in target_group_names if name not in existing_group_names]
 
         self._user.groups.set(existing_groups + new_groups)
+        
+  def _get_or_create_user(self, force_populate=False):
+      """
+      Loads the User model object from the database or creates it if it
+      doesn't exist. Also populates the fields, subject to
+      AUTH_LDAP_ALWAYS_UPDATE_USER.
+      """
+      save_user = False
+
+      username = self.backend.ldap_to_django_username(self._username)
+
+      self._user, built = self.backend.get_or_build_user(username, self)
+      self._user.ldap_user = self
+      self._user.ldap_username = self._username
+
+      should_populate = force_populate or self.settings.ALWAYS_UPDATE_USER or built
+
+      if built:
+          logger.debug("Creating Django user {}".format(username))
+          self._user.set_unusable_password()
+          save_user = True
+
+      if should_populate:
+          logger.debug("Populating Django user {}".format(username))
+          self._populate_user()
+          save_user = True
+
+          # Give the client a chance to finish populating the user just
+          # before saving.
+          populate_user.send(self.backend.__class__, user=self._user, ldap_user=self)
+
+      if save_user:
+          self._user.userdn=self.dn
+          self._user.save()
+
+      # This has to wait until we're sure the user has a pk.
+      if self.settings.MIRROR_GROUPS or self.settings.MIRROR_GROUPS_EXCEPT:
+          self._normalize_mirror_settings()
+          self._mirror_groups()

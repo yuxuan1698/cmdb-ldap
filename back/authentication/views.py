@@ -28,6 +28,7 @@ from django.core.cache import cache
 from common.utils import CmdbLDAPLogger,LDAPJSONEncoder
 from authentication.utils import user_payload_handler
 from crontasks.tasks import send_register_email
+from django.contrib.auth.decorators import permission_required
 
 logger=CmdbLDAPLogger().get_logger('cmdb_ldap')
 
@@ -52,6 +53,7 @@ class UserListViewSet(APIView):
   允许用户查看或编辑的API路径。
   """
   # serializer_class=LdapSerializer
+  # @permission_required('user.change_permission')
   def get(self,request, *args, **kwargs):
     """ 
     获取所有用户的列表信息
@@ -81,6 +83,7 @@ class CreateUserViewSet(APIView):
         returnData = {"status": changeStatus}
         dbdata=user_payload_handler(request.data,newUserDn,newUser)
         dbUsers = Users(**dbdata)
+        dbUsers.set_password(request.data['userPassword'])
         dbUsers.save()
         if 'mail' in request.data and changeStatus :
           reqdata={
