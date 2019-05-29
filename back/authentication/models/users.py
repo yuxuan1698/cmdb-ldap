@@ -5,6 +5,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from .usergroups import UserGroups
 from django.utils.translation import ugettext_lazy as _
+
 __all__ = ['Users']
 
 class Users(AbstractUser):
@@ -31,7 +32,6 @@ class Users(AbstractUser):
         related_name="user_set",
         related_query_name="user",
     )
-
     class Meta(AbstractUser.Meta):
         ordering = ['username']
         verbose_name = _("Users")

@@ -9,18 +9,19 @@ from django.conf import settings
 from common.utils import CmdbLDAPLogger
 from authentication.models import Users
 from django.contrib.auth import backends
-logger=CmdbLDAPLogger().get_logger('cmdb_ldap')
+logger=CmdbLDAPLogger.get_logger('cmdb_ldap')
 
 def jwt_response_payload_handler(token,userobj=None,request=None):
     """为返回的结果添加用户相关信息"""
-    logger.info(userobj.get_all_permissions())
-    logger.info(userobj.is_superuser)
+    # logger.info(userobj.get_all_permissions())
+    # logger.info(userobj.is_superuser)
     return {
              'nickname':userobj.nickname,
              'username':userobj.username,
              'email':userobj.email,
              'token_prefix': settings.JWT_AUTH.get('JWT_AUTH_HEADER_PREFIX') or 'JWT',
-             'token':token
+             'token':token,
+             'permission':"all" if userobj.is_superuser else userobj.get_all_permissions()
             }
 def reflush_secretkey(userModel):
     """返回用户UUID"""

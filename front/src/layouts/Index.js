@@ -1,8 +1,4 @@
 import withRouter from 'umi/withRouter';
-import {connect} from 'dva';
-// 路由跳转
-import router from 'umi/router';
-
 import {
   Layout, LocaleProvider
 } from 'antd';
@@ -14,7 +10,6 @@ import CMDBContent from './Content/';
 import CMDBFooter from './Footer';
 
 @withRouter
-// @connect(({ login, loading }) => ({ login, loading }))
 class CMDBLayout extends PureComponent {
   constructor(props){
     super(props)
