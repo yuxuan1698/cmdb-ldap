@@ -12,6 +12,11 @@ class Users(AbstractUser):
     '''
     继承Django的AbstractUser 并向里面添加两条数据内容
     '''
+    class Meta:
+        permissions = (
+                ('view_user_permission',u'查看管理页面'),
+                ('view_ldap_manager', u'查看管理ldap菜单'),
+            )
     id = models.UUIDField(default=uuid4, primary_key=True)
     gender = models.CharField(max_length=6,choices=(('male','男'),('female','女')),default='male',verbose_name='性别')
     nickname = models.TextField(

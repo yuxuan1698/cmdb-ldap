@@ -13,6 +13,7 @@ https                                     : //docs.djangoproject.com/en/2.1/ref/
 import os
 import ldap,datetime
 from django_auth_ldap.config import LDAPSearch,GroupOfUniqueNamesType
+import logging
 
 BASE_DIR                                  = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -250,7 +251,6 @@ AUTH_LDAP_BACKEND                         = 'authentication.ldap.backend.LDAPBac
 
 if AUTH_LDAP                              : 
     AUTHENTICATION_BACKENDS.insert(0, AUTH_LDAP_BACKEND)
-    
 AUTH_USER_MODEL                           = "authentication.Users"
 # AUTH_GROUP_MODEL                          = "authentication.UserGroups"
 

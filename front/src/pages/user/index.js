@@ -98,7 +98,7 @@ class CMDBUserList extends PureComponent {
   }
   handleDisplayModal=(record)=>{
     const {dispatch}=this.props
-    if(!this.state.displayuser){
+    if(!this.state.displayuser && record.hasOwnProperty('userdn')){
       this.setState({
         displayuser:!this.state.displayuser,
         userinfo:record

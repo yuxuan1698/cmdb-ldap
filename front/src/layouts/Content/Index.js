@@ -2,6 +2,7 @@ import { PureComponent,Fragment } from 'react';
 import {
   Layout
 } from 'antd'
+import { TransitionGroup, CSSTransition } from "react-transition-group";
 import CMDBHeader from '../Header/';
 import CMDBSider from './Sider';
 const {Content} =Layout
@@ -24,7 +25,7 @@ class CMDBContent extends PureComponent {
             collapsed={collapsed} 
             toggleSideMenu={toggleSideMenu} />
           <Content  style={{ overflow: "auto",padding:10,display:"flex"}}>
-            {children}
+                {children}
           </Content>
         </Layout>
       </Fragment>

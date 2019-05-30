@@ -69,7 +69,7 @@ class CMDBLdapPermission extends PureComponent {
         </span>)
       }
     }
-    return <TreeNode icon={<Icon type='user' /> } isLeaf={true}
+    return <TreeNode disableCheckbox icon={<Icon type='user' /> } isLeaf={true}
        key={item[0]} style={{padding:1}} title={title} dataRef={item} />;
   })
   onResize = (event, { size }) => {

@@ -43,6 +43,9 @@ export default {
     'layout-header-background': '#fcfcfdcc',
     'layout-header-padding':"0px",
     'layout-sider-background':"#1da57a",
+    'tabs-title-font-size':'14px',
+    'switch-sm-height':'18px',
+    'tabs-bar-margin':'0px -px 8px 0px'
   },
   "proxy": {
     "/api": {

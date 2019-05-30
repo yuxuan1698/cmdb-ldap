@@ -52,8 +52,10 @@ class DrawerUpdateUser extends PureComponent {
   }
   componentDidMount(){
     const {modifydata}=this.props
-    this.handleClassObjectsChange(modifydata['data']['objectClass'])
-    this.setState({currField:Object.keys(modifydata['data']).filter(i=>i!=='objectClass').sort((i,b)=>i=='uid'?-1:0) })
+    if(modifydata) { 
+      this.handleClassObjectsChange(modifydata['data']['objectClass'])
+      this.setState({currField:Object.keys(modifydata['data']).filter(i=>i!=='objectClass').sort((i,b)=>i=='uid'?-1:0) })
+    }
   }
   initSelectedItems(arr){
     const {classobjects}=this.state
@@ -205,7 +207,7 @@ class DrawerUpdateUser extends PureComponent {
                       <Col span={24} key={i} >
                       <Form.Item  labelCol={{ span: 7 }} wrapperCol={{ span: 13 }} label={filedToName[i]?filedToName[i]:i} hasFeedback required>
                         {getFieldDecorator(i, {
-                            initialValue: i==='userPassword'?"":(modifydata['data'][i]?modifydata['data'][i][0]:(i==='loginShell'?'/bin/bash':"")),
+                            initialValue: i==='userPassword'?"":(modifydata && modifydata['data'][i]?modifydata['data'][i][0]:(i==='loginShell'?'/bin/bash':"")),
                             rules: [{ required: i==='userPassword'?false:true, message: `请输入${filedToName[i]}(${i})` }],
                         })(inputField)}
                         {!this.state.mustField.includes(i)?<Tooltip placement="top" title="删除字段">

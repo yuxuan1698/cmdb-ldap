@@ -4,6 +4,7 @@ import {
 } from 'antd';
 import zh_CN from 'antd/lib/locale-provider/zh_CN';
 
+
 import css from './index.less';
 import { PureComponent } from 'react';
 import CMDBContent from './Content/';
@@ -25,18 +26,19 @@ class CMDBLayout extends PureComponent {
   render(){
     const {children,location}=this.props
     return (
-      <LocaleProvider locale={zh_CN}>
-        <Layout className={css.mainLayer}>
-          <CMDBContent 
-            children={children} 
-            collapsed={this.state.collapsed}
-            toggleSideMenu={this.toggleSideMenu.bind(this)} 
-            location={location} />
-          {location.pathname.match('^/login')?(
-            <CMDBFooter />
-          ):""}
-        </Layout >
-      </LocaleProvider>
+      
+        <LocaleProvider locale={zh_CN}>
+          <Layout className={css.mainLayer}>
+            <CMDBContent 
+              children={children} 
+              collapsed={this.state.collapsed}
+              toggleSideMenu={this.toggleSideMenu.bind(this)} 
+              location={location} />
+            {location.pathname.match('^/login')?(
+              <CMDBFooter />
+            ):""}
+          </Layout >
+        </LocaleProvider>
       )
   }
 }
