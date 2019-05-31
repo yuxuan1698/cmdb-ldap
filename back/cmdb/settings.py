@@ -137,13 +137,13 @@ AUTH_PASSWORD_VALIDATORS                  = [
 
 LANGUAGE_CODE                             = 'zh-hans'
 
-TIME_ZONE                                 = 'UTC'
+TIME_ZONE                                 = 'Asia/Chongqing'
 
 USE_I18N                                  = True
 
 USE_L10N                                  = True
 
-USE_TZ                                    = True
+USE_TZ                                    = False
 
 APPEND_SLASH                              = True
 
@@ -225,9 +225,10 @@ AUTH_LDAP_USER_ATTR_MAP                   = {"username": "cn", "name": "sn", "em
 AUTH_LDAP_MIRROR_GROUPS                   = True
 AUTH_LDAP_FIND_GROUP_PERMS                = True
 AUTH_LDAP_GROUP_TYPE                      = GroupOfUniqueNamesType(name_attr="cn")
-AUTH_LDAP_GROUP_SEARCH_OU                 = "ou=Cmdb,ou=Groups,dc=iwubida,dc=com"
-AUTH_LDAP_GROUP_SEARCH                    = LDAPSearch(AUTH_LDAP_GROUP_SEARCH_OU,ldap.SCOPE_SUBTREE, "(objectClass=*)" )  
-AUTH_LDAP_USER_FLAGS_BY_GROUP             = {'is_superuser': "cn=admin,%s" % AUTH_LDAP_GROUP_SEARCH_OU }
+AUTH_LDAP_GROUP_SEARCH_OU                 = "ou=Groups,dc=iwubida,dc=com"
+AUTH_LDAP_CMDB_GROUP_OU                   = "ou=Cmdb,ou=Groups,dc=iwubida,dc=com"
+AUTH_LDAP_GROUP_SEARCH                    = LDAPSearch(AUTH_LDAP_CMDB_GROUP_OU,ldap.SCOPE_SUBTREE, "(objectClass=*)" )  
+AUTH_LDAP_USER_FLAGS_BY_GROUP             = {'is_superuser': "cn=admin,%s" % AUTH_LDAP_CMDB_GROUP_OU }
 # AUTH_LDAP_GROUP_SEARCH_FILTER           = ""
 AUTH_LDAP_USER_SEARCH                     = LDAPSearch(AUTH_LDAP_SEARCH_OU, ldap.SCOPE_SUBTREE, AUTH_LDAP_SEARCH_FILTER)
 AUTH_LDAP_CONNECTION_OPTIONS              = {

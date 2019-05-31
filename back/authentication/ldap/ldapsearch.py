@@ -120,7 +120,6 @@ class CmdbLDAP(object):
     trae la lista de atributos de un servidor dado
     """
     allatt= {}
-    o = []
     attr_tm = self.schema.tree(ldap.schema.AttributeType) 
     for a in  attr_tm.keys():
       att = self.schema.get_obj(ldap.schema.AttributeType, a)
@@ -381,3 +380,20 @@ class CmdbLDAP(object):
         except ldap.LDAPError as e:
           return False, e.args[0]
       return "删除用户%s成功" % (';'.join(data['currentDn'])), None
+
+  def get_user_permissions(self,userdn=""):
+    """ 返回所有LDAP DN属性 """
+    if self.connect() and userdn:
+      searchFilter="(|(member={})(uniqueMember={})(memberUid={}))".format(userdn,userdn,userdn.split(',')[0].split('=')[1])
+      result_id=self.conn.search(settings.AUTH_LDAP_GROUP_SEARCH_OU, ldap.SCOPE_SUBTREE, searchFilter, None)
+      result_set = []
+      while 1:
+        result_type, result_data = self.conn.result(result_id, 0)
+        if(result_data == []):
+          break
+        else:
+          if result_type == ldap.RES_SEARCH_ENTRY:
+            result_set.append(result_data[0])
+      return result_set,None
+    else:
+      return None,self.errorMsg

@@ -92,3 +92,17 @@ export function getGroupList (baseou) {
         url: `/v1/ldap/ous/${baseou||''}`
     })
 }
+// 获取用户分配的权限列表API
+export function getUserPermissionList (userdn) {
+    return request({
+        method: "get",
+        url: `/v1/ldap/permission/${userdn||''}/`
+    })
+}
+// 获取权限组列表
+export function getPermissionGroupsListApi () {
+    return request({
+        method: "get",
+        url: `/v1/ldap/allgroups/`
+    })
+}

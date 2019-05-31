@@ -6,6 +6,7 @@ import {
   PostLDAPUpdateUser,
   getLDAPUserAttribute,
   PostLDAPLockUnLockUser,
+  getUserPermissionList,
   getLDAPObjectClassList
 } from '../../../services/api';
 
@@ -79,6 +80,12 @@ export default {
       },
       *postLDAPLockUnlockUser({ payload,callback }, { call }) {
         const data = yield call(PostLDAPLockUnLockUser,payload)
+        if (data) {
+          callback(data)
+        }
+      },
+      *getLDAPUserPermissions({ payload,callback }, { call }) {
+        const data = yield call(getUserPermissionList,payload)
         if (data) {
           callback(data)
         }

@@ -167,6 +167,19 @@ class UserAttributeByViewSet(APIView):
     userattrs=cmdbldap['all'].get_user_list(username,['*','+'])
     return JsonResponse(userattrs[0],encoder=LDAPJSONEncoder,safe=False)
 
+class UserPermissionListByViewSet(APIView):
+  """
+  获取用户权限列表
+  """
+  # serializer_class=LdapUserSerializer
+  def get(self,request,*args,**kwargs):
+    """
+    根据用户获取用户信息
+    """
+    userdn=kwargs.get('userdn')
+    userattrs=CmdbLDAP().get_user_permissions(userdn)
+    return JsonResponse(userattrs[0],encoder=LDAPJSONEncoder,safe=False)
+
 class GetLdapAllCLassListViewSet(APIView):
   """
   获取所有LDAP的CLASSES名称及字段信息
@@ -209,6 +222,18 @@ class getLDAPOUListViewSet(APIView):
     else:
       queryOU=settings.AUTH_LDAP_BASE_DN
     ous,errorMsg=cmdbldap['getOUDN'].get_base_ou(queryOU)
+    logger.info(errorMsg)
+    if len(ous)>0:
+      return JsonResponse(ous,encoder=LDAPJSONEncoder,safe=False)
+    else:
+      return JsonResponse({"error":errorMsg},encoder=LDAPJSONEncoder,status=status.HTTP_400_BAD_REQUEST,safe=False)
+class getLDAPPermissionGroupsListViewSet(APIView):
+  """
+  获取 权限控制Groups OU信息
+  """
+  def get(self,request,*args,**kwargs):
+    queryOU=settings.AUTH_LDAP_GROUP_SEARCH_OU
+    ous,errorMsg=CmdbLDAP().get_base_ou(queryOU)
     logger.info(errorMsg)
     if len(ous)>0:
       return JsonResponse(ous,encoder=LDAPJSONEncoder,safe=False)

@@ -88,7 +88,7 @@ class CMDBEmailSettingContent extends PureComponent {
                 disabled
                 value="端口:"
               />
-              <Input style={{ width: 80, textAlign: 'center', }} placeholder="端口" />
+              <Input style={{ width: 80 }} placeholder="端口" />
             </InputGroup>
           )}
         </Form.Item>
@@ -101,7 +101,7 @@ class CMDBEmailSettingContent extends PureComponent {
               },
             ],
           })(
-          <Input style={{textAlign: 'center' }} placeholder="请输入EMAIL用户名" />
+          <Input placeholder="请输入EMAIL用户名" />
           )}
         </Form.Item>
         <Form.Item label="Email用户密码">
@@ -113,7 +113,7 @@ class CMDBEmailSettingContent extends PureComponent {
               },
             ],
           })(
-          <Input.Password style={{textAlign: 'center' }} placeholder="请输入EMAIL用户密码" />
+          <Input.Password placeholder="请输入EMAIL用户密码" />
           )}
         </Form.Item>
         <Form.Item label="启用TLS">

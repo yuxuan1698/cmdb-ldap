@@ -2,6 +2,7 @@ from django_auth_ldap.backend import _LDAPUser, LDAPBackend
 from authentication.models import UserGroups
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from common.utils import CmdbLDAPLogger
+from django.utils import timezone
 import django.dispatch
 import ldap 
 
@@ -86,10 +87,7 @@ class LDAPUser(_LDAPUser):
         raise
 
     return user
-#   def _get_group_permissions(self, user_obj):
-#     user_groups_field = get_user_model()._meta.get_field('groups')
-#     user_groups_query = 'usergroups__%s' % user_groups_field.related_query_name()
-#     return Permission.objects.filter(**{user_groups_query: user_obj})
+
   def _mirror_groups(self):
     """
     Mirrors the user's LDAP groups in the Django database and updates the
@@ -158,6 +156,7 @@ class LDAPUser(_LDAPUser):
 
       if save_user:
           self._user.userdn=self.dn
+          self._user.last_login=timezone.now()
           self._user.save()
 
       # This has to wait until we're sure the user has a pk.

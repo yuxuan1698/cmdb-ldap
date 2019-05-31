@@ -19,20 +19,24 @@ class CMDBSystemSetting extends PureComponent {
     return (
       <Layout >
         <CMDBBreadcrumb route={{'系统设置':"",'基本设置':'/system/setting'}} title='系统基本设置'  />
-        <Tabs type="card" tabBarStyle={{width:130,backgroundColor: "#f1f1f1",padding:"15px 0 0 15px"}} tabPosition="left" style={{height:"100%",marginTop:10,padding:10,boxShadow:"#dcd8d8 0px 0px 3px",backgroundColor:"#fff"}}>
-          <TabPane tab={<div><Icon type="setting" />基本设置</div>} key="1">
+        <Tabs  
+          // renderTabBar={<div><Icon type="setting" theme="filled" />基本设置</div>}
+          tabBarStyle={{width:130,backgroundColor: "#f1f1f1",padding:"15px 0 0 0px"}} 
+          tabPosition="left" 
+          style={{height:"100%",marginTop:10,padding:10,boxShadow:"#dcd8d8 0px 0px 3px",backgroundColor:"#fff"}}>
+          <TabPane tab={<div><Icon type="setting" theme="filled" />基本设置</div>} key="1">
             Content of Tab 1
           </TabPane>
-          <TabPane tab={<div><Icon type="reconciliation"/>LDAP设置</div>} key="2">
+          <TabPane tab={<div><Icon type="idcard" theme="filled" />LDAP设置</div>} key="2">
             <CMDBLDAPSettingContent />
           </TabPane>
-          <TabPane tab={<div><Icon type="mail"  />邮件设置</div>}  key="3">
+          <TabPane tab={<div><Icon type="mail" theme="filled" />邮件设置</div>}  key="3">
             <CMDBEmailSettingContent />
           </TabPane>
-          <TabPane tab={<div><Icon type="dingding"  />钉钉设置</div>}  key="4">
+          <TabPane tab={<div><Icon type="dingtalk-circle" theme="filled" />钉钉设置</div>}  key="4">
             Content of Tab 3
           </TabPane>
-          <TabPane tab={<div><Icon type="control"/>扩展设置</div>} key="5">
+          <TabPane tab={<div><Icon type="control" theme="filled"/>扩展设置</div>} key="5">
             Content of Tab 4
           </TabPane>
         </Tabs>

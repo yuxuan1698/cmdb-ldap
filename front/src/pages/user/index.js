@@ -84,7 +84,6 @@ class CMDBUserList extends PureComponent {
   confirmDeletion=(userkeys)=>{
     const {dispatch}=this.props
     dispatch({type:'users/postLDAPDeleteUser',payload: {userdn:userkeys},callback:(data)=>{
-      message.info(data.status)
       dispatch({type:'users/getUserList'})
       this.setState({selectedRowKeys:[]})
     }})
@@ -92,7 +91,6 @@ class CMDBUserList extends PureComponent {
   onLockUnLockUser=(lock)=>{
     const {dispatch}=this.props
     dispatch({type:'users/postLDAPLockUnlockUser',payload: {...lock},callback:(data)=>{
-      message.info(data.status)
       dispatch({type:'users/getUserList'})
     }})
   }

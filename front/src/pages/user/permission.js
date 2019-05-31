@@ -32,7 +32,7 @@ class CMDBLdapPermission extends PureComponent {
       searchValue: "",
       selectdata: "",
       loadedData: {},
-      // loadedKeys: [],
+      selectKey: "",
       classobjects: "",
     }
   }
@@ -41,7 +41,6 @@ class CMDBLdapPermission extends PureComponent {
       expandedKeys: [],
       autoExpandParent: false,
       selectdata: "",
-      // loadedKeys: []
     })
   }
   componentWillMount(){
@@ -57,7 +56,6 @@ class CMDBLdapPermission extends PureComponent {
     let searchText=`${item[1].sn}(${item[1].uid})`
     let title = <span className={usercss.permission_user_style} >{searchText}</span>
     if (searchValue) {
-      console.log(item)
       const index = searchText.indexOf(searchValue);
       const beforeStr = searchText.substr(0, index);
       const afterStr = searchText.substr(index + searchValue.length);
@@ -75,8 +73,8 @@ class CMDBLdapPermission extends PureComponent {
   onResize = (event, { size }) => {
     this.setState({ width: size.width });
   }
-  handleOnSelect = (selectkey) => {
-    
+  handleOnSelect = (selectKey) => {
+    this.setState({selectKey:selectKey[0]})
   }
   handleOnChange = (e) => {
     const value = e.target.value;
@@ -92,8 +90,8 @@ class CMDBLdapPermission extends PureComponent {
     });
   }
   render() {
-    const { searchValue, width, classobjects, selectdata } = this.state
-    const { loading,userlist } = this.props
+    const { searchValue, width, selectKey } = this.state
+    const { loading,userlist,dispatch } = this.props
     return (
       <Layout className={usercss.userbody}>
         <CMDBBreadcrumb route={{ '用户管理': "", '用户权限管理': '/user/permission' }} title='用户权限管理' />
@@ -106,7 +104,7 @@ class CMDBLdapPermission extends PureComponent {
               <Layout style={{ height: "100%", padding: 5, boxShadow: "0px 0px 3px #dcd8d8" }} >
                 <Search style={{ marginBottom: 8 }} placeholder="Search(Key Press)" onChange={this.handleOnChange.bind(this)} />
                 <Content className={usercss.ldap_content_box} >
-                  <Spin tip="Loading..." spinning={loading.effects['users/getUserList']}>
+                  <Spin tip="Loading..." spinning={Boolean(loading.effects['users/getUserList'])||Boolean(loading.effects['users/getLDAPUserPermissions'])}>
                     <DirectoryTree 
                       draggable
                       onExpand={this.onExpand.bind(this)}
@@ -117,23 +115,13 @@ class CMDBLdapPermission extends PureComponent {
                   </Spin>
                 </Content>
               </Layout>
-            </Sider>
+            </Sider> 
           </Resizable>
           <Content className={usercss.right_content_class}>
-            {
-              (classobjects && selectdata) ? < CMDBSeletPermission
-              selectdata={this.state.selectdata}
-              classobjects={classobjects} /> : 
-              < CMDBSeletPermission
-              selectdata = {
-                this.state.selectdata
-              }
-              classobjects = {
-                classobjects
-              }
-              />
-              // <Empty className={usercss.right_empty_center} />
-              }
+            <CMDBSeletPermission
+              loading={loading}
+              dispatch={dispatch}
+              selectKey={selectKey} /> 
           </Content>
         </Layout>
       </Layout>

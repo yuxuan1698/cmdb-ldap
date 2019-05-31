@@ -2,7 +2,8 @@ import {
   getGroupList,
   PostLDAPUpdateDN,
   PostLDAPDeleteDN,
-  PostLDAPCreateDN
+  PostLDAPCreateDN,
+  getPermissionGroupsListApi
 } from '../../../services/api';
 
 export default {
@@ -53,6 +54,12 @@ export default {
       },
       *getLDAPGroupsSecendList({ payload,callback }, { call }) {
         const data = yield call(getGroupList, payload)
+        if (data) {
+          callback(data)
+        }
+      },
+      *getPermissionGroupsList({ callback }, { call }) {
+        const data = yield call(getPermissionGroupsListApi)
         if (data) {
           callback(data)
         }

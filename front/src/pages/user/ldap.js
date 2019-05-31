@@ -59,26 +59,17 @@ class CMDBLdapGroups extends PureComponent {
           </span>)
       }
     }
-    if (item.children) {
-      return (
-        <TreeNode  
-          isLeaf = {
-            item.isLeaf
-          }
-          disabled={this.state.isNewDn} 
-          title={title} key={item.key} dataRef={item}>
-          {this.renderTreeNodes(item.children,searchValue)}
-        </TreeNode>
-      );
-    }
-    return <TreeNode  
-          isLeaf = {
-            item.isLeaf
-          }
-          disabled={this.state.isNewDn} 
-          icon={item.isLeaf?<Icon  type='bars' />:""}  
-          key={item.key} title={title}  
-          dataRef={item} />;
+    return (
+      <TreeNode  
+        isLeaf = {
+          item.isLeaf
+        }
+        icon={item.isLeaf?<Icon  type='bars' />:""}  
+        disabled={this.state.isNewDn} 
+        title={title} key={item.key} dataRef={item}>
+        {item.children?this.renderTreeNodes(item.children,searchValue):""}
+      </TreeNode>
+    );
   })
   handleRightMenu=()=>{
     let menu = (<ContextMenu id="ldap_control_menu" >
@@ -131,14 +122,14 @@ class CMDBLdapGroups extends PureComponent {
           });
           resolve()
         }else{
-          Object.keys(data).map(i=>{
-            const tt=data[i][1]
-            loadedobject[tt]=data[i][0]
+          Object.values(data).map(i=>{
+            const tt=i[1]
+            loadedobject[tt]=i[0]
             list.push({
               'title':tt.split(',')[0].split('=')[1],
               'key':`${tt}`,
-              'isLeaf': data[i][0].hasOwnProperty('hasSubordinates') ?
-                (data[i][0]['hasSubordinates'][0] === "TRUE" ? false : true) :
+              'isLeaf': i[0].hasOwnProperty('hasSubordinates') ?
+                (i[0]['hasSubordinates'][0] === "TRUE" ? false : true) :
                 false
             })
           })
