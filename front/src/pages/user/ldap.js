@@ -89,7 +89,7 @@ class CMDBLdapGroups extends PureComponent {
         < MenuItem onClick = {
           this.handleFlushAndReset.bind(this)
         } >
-   	      < Icon style={{margin:"0 5px 0 -7px"}} type = "reload" / > 刷新节点
+   	      < Icon style={{margin:"0 5px 0 -7px",color:"#1590ff"}} type = "reload" / > 刷新节点
         </MenuItem>
         <MenuItem divider />
         < MenuItem >
@@ -280,7 +280,6 @@ class CMDBLdapGroups extends PureComponent {
             <Layout style={{height:"100%",padding:5,boxShadow:"0px 0px 3px #dcd8d8"}} >
               <Search style={{ marginBottom: 8 }} placeholder="Search(Key Press)" onSearch={this.handleOnChange.bind(this)}  />
               <Content className={usercss.ldap_content_box} >
-                {/* {isNewDn?<div className={usercss.tree_not_control_div}>新建DN中，无法选择操作。</div>:""} */}
                 <Spin tip={isNewDn?"新建DN中,无法选择操作.":"Loading..." }
                   wrapperClassName={usercss.tree_not_control_div}
                   indicator={isNewDn?<Icon type="message" theme="twoTone" />:null} 
