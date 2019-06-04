@@ -284,7 +284,7 @@ class CMDBLdapGroups extends PureComponent {
                   wrapperClassName={usercss.tree_not_control_div}
                   indicator={isNewDn?<Icon type="message" theme="twoTone" />:null} 
                   size='large'
-                  spinning={loading.effects['ldap/getLDAPGroupsList']||isNewDn}>
+                  spinning={Boolean(loading.effects['ldap/getLDAPGroupsList']||isNewDn)}>
                   <ContextMenuTrigger id='ldap_control_menu'  disabled={this.state.isNewDn} >
                     <DirectoryTree loadData={this.onLoadData} 
                       expandedKeys={expandedKeys}

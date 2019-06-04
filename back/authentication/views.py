@@ -221,7 +221,7 @@ class getLDAPOUListViewSet(APIView):
       queryOU=kwargs.get('baseou')
     else:
       queryOU=settings.AUTH_LDAP_BASE_DN
-    ous,errorMsg=cmdbldap['getOUDN'].get_base_ou(queryOU)
+    ous,errorMsg=CmdbLDAP().get_base_ou(queryOU)
     logger.info(errorMsg)
     if len(ous)>0:
       return JsonResponse(ous,encoder=LDAPJSONEncoder,safe=False)

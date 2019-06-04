@@ -118,7 +118,10 @@ body {
     width: 5px;
     height: 100%;
     bottom: 0;
-    right: 0;
+    right: -3px;
+    -moz-user-select: none; 
+    -khtml-user-select: none; 
+    user-select: none;
     /* background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zd…BMIDQuMiAwIEwgNiAwIEwgNiA2IEwgNiA2IFoiIGZpbGw9IiMwMDAwMDAiLz48L2c+PC9zdmc+); */
     /* background-position: right; */
     padding: 0 3px 3px 0;

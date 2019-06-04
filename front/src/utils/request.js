@@ -68,8 +68,8 @@ axios.interceptors.response.use((response) => {
 
 export default function request (opt) {
   let timer= setInterval(()=>{
-      NProgress.inc(.05)
-    }, 400);
+      NProgress.inc(.01)
+    }, 150);
   // 调用 axios api，统一拦截
   return axios(opt)
     .then((response) => {
