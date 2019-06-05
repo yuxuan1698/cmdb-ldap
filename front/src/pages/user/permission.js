@@ -104,7 +104,9 @@ class CMDBLdapPermission extends PureComponent {
               <Layout style={{ height: "100%", padding: 5, boxShadow: "0px 0px 3px #dcd8d8" }} >
                 <Search style={{ marginBottom: 8 }} placeholder="Search(Key Press)" onChange={this.handleOnChange.bind(this)} />
                 <Content className={usercss.ldap_content_box} >
-                  <Spin tip="Loading..." spinning={Boolean(loading.effects['users/getUserList'])||Boolean(loading.effects['users/getLDAPUserPermissions'])}>
+                  <Spin tip="Loading..." 
+                    style={{minHeight:300}}
+                    spinning={Boolean(loading.effects['users/getUserList'])||Boolean(loading.effects['users/getLDAPUserPermissions'])}>
                     <DirectoryTree 
                       draggable
                       onExpand={this.onExpand.bind(this)}

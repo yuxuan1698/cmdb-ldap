@@ -1,6 +1,6 @@
 'use strict'
-import {PureComponent} from 'react'
-import { Spin,Icon, Tree, Table, Button,Layout } from 'antd';
+import {PureComponent,ReactDOM} from 'react'
+import { Spin,Icon, Tree, Table, Button,Layout,Popover } from 'antd';
 
 import { Resizable } from 'react-resizable';
 import css from './index.less'
@@ -9,7 +9,7 @@ const {TreeNode,DirectoryTree}=Tree
 const {Footer,Content}=Layout
 class LDAPSelectPermission extends PureComponent {
   state = {
-    width:600,
+    width:400,
     targetKeys: [],
     targetValues:[],
     selectedKeys:[],
@@ -18,6 +18,7 @@ class LDAPSelectPermission extends PureComponent {
     loadedKeys:[],
     grouplist:[],
     grouplistobject:{},
+    currPermissionKeys:{},
     searchValue:""
   }
   componentWillMount(){
@@ -30,18 +31,17 @@ class LDAPSelectPermission extends PureComponent {
     let {dispatch}=this.props
     dispatch({type:'ldap/getPermissionGroupsList',callback:(data)=>{
       let grouplist=[]
-      let grouplistobject={}
       Object.values(data).map(it=>{
-        grouplistobject[it[1]]=it[0]
         grouplist.push({
           'title':it[1].split(',')[0].split('=')[1],
           'key':it[1],
+          'description':  it[0].hasOwnProperty('description')?`(${it[0]['description'][0]})`:"",
           'isLeaf': it[0].hasOwnProperty('hasSubordinates') ?
             (it[0]['hasSubordinates'][0] === "TRUE" ? false : true) :
             false
         })
       })
-      this.setState({grouplist:grouplist,grouplistobject})
+      this.setState({grouplist:grouplist})
     }})
   }
   getUserPermission=(selectKey)=>{
@@ -62,7 +62,12 @@ class LDAPSelectPermission extends PureComponent {
               description:it[1].hasOwnProperty('description')?it[1]['description']:""
             }
           })
-          this.setState({targetKeys,targetValues,expandedKeys:Array.from(parentExtentedKeys)})
+          this.setState({
+            targetKeys,
+            currPermissionKeys:{},
+            selectedRowKeys:[],
+            targetValues,
+            expandedKeys:Array.from(parentExtentedKeys)})
         }
       }})
     }
@@ -85,22 +90,44 @@ class LDAPSelectPermission extends PureComponent {
     })
   }
   renderTreeNodes = (data) => data.map((item) => {
-      let {targetValues,expandedKeys}=this.state
+      let {targetValues,expandedKeys,currPermissionKeys}=this.state
+      let {selectKey}=this.props
+      let havePermission=Boolean(
+        targetValues.includes(item.key)||
+        (currPermissionKeys.hasOwnProperty(item.key) &&
+        currPermissionKeys[item.key].type==='add'
+        ))
       return (
         <TreeNode
           key={item.key}
           isLeaf = {item.isLeaf}
-          disabled={targetValues.includes(item.key)?true:false}
+          disabled={havePermission?true:false}
           icon={item.isLeaf?<Icon  type='team' />:""}  
           groupdn={item.key}
           dataRef={item}
-          title={expandedKeys.includes(item.key)?<strong>{item.title}</strong>:<span>{item.title}</span>}>
+          title={expandedKeys.includes(item.key)||targetValues.includes(item.key)?
+          <strong>{item.title}{item.description}</strong>:
+          (item.isLeaf && selectKey && !havePermission ?
+            <Popover 
+              placement="right" 
+              title={item.pop} 
+              content={
+                <div style={{textAlign:"center"}}>
+                  <Button block type='primary' size="small" onClick={this.handleAddPermission.bind(this,item.key)} >添加用户到此组</Button>
+                </div>
+                } 
+              trigger="hover">
+            <span >{item.title}{item.description}</span>
+          </Popover>:
+          <span >{item.title}{item.description}</span>)
+          }>
           {item.hasOwnProperty('children')?this.renderTreeNodes(item.children):""}
         </TreeNode>
       );
   })
   onLoadData = treeNode => {
     const {dispatch} =this.props
+    const {loadedKeys,grouplistobject}=this.state
     return new Promise((resolve)=>{
       if (treeNode.props.children) {
         resolve();
@@ -116,6 +143,7 @@ class LDAPSelectPermission extends PureComponent {
           list.push({
             'title':tt.split(',')[0].split('=')[1],
             'key':`${tt}`,
+            'pop':i[0].hasOwnProperty('description')?i[0].description:'',
             'isLeaf': i[0].hasOwnProperty('hasSubordinates') ?
               (i[0]['hasSubordinates'][0] === "TRUE" ? false : true) :
               false
@@ -124,7 +152,8 @@ class LDAPSelectPermission extends PureComponent {
         treeNode.props.dataRef.children = list
         setTimeout(() => {
           this.setState({
-            loadedKeys: this.state.loadedKeys.concat(curkey)
+            loadedKeys: loadedKeys.concat(curkey),
+            grouplistobject:Object.assign(grouplistobject,loadedobject)
           });
           resolve();
         }, 100);
@@ -141,13 +170,42 @@ class LDAPSelectPermission extends PureComponent {
     this.setState({ width: size.width });
   }
   handleRemovePermissionItem=()=>{
-    let {selectedRowKeys}=this.state
-    alert(selectedRowKeys)
+    let {selectedRowKeys,targetKeys,targetValues,currPermissionKeys}=this.state
+    selectedRowKeys.map(i=>currPermissionKeys.hasOwnProperty(i)?currPermissionKeys[i].type='del':false)
+    this.setState({
+      selectedRowKeys:[],
+      targetKeys:targetKeys.filter(i=>!selectedRowKeys.includes(i.key)),
+      targetValues:targetValues.filter(i=>!selectedRowKeys.includes(i)),
+      currPermissionKeys
+    })
+  }
+
+  handleAddPermission=(currGroupDn)=>{
+    if(currGroupDn){
+      let {grouplistobject,currPermissionKeys,targetKeys,selectedRowKeys}=this.state
+      let {selectKey}=this.props
+      let tmpKeys=targetKeys.filter(i=>i.key!==currGroupDn)
+      tmpKeys.push({
+        key:currGroupDn,
+        parentname:currGroupDn.split(',')[1].split('=')[1],
+        groupname:currGroupDn.split(',')[0].split('=')[1],
+        description:grouplistobject[currGroupDn].hasOwnProperty('description')?grouplistobject[currGroupDn]['description']:""
+      })
+      this.setState({
+        currPermissionKeys:Object.assign(currPermissionKeys,{[currGroupDn]:{type:'add',userdn:selectKey}}),
+        selectedRowKeys:Array.from(new Set([...selectedRowKeys,currGroupDn])),
+        targetKeys:tmpKeys
+      })
+    }
+  }
+  initFormatPermissionList=()=>{
+
   }
   render(){
-    const { grouplist,selectedKeys,expandedKeys,searchValue,targetKeys,selectedRowKeys,width } = this.state;
+    const { grouplist,selectedKeys,expandedKeys,searchValue,targetKeys,selectedRowKeys,width,currPermissionKeys } = this.state;
     const {loading,selectKey}=this.props
     let currUser=selectKey.split(',')[0].split('=')[1]
+    let tableData=targetKeys
     return (
       <Layout style={{height:"100%",display:"flex",flexDirection:"column"}}>
         <Layout style={{height:"100%",display:"flex",padding:5,flexDirection:"row"}}>
@@ -158,17 +216,14 @@ class LDAPSelectPermission extends PureComponent {
                 <DirectoryTree loadData={this.onLoadData} 
                   expandedKeys={expandedKeys}
                   className={css.permission_tree_box}
-                  // autoExpandParent={autoExpandParent}
                   selectedKeys={selectedKeys}
-                  // loadedKeys={loadedKeys}
                   onExpand={this.onExpand.bind(this)}
-                  // onRightClick={this.handleRightButtonEvent.bind(this)}
                   onSelect={this.handleOnSelect.bind(this)}>
                     {this.renderTreeNodes(grouplist,searchValue)}
                 </DirectoryTree>
               </Spin>
             </Sider>
-            <Resizable axis="x"  minConstraints={[350,350]}
+            <Resizable axis="x"  minConstraints={[300,300]}
               maxConstraints={[620, 620]}
               height={100}
               width={width}
@@ -189,7 +244,7 @@ class LDAPSelectPermission extends PureComponent {
             className={css.permission_current_status}
             bordered
             rowKey='key'
-            bodyStyle={{margin:0}}
+            bodyStyle={{margin:0,}}
             pagination={{
               size:"small",
               showSizeChanger:true,
@@ -221,23 +276,16 @@ class LDAPSelectPermission extends PureComponent {
                 key:'description'
               },
             ]}
-            dataSource={targetKeys}
+            dataSource={tableData}
             size="small"
-            onRow={record => ({
-              onDoubleClick:()=>{
-                
-                if(selectedRowKeys.includes(record.key)){
-                  this.setState({selectedRowKeys:selectedRowKeys.filter(i=>i!=record.key)})
-                }else{
-                  this.setState({selectedRowKeys:selectedRowKeys.push(record.key)})
-                }
-              }
-            })}
           />
           </Layout>
         <Footer className={css.permission_box_footbar}>
           <Button title="返回" icon='retweet' style={{margin:"0 10px"}} type="dashed"  >返回</Button>
-          <Button title="保存权限" icon='usergroup-add' disabled={true} loading={loading.effects['users/getLDAPUserPermissions']}>保存权限</Button>
+          <Button title="保存权限" 
+            icon='usergroup-add' 
+            disabled={Object.keys(currPermissionKeys).length>0?false:true} 
+            loading={loading.effects['users/getLDAPUserPermissions']}>保存权限</Button>
         </Footer>
       </Layout>
     )
