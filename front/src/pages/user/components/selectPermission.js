@@ -1,6 +1,6 @@
 'use strict'
 import {PureComponent,ReactDOM} from 'react'
-import { Spin,Icon, Tree, Table, Button,Layout,Popover } from 'antd';
+import { Spin,Icon, Tree, Table, Button,Layout,Popover, Modal } from 'antd';
 
 import { Resizable } from 'react-resizable';
 import css from './index.less'
@@ -17,6 +17,7 @@ class LDAPSelectPermission extends PureComponent {
     expandedKeys:[],
     loadedKeys:[],
     grouplist:[],
+    oldgrouplist:[],
     grouplistobject:{},
     currPermissionKeys:{},
     searchValue:""
@@ -51,9 +52,11 @@ class LDAPSelectPermission extends PureComponent {
         if(data && data instanceof Object){
           let listdata=Object.values(data)
           let targetValues=[]
+          let oldgrouplist=[]
           let parentExtentedKeys=new Set()
           let targetKeys=listdata.map(it=>{
             targetValues.push(it[0])
+            oldgrouplist.push(it[0])
             parentExtentedKeys.add(it[0].replace(it[0].split(',')[0]+",",''))
             return {
               key:it[0],
@@ -67,7 +70,8 @@ class LDAPSelectPermission extends PureComponent {
             currPermissionKeys:{},
             selectedRowKeys:[],
             targetValues,
-            expandedKeys:Array.from(parentExtentedKeys)})
+            expandedKeys:Array.from(parentExtentedKeys),
+            oldgrouplist})
         }
       }})
     }
@@ -90,18 +94,16 @@ class LDAPSelectPermission extends PureComponent {
     })
   }
   renderTreeNodes = (data) => data.map((item) => {
-      let {targetValues,expandedKeys,currPermissionKeys}=this.state
+      let {targetValues,expandedKeys,currPermissionKeys,oldgrouplist}=this.state
       let {selectKey}=this.props
       let havePermission=Boolean(
-        targetValues.includes(item.key)||
-        (currPermissionKeys.hasOwnProperty(item.key) &&
-        currPermissionKeys[item.key].type==='add'
-        ))
+        targetValues.includes(item.key)
+        )
       return (
         <TreeNode
           key={item.key}
           isLeaf = {item.isLeaf}
-          disabled={havePermission?true:false}
+          disabled={havePermission}
           icon={item.isLeaf?<Icon  type='team' />:""}  
           groupdn={item.key}
           dataRef={item}
@@ -170,8 +172,25 @@ class LDAPSelectPermission extends PureComponent {
     this.setState({ width: size.width });
   }
   handleRemovePermissionItem=()=>{
-    let {selectedRowKeys,targetKeys,targetValues,currPermissionKeys}=this.state
-    selectedRowKeys.map(i=>currPermissionKeys.hasOwnProperty(i)?currPermissionKeys[i].type='del':false)
+    let {selectedRowKeys,targetKeys,targetValues,currPermissionKeys,grouplistobject,oldgrouplist}=this.state
+    let {selectKey}=this.props
+    selectedRowKeys.map(i=>{
+      if(!oldgrouplist.includes(i)){
+        if(currPermissionKeys.hasOwnProperty(i)) delete currPermissionKeys[i]
+      }else{
+        let values={}
+        if(grouplistobject[i].hasOwnProperty('uniqueMember')){
+          values={uniqueMember:grouplistobject[i]['uniqueMember'].filter(s=>s!==selectKey)}
+        } else if(grouplistobject[i].hasOwnProperty('member')){
+          values={member:grouplistobject[i]['member'].filter(s=>s!==selectKey)}
+        } else if(grouplistobject[i].hasOwnProperty('memberUid')){
+          values={memberUid:grouplistobject[i]['memberUid'].filter(s=>s!==selectKey.split(',')[0].split('=')[1])}
+        } else{
+          return false 
+        }
+        currPermissionKeys[i]=values
+      }
+    })
     this.setState({
       selectedRowKeys:[],
       targetKeys:targetKeys.filter(i=>!selectedRowKeys.includes(i.key)),
@@ -182,9 +201,28 @@ class LDAPSelectPermission extends PureComponent {
 
   handleAddPermission=(currGroupDn)=>{
     if(currGroupDn){
-      let {grouplistobject,currPermissionKeys,targetKeys,selectedRowKeys}=this.state
+      let {targetValues,grouplistobject,currPermissionKeys,targetKeys,selectedRowKeys,oldgrouplist}=this.state
       let {selectKey}=this.props
       let tmpKeys=targetKeys.filter(i=>i.key!==currGroupDn)
+      let newcurrPermissionKeys=currPermissionKeys
+      if(oldgrouplist.includes(currGroupDn)){
+        if(newcurrPermissionKeys.hasOwnProperty(currGroupDn)) delete newcurrPermissionKeys[currGroupDn]
+      }else{
+        let values={}
+        if(grouplistobject[currGroupDn].hasOwnProperty('uniqueMember')){
+          values={uniqueMember:Array.from(new Set([...grouplistobject[currGroupDn]['uniqueMember'],selectKey]))}
+        } else if(grouplistobject[currGroupDn].hasOwnProperty('member')){
+          values={member:Array.from(new Set([...grouplistobject[currGroupDn]['member'],selectKey]))}
+        } else if(grouplistobject[currGroupDn].hasOwnProperty('memberUid')){
+          values={memberUid:Array.from(new Set([
+            ...grouplistobject[currGroupDn]['memberUid'],
+            selectKey.split(',')[0].split('=')[1]
+          ]))}
+        } else{
+          return false 
+        }
+        newcurrPermissionKeys[currGroupDn]=values
+      }
       tmpKeys.push({
         key:currGroupDn,
         parentname:currGroupDn.split(',')[1].split('=')[1],
@@ -192,20 +230,32 @@ class LDAPSelectPermission extends PureComponent {
         description:grouplistobject[currGroupDn].hasOwnProperty('description')?grouplistobject[currGroupDn]['description']:""
       })
       this.setState({
-        currPermissionKeys:Object.assign(currPermissionKeys,{[currGroupDn]:{type:'add',userdn:selectKey}}),
+        currPermissionKeys:newcurrPermissionKeys,
         selectedRowKeys:Array.from(new Set([...selectedRowKeys,currGroupDn])),
+        targetValues:Array.from(new Set([...targetValues,currGroupDn])),
         targetKeys:tmpKeys
       })
     }
   }
-  initFormatPermissionList=()=>{
-
+  handleSavePermissionChange=()=>{
+    let {dispatch}=this.props
+    let {currPermissionKeys}=this.state
+    dispatch({type:'ldap/postLDAPGroupPermission',payload:currPermissionKeys,callback:(d)=>{
+      console.log(d)
+    }})
+    // if(filterValues.length===0){
+    //   return Modal.error({
+    //       title: '移除权限提示',
+    //       content: `权限组里必须要保证最少有条记录，删除些条件后，权限组为空。`
+    //     })
+    // } 
   }
   render(){
-    const { grouplist,selectedKeys,expandedKeys,searchValue,targetKeys,selectedRowKeys,width,currPermissionKeys } = this.state;
+    const { grouplist,selectedKeys,expandedKeys,searchValue,targetKeys,selectedRowKeys,width,currPermissionKeys,oldgrouplist } = this.state;
     const {loading,selectKey}=this.props
     let currUser=selectKey.split(',')[0].split('=')[1]
     let tableData=targetKeys
+    console.log(currPermissionKeys)
     return (
       <Layout style={{height:"100%",display:"flex",flexDirection:"column"}}>
         <Layout style={{height:"100%",display:"flex",padding:5,flexDirection:"row"}}>
@@ -285,6 +335,7 @@ class LDAPSelectPermission extends PureComponent {
           <Button title="保存权限" 
             icon='usergroup-add' 
             disabled={Object.keys(currPermissionKeys).length>0?false:true} 
+            onClick={this.handleSavePermissionChange.bind(this)}
             loading={loading.effects['users/getLDAPUserPermissions']}>保存权限</Button>
         </Footer>
       </Layout>

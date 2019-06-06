@@ -33,10 +33,12 @@ const filedToName={
   description:'描述内容',
   ou:'所属部门',
   o:'组织单位',
+  member:'成员',
+  memberUid:'Unix组成员'
 }
 
 @Form.create()
-@connect(({users,loading})=>({userdnlist:users.userdnlist,loading}))
+@connect(({users,loading})=>({userdnlist:Object.values(users.userlist),loading}))
 class CMDBLDAPManager extends PureComponent {
   constructor(props){
     super(props)
@@ -262,7 +264,7 @@ class CMDBLDAPManager extends PureComponent {
                               placeholder={(filedToName[i] ? filedToName[i] : i) + `(${i})`} 
                               autosize={{ minRows: 2, maxRows: 5 }} />
                           }
-                          if(['member','manager','uniqueMember','seeAlso'].includes(i)){
+                          if(['member','manager','uniqueMember','seeAlso','memberUid'].includes(i)){
                             let curval=getFieldValue(i)
                             inputField=<Select
                                       mode="multiple" showArrow autoFocus allowClear
@@ -270,11 +272,13 @@ class CMDBLDAPManager extends PureComponent {
                                       notFoundContent={<div style={{textAlign:"center"}}><Icon type='loading' style={{ fontSize: 60 }} /></div>}
                                       onDropdownVisibleChange={this.handelOnSyncLoadUserDn.bind(this)}
                                       placeholder={`请选择属性领导/上级(${i})`} >
-                                      {userdnlist.filter(s=>!(curval && curval.includes(s))).map(item => (
-                                        <Option key={item} value={item}>
-                                          {item}
-                                        </Option>
-                                      ))}
+                                      {userdnlist.filter(s=>!(curval && curval.includes(s[0]))).map(item => {
+                                        let value=(i==='memberUid'?item[0].split(',')[0].split('=')[1]:item[0])
+                                        return (<Option key={value} value={value}>
+                                                  {value} ({item[1].hasOwnProperty('sn')?item[1]['sn']:''})
+                                                </Option>)
+                                        }
+                                      )}
                                     </Select>
                           }
                           return (

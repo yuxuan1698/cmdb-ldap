@@ -180,6 +180,19 @@ class UserPermissionListByViewSet(APIView):
     userattrs=CmdbLDAP().get_user_permissions(userdn)
     return JsonResponse(userattrs[0],encoder=LDAPJSONEncoder,safe=False)
 
+class SavePermissionListByViewSet(APIView):
+  """
+  获取用户权限列表
+  """
+  def post(self,request,*args,**kwargs):
+    """
+    根据用户获取用户信息
+    """
+    logger.info(request.data)
+    # userdn=kwargs.get('userdn')
+    # userattrs=CmdbLDAP().get_user_permissions(userdn)
+    return JsonResponse('a',encoder=LDAPJSONEncoder,safe=False)
+
 class GetLdapAllCLassListViewSet(APIView):
   """
   获取所有LDAP的CLASSES名称及字段信息

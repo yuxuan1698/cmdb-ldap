@@ -19,6 +19,7 @@ from .views import (
     DeleteDNViewSet,
     DeleteUserViewSet,
     UserPermissionListByViewSet,
+    SavePermissionListByViewSet,
     getLDAPPermissionGroupsListViewSet,
     LockUnLockUserViewSet
 )
@@ -41,6 +42,7 @@ urlpatterns = [
     path('ldap/user/list/', UserListViewSet.as_view(),name='ldap-userlist'),
     url(r'ldap/user/attr/(?P<username>[^/]+)/', UserAttributeByViewSet.as_view(),name='ldap-userattr'),
     url(r'ldap/permission/(?P<userdn>[^/]+)/', UserPermissionListByViewSet.as_view(),name='ldap-permission'),
+    url(r'ldap/save/permissions/', SavePermissionListByViewSet.as_view(),name='ldap-savepermission'),
     url(r'ldap/dn/update/', UpdateDNViewSet.as_view(),name='ldap-dnupdate'),
     url(r'ldap/dn/create/', CreateDNViewSet.as_view(),name='ldap-dncreate'),
     url(r'ldap/dn/delete/', DeleteDNViewSet.as_view(), name='ldap-dndelete'),

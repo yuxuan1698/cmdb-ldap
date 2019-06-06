@@ -106,3 +106,11 @@ export function getPermissionGroupsListApi () {
         url: `/v1/ldap/allgroups/`
     })
 }
+// 获取权限组列表
+export function PostLDAPGroupPermissions (data) {
+    return request({
+        method: "post",
+        url: '/v1/ldap/save/permissions/',
+        data: data,
+    })
+}

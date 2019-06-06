@@ -3,7 +3,8 @@ import {
   PostLDAPUpdateDN,
   PostLDAPDeleteDN,
   PostLDAPCreateDN,
-  getPermissionGroupsListApi
+  getPermissionGroupsListApi,
+  PostLDAPGroupPermissions
 } from '../../../services/api';
 
 export default {
@@ -60,6 +61,13 @@ export default {
       },
       *getPermissionGroupsList({ callback }, { call }) {
         const data = yield call(getPermissionGroupsListApi)
+        if (data) {
+          callback(data)
+        }
+      },
+      // 保存组权限
+      *postLDAPGroupPermission({ payload,callback }, { call }) {
+        const data = yield call(PostLDAPGroupPermissions, payload)
         if (data) {
           callback(data)
         }

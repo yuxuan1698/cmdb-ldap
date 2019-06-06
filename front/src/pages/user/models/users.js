@@ -14,7 +14,6 @@ export default {
     names: 'users',
     state:{
       userlist:{},
-      userdnlist:[]
     },
     subscriptions: {
       setup({ dispatch, history }) {
@@ -43,7 +42,6 @@ export default {
             type:'userlist', 
             payload: {
               userlist: data,
-              userdnlist: Object.keys(data).map(i=>data[i][0]),
             }
           })
         }
