@@ -188,10 +188,9 @@ class SavePermissionListByViewSet(APIView):
     """
     根据用户获取用户信息
     """
-    logger.info(request.data)
-    # userdn=kwargs.get('userdn')
-    # userattrs=CmdbLDAP().get_user_permissions(userdn)
-    return JsonResponse('a',encoder=LDAPJSONEncoder,safe=False)
+    permissionData=request.data
+    success,errmsg = CmdbLDAP().save_permissions_group(permissionData)
+    return JsonResponse(success, encoder=LDAPJSONEncoder, safe=False)
 
 class GetLdapAllCLassListViewSet(APIView):
   """

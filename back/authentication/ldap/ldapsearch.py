@@ -397,3 +397,18 @@ class CmdbLDAP(object):
       return result_set,None
     else:
       return None,self.errorMsg
+  def save_permissions_group(self,permissData={}):
+    """ 保存用户的组权限 """
+    if self.connect() and permissData:
+      for i,v in permissData.items():
+        data=convert_string_to_bytes(v)
+        modlist=[]
+        for it, vl in data.items():
+          modlist.append((ldap.MOD_REPLACE,it,vl))
+        try:
+          self.conn.modify_s(i, modlist)
+          return "保存用户权限成功", None
+        except Exception as e:
+          return None,"保存权限失败！"
+    else:
+      return None,self.errorMsg

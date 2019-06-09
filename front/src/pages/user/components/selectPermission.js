@@ -1,15 +1,25 @@
 'use strict'
-import {PureComponent,ReactDOM} from 'react'
-import { Spin,Icon, Tree, Table, Button,Layout,Popover, Modal } from 'antd';
+import {PureComponent } from 'react'
+import {
+  Spin,
+  Icon,
+  Tree,
+  Table,
+  Button,
+  Layout,
+  Popover,
+  Modal,
+  notification
+} from 'antd';
 
 import { Resizable } from 'react-resizable';
 import css from './index.less'
 import Sider from 'antd/lib/layout/Sider';
 const {TreeNode,DirectoryTree}=Tree
-const {Footer,Content}=Layout
+const {Footer}=Layout
 class LDAPSelectPermission extends PureComponent {
   state = {
-    width:400,
+    width:350,
     targetKeys: [],
     targetValues:[],
     selectedKeys:[],
@@ -241,7 +251,10 @@ class LDAPSelectPermission extends PureComponent {
     let {dispatch}=this.props
     let {currPermissionKeys}=this.state
     dispatch({type:'ldap/postLDAPGroupPermission',payload:currPermissionKeys,callback:(d)=>{
-      console.log(d)
+      notification.error({
+        message: "保存成功",
+        description: d
+      })
     }})
     // if(filterValues.length===0){
     //   return Modal.error({
