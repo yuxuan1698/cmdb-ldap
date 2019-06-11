@@ -5,7 +5,7 @@ export default {
     state: {
       smallSideBar:false,
       isAdmin:false,
-      languages:'zh-CN',
+      languages: navigator.language,
       classobjects:""
     },
     subscriptions: {
@@ -27,11 +27,22 @@ export default {
           })
         }
       },
+      // *changeLanguage({ }, { call,put }) {
+      //   const data = yield call(getLDAPObjectClassList)
+      //   if (data) {
+      //     yield put({
+      //       type:'classobjects', 
+      //       payload: {
+      //         classobjects: data,
+      //       }
+      //     })
+      //   }
+      // },
     },
     reducers: {
-    // LDAP classObjects
-    classobjects(state, {payload} ) {
-      return {...state,...payload}
+      // LDAP classObjects
+      classobjects(state, {payload} ) {
+        return {...state,...payload}
       },
-    },
+    }
   }

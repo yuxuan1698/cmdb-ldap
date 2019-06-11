@@ -1,4 +1,4 @@
-
+import {resolve} from "path";
 // ref: https://umijs.org/config/
 export default {
   treeShaking: true,
@@ -20,6 +20,7 @@ export default {
       dll: true,
       locale: {
         enable: true,
+        baseNavigator:true,
         default: 'zh-CN',
         antd: true
       },
@@ -34,7 +35,12 @@ export default {
       },
     }],
   ],
-  "theme": {
+  alias:{
+    utils: resolve(__dirname,'./src/utils/utils'),
+    cmdbstore: resolve(__dirname,'./src/utils/store'),
+    requestapi: resolve(__dirname,'./src/utils/request') ,
+  },
+  theme: {
     "primary-color": "#1DA57A",
     'border-radius-base': '3px',
     'link-color': '#1DA57A',
@@ -47,7 +53,7 @@ export default {
     'switch-sm-height':'18px',
     'tabs-bar-margin':'0px -px 8px 0px'
   },
-  "proxy": {
+  proxy: {
     "/api": {
       "target": "http://127.0.0.1:8000/api",
       "changeOrigin": true,

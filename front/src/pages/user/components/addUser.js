@@ -1,6 +1,6 @@
 'use strict'
 
-import {Fragment, PureComponent } from 'react';
+import { PureComponent } from 'react';
 import css from './index.less'
 import {
     Drawer, Form, Button, Radio, Row, Input, Select,

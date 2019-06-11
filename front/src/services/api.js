@@ -1,11 +1,11 @@
-import request from '../utils/request'
-import {singleListToString} from '../utils/utils'
+import request from 'requestapi'
+import {singleListToString} from 'utils'
 // 修改用户密码API
 export function UserChangePassword (data) {
     return request({
         method: "post",
         url: '/v1/ldap/user/changepassword/',
-        data: data,
+        ...data
     })
 }
 // 更新LDAP DN 接口

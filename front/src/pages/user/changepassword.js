@@ -2,12 +2,12 @@
 
 import {PureComponent} from 'react'
 import {
-  Form, Input, Button,Icon,notification
+  Form, Input, Button,Icon,notification,message
   } from 'antd';
 import { connect } from 'dva';
 // 国际化
 import { formatMessage } from 'umi/locale'; 
-
+import {isNotAuthChangerPassword} from 'utils'
 // 
 @connect(({ login, loading }) => ({ login, loading }))
 @Form.create()
@@ -34,15 +34,20 @@ class CMDBChangePassword extends PureComponent {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        let { dispatch } = this.props
+        let { dispatch,location } = this.props
+        let payload={data:values}
+        if(isNotAuthChangerPassword(location)){
+          let { query } = location
+          payload['headers']={'Authorization':`${query.tokenPrefix} ${query.token}`}
+        }
         dispatch({ 
           type: 'users/changePasswordAction',
-          payload: values,
+          payload: payload,
           callback:(data)=>{
             this.handleReset()
             notification.success({
-              message:"密码修改提示",
-              description: `${data.status} 需要重新登陆！`
+              message: formatMessage({id:'user.changepassword.success.title'}),
+              description: formatMessage({id:'user.changepassword.success.msg'},{status:data.status})
             })
           setTimeout(this.handleRelogin.bind(this),1000)
           }
@@ -51,9 +56,13 @@ class CMDBChangePassword extends PureComponent {
     });
   }
   render(){
-    const currUser=this.props.login.userinfo
-    const { loading }=this.props
-    const { getFieldDecorator } = this.props.form;
+    const { loading,location,login,form }=this.props
+    const currUser=Object.keys(login.userinfo).length>0?login.userinfo:location.query
+    console.log()
+    if(Object.keys(login.userinfo).length>0 && Object.keys(location.query).length>0){
+      message.warn('你有登陆CMDB管理平台，只能修改登陆的用户名的密码。')
+    }
+    const { getFieldDecorator } = form;
     const formItemLayout = {
         labelCol: {
           xs: { span: 7 },

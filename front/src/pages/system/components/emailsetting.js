@@ -1,7 +1,7 @@
 'use strict'
 
 import {PureComponent} from 'react'
-import { Form,Switch,Input,Button,Select,Checkbox } from 'antd';
+import { Form,Switch,Input,Select,Checkbox } from 'antd';
 const InputGroup = Input.Group;
 const { Option } = Select;
 
@@ -34,19 +34,19 @@ class CMDBEmailSettingContent extends PureComponent {
       },
     };
  
-    const tailFormItemLayout = {
-      labelCol: {
-        xs: { span: 8 },
-        sm: { span: 8 },
-        md: { span: 7 },
-        lg: { span: 6 },
-      },
-      wrapperCol: {
-        xs: {
-          span: 10,
-        }
-      },
-    };
+    // const tailFormItemLayout = {
+    //   labelCol: {
+    //     xs: { span: 8 },
+    //     sm: { span: 8 },
+    //     md: { span: 7 },
+    //     lg: { span: 6 },
+    //   },
+    //   wrapperCol: {
+    //     xs: {
+    //       span: 10,
+    //     }
+    //   },
+    // };
     const { getFieldDecorator } = this.props.form;
     return (
       <Form {...formItemLayout} onSubmit={this.handleSubmit}>

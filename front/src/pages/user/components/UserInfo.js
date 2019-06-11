@@ -2,9 +2,10 @@
 
 import {PureComponent} from 'react';
 import {
-  Modal,Row,Col,Divider,Tag, Spin
+  Modal,Row,Col,Divider,Tag, Spin,Icon
 } from 'antd';
-import moment from 'moment'
+
+import {formatTimeAndZone} from 'utils'
 import css from './index.less'
 
 const color=["blue","cyan","geekblue","magenta","red","volcano","green","orange","gold","lime","purple"];
@@ -15,16 +16,7 @@ const DescriptionItem = ({ title, content,keyval }) => {
         if(index>color.length) index=0
         index+=1
         if(keyval==='memberOf') return <Tag key={i} color={color[index-1]}>{i}</Tag>
-        let datavalue=""
-        if(i.match(/^\d{8}\d{6}Z$|^\d{8}\d{6}.\d+Z$/g)===null){
-          datavalue=i
-        }else{
-          const timezone=moment().utcOffset()
-          datavalue=moment(i
-            .replace(/^(\d{8})(\d{6})Z$/g,"$1T$2")
-            .replace(/^(\d{8})(\d{6})\.\d+Z$/g,"$1T$2")
-          ).add(timezone,"minutes").format("YYYY/MM/DD HH:mm:ss")
-        }
+        let datavalue=formatTimeAndZone(i)
         return content.length>1?<Tag key={i} color={color[index-1]}>{datavalue}</Tag>:
         <Tag key={i} style={{ background: '#fff', borderStyle: 'dashed' }} >{datavalue}</Tag>
         }):<Tag style={{ background: '#fff', borderStyle: 'dashed' }} >{content}</Tag>}</div>)
@@ -128,7 +120,7 @@ class UserInfo extends PureComponent {
     const loading=this.props.loading.effects['users/getUserAttribute']
     return (
       <Modal  
-        title={<span>用户属性</span>}
+        title={<span><Icon type='user'/>用户属性</span>}
         destroyOnClose
         centered
         visible={this.props.visible} 

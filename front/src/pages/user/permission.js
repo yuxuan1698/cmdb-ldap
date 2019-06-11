@@ -89,6 +89,9 @@ class CMDBLdapPermission extends PureComponent {
       autoExpandParent: false,
     });
   }
+  handleReturnOrReset=()=>{
+    this.setState({selectKey:''})
+  }
   render() {
     const { searchValue, width, selectKey } = this.state
     const { loading,userlist,dispatch } = this.props
@@ -106,7 +109,7 @@ class CMDBLdapPermission extends PureComponent {
                 <Content className={usercss.ldap_content_box} >
                   <Spin tip="Loading..." 
                     style={{minHeight:300}}
-                    spinning={Boolean(loading.effects['users/getUserList'])||Boolean(loading.effects['users/getLDAPUserPermissions'])}>
+                    spinning={Boolean(loading.effects['users/getUserList'])}>
                     <DirectoryTree 
                       draggable
                       onExpand={this.onExpand.bind(this)}
@@ -120,10 +123,14 @@ class CMDBLdapPermission extends PureComponent {
             </Sider> 
           </Resizable>
           <Content className={usercss.right_content_class}>
-            <CMDBSeletPermission
+            {selectKey?<CMDBSeletPermission
               loading={loading}
               dispatch={dispatch}
-              selectKey={selectKey} /> 
+              handleReturnOrReset={this.handleReturnOrReset.bind(this)}
+              selectKey={selectKey} />:
+              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} 
+                description="请先选择需要用户......" 
+                className={usercss.right_empty_center} /> }
           </Content>
         </Layout>
       </Layout>

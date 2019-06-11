@@ -177,8 +177,12 @@ class UserPermissionListByViewSet(APIView):
     根据用户获取用户信息
     """
     userdn=kwargs.get('userdn')
-    userattrs=CmdbLDAP().get_user_permissions(userdn)
-    return JsonResponse(userattrs[0],encoder=LDAPJSONEncoder,safe=False)
+    userattrs,errMsg=CmdbLDAP().get_user_permissions(userdn)
+    # return JsonResponse(userattrs[0],encoder=LDAPJSONEncoder,safe=False)
+    if userattrs:
+      return JsonResponse(userattrs,encoder=LDAPJSONEncoder,safe=False)
+    else:
+      return JsonResponse(errMsg,encoder=LDAPJSONEncoder,status=status.HTTP_400_BAD_REQUEST,safe=False)
 
 class SavePermissionListByViewSet(APIView):
   """
@@ -190,7 +194,10 @@ class SavePermissionListByViewSet(APIView):
     """
     permissionData=request.data
     success,errmsg = CmdbLDAP().save_permissions_group(permissionData)
-    return JsonResponse(success, encoder=LDAPJSONEncoder, safe=False)
+    if success:
+      return JsonResponse({'status':success},encoder=LDAPJSONEncoder,safe=False)
+    else:
+      return JsonResponse(errmsg,encoder=LDAPJSONEncoder,status=status.HTTP_400_BAD_REQUEST,safe=False)
 
 class GetLdapAllCLassListViewSet(APIView):
   """

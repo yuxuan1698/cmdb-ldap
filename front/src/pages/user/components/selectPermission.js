@@ -8,7 +8,6 @@ import {
   Button,
   Layout,
   Popover,
-  Modal,
   notification
 } from 'antd';
 
@@ -67,6 +66,7 @@ class LDAPSelectPermission extends PureComponent {
           let targetKeys=listdata.map(it=>{
             targetValues.push(it[0])
             oldgrouplist.push(it[0])
+            console.log(it)
             parentExtentedKeys.add(it[0].replace(it[0].split(',')[0]+",",''))
             return {
               key:it[0],
@@ -123,10 +123,8 @@ class LDAPSelectPermission extends PureComponent {
             <Popover 
               placement="right" 
               title={item.pop} 
-              content={
-                <div style={{textAlign:"center"}}>
-                  <Button block type='primary' size="small" onClick={this.handleAddPermission.bind(this,item.key)} >添加用户到此组</Button>
-                </div>
+              content={<Button block type='primary' icon='plus' size="small" 
+                    onClick={this.handleAddPermission.bind(this,item.key)} >添加用户到此组</Button>
                 } 
               trigger="hover">
             <span >{item.title}{item.description}</span>
@@ -250,25 +248,32 @@ class LDAPSelectPermission extends PureComponent {
   handleSavePermissionChange=()=>{
     let {dispatch}=this.props
     let {currPermissionKeys}=this.state
-    dispatch({type:'ldap/postLDAPGroupPermission',payload:currPermissionKeys,callback:(d)=>{
-      notification.error({
-        message: "保存成功",
-        description: d
+    let haveError=false
+    Object.keys(currPermissionKeys).map(i=>{
+      Object.keys(currPermissionKeys[i]).map(m=>{
+        if(currPermissionKeys[i][m].length===0){
+          haveError=true
+          notification.error({
+            message: "保存权限失败",
+            description: <span>权限组[<strong style={{color:"red"}}>{i.split(',')[0].split('=')[1]}</strong>]所分配的用户为空，最少需要有一人在权限组内。</span>
+          })
+        }
       })
+    })
+    if(haveError) return haveError
+    dispatch({type:'ldap/postLDAPGroupPermission',payload:currPermissionKeys,callback:(d)=>{
+      notification.info({
+        message: "保存成功提示",
+        description: d.status
+      })
+      this.props.handleReturnOrReset()
     }})
-    // if(filterValues.length===0){
-    //   return Modal.error({
-    //       title: '移除权限提示',
-    //       content: `权限组里必须要保证最少有条记录，删除些条件后，权限组为空。`
-    //     })
-    // } 
   }
   render(){
     const { grouplist,selectedKeys,expandedKeys,searchValue,targetKeys,selectedRowKeys,width,currPermissionKeys,oldgrouplist } = this.state;
     const {loading,selectKey}=this.props
     let currUser=selectKey.split(',')[0].split('=')[1]
     let tableData=targetKeys
-    console.log(currPermissionKeys)
     return (
       <Layout style={{height:"100%",display:"flex",flexDirection:"column"}}>
         <Layout style={{height:"100%",display:"flex",padding:5,flexDirection:"row"}}>
@@ -344,7 +349,7 @@ class LDAPSelectPermission extends PureComponent {
           />
           </Layout>
         <Footer className={css.permission_box_footbar}>
-          <Button title="返回" icon='retweet' style={{margin:"0 10px"}} type="dashed"  >返回</Button>
+          <Button title="返回" icon='retweet' onClick={this.props.handleReturnOrReset} style={{margin:"0 10px"}} type="dashed"  >返回</Button>
           <Button title="保存权限" 
             icon='usergroup-add' 
             disabled={Object.keys(currPermissionKeys).length>0?false:true} 

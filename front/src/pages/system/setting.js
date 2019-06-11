@@ -2,12 +2,11 @@
 
 import {PureComponent} from 'react'
 import CMDBBreadcrumb from "../components/Breadcrumb";
-import {Layout,Select,Tabs,Icon,Switch } from 'antd';
+import {Layout,Tabs,Icon } from 'antd';
 import CMDBLDAPSettingContent from "./components/ldapsetting"
 import CMDBEmailSettingContent from "./components/emailsetting"
 // import css from './index.less'
 const { TabPane } = Tabs;
-const { Option } = Select;
 
 class CMDBSystemSetting extends PureComponent {
   constructor(props){

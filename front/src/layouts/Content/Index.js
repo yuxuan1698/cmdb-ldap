@@ -2,9 +2,11 @@ import { PureComponent,Fragment } from 'react';
 import {
   Layout
 } from 'antd'
-import { TransitionGroup, CSSTransition } from "react-transition-group";
+
+// import { TransitionGroup, CSSTransition } from "react-transition-group";
 import CMDBHeader from '../Header/';
 import CMDBSider from './Sider';
+import {isLoginPageAction,isNotAuthChangerPassword} from 'utils'
 const {Content} =Layout
 class CMDBContent extends PureComponent {
   render(){
@@ -14,9 +16,10 @@ class CMDBContent extends PureComponent {
       toggleSideMenu,
       location
     }=this.props
+    let currlogin=isLoginPageAction(location) || isNotAuthChangerPassword(location)
     return (
       <Fragment >
-        {!location.pathname.match('^/login')?<CMDBSider 
+        {!currlogin ?<CMDBSider 
             location={location}
             collapsed={collapsed} 
             toggleSideMenu={toggleSideMenu} />:""}

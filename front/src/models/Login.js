@@ -1,6 +1,7 @@
 import {userlogin} from '../services/login';
-import { Store } from '../utils/store'
+import { Store } from 'cmdbstore'
 import router from 'umi/router';
+import {isLoginStatus,isNotAuthChangerPassword} from 'utils'
 export default {
     namespace: 'login',
     state: {
@@ -25,29 +26,31 @@ export default {
       },
       setup({ dispatch,history }) {
         const data = Store.getLocal('userinfo');
-        if (!data || !(data.hasOwnProperty('token') && data.token!=="")) {
-          dispatch({
-            type: 'logout',
-            payload: {userinfo:""},
-          });
-          const {pathname} = history.location
-          let query={}
-          if(!pathname.match('^/login|^/$')){
-            query={from:pathname }
-          }
-          router.push({
-            pathname:'/login',
-            query: query
-          })
-        } else {
+        const {pathname,query} = history.location
+        let args={}
+        if(!pathname.match('^/login|^/$')){
+          args={from:pathname,...query }
+        }
+        if (isLoginStatus(data)) {
           dispatch({
             type: 'login',
             payload: {
               userinfo: data,
             },
           });
-          if(history.location.pathname.match('^/login')){
+          if(pathname.match('^/login')){
             router.push('/')
+          }
+        } else {
+          if(!isNotAuthChangerPassword(history.location)){
+            dispatch({
+              type: 'logout',
+              payload: {userinfo:""},
+            });
+            router.push({
+              pathname:'/login',
+              query: args
+            })
           }
         }
       } 

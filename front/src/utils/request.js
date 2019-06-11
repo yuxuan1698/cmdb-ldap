@@ -3,7 +3,7 @@ import NProgress from 'nprogress';
 import { message } from 'antd';
 // 国际化
 import {formatMessage} from 'umi/locale';
-import { GenerateRequestAuthParams,formatReturnMsg } from "../utils/utils";
+import { GenerateRequestAuthParams,formatReturnMsg } from "utils";
 
 /**
  * 一、功能：

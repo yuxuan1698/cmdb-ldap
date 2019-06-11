@@ -3,11 +3,12 @@
 import {connect} from 'dva';
 import {PureComponent} from 'react'
 import PropTypes from 'prop-types';
-import { Table, Icon, Button, Alert,message,Layout,Input,Tooltip } from 'antd';
+import { Table, Icon, Button, Alert,Layout,Input,Tooltip } from 'antd';
 import usercss from "./user.less";
 import CMDBBreadcrumb from "../components/Breadcrumb";
 import dynamic from 'umi/dynamic';
 import {UserEditButton,UserBatchButton} from './components/UserEditButton'
+import {formatTimeAndZone} from 'utils'
 const {
   Content
 } = Layout;
@@ -172,13 +173,15 @@ class CMDBUserList extends PureComponent {
       dataIndex: 'mail',
       key: 'mail',
     },{
-      title: '通知',
+      title: '动作',
       dataIndex: 'mail_notification',
       key: 'mail_notification',
-      width:50,
+      width:80,
       align:"center",
       render:(text)=>{
-        return <Button size='small' type="default" block icon='mail'/>
+        return <Tooltip placement = "top" title='重新发送此用户的邮件'>
+          <Button size='small' type="default" style={{padding:"0 4px",borderRadius:30}}  icon='mail'/>
+          </Tooltip>
 
       }
     },{
@@ -188,9 +191,10 @@ class CMDBUserList extends PureComponent {
       width: 50,
       align:"center",
       render:(text)=>{
+          console.log(text)
           return <Tooltip placement = "top"
           title = {
-            text===""?"正常":`锁定时间:${text}`
+            text===""?"正常":`锁定时间:${formatTimeAndZone(text[0])}`
           }
           arrowPointAtCenter >
                   {text===""?(<Icon className={usercss.user_list_unlock} type="check-circle" />):
@@ -198,7 +202,7 @@ class CMDBUserList extends PureComponent {
               </Tooltip>
       }
     },{
-      title: "动作",
+      title: "操作",
       key: 'action',
       align: 'center',
       width:115,

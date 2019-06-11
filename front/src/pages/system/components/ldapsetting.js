@@ -1,7 +1,7 @@
 'use strict'
 
 import {PureComponent} from 'react'
-import { Form,Switch,Input,Button,Select,AutoComplete } from 'antd';
+import { Form,Switch,Input,Select } from 'antd';
 const InputGroup = Input.Group;
 const { Option } = Select;
 
@@ -34,18 +34,18 @@ class CMDBLDAPSettingContent extends PureComponent {
       },
     };
  
-    const tailFormItemLayout = {
-      wrapperCol: {
-        xs: {
-          span: 24,
-          offset: 0,
-        },
-        sm: {
-          span: 16,
-          offset: 8,
-        },
-      },
-    };
+    // const tailFormItemLayout = {
+    //   wrapperCol: {
+    //     xs: {
+    //       span: 24,
+    //       offset: 0,
+    //     },
+    //     sm: {
+    //       span: 16,
+    //       offset: 8,
+    //     },
+    //   },
+    // };
     const { getFieldDecorator } = this.props.form;
     return (
       <Form {...formItemLayout} onSubmit={this.handleSubmit}>

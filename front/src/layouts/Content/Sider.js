@@ -5,72 +5,74 @@
   import classnames from 'classnames';
   import css from '../index.less';
   import Link from 'umi/link';
+  import {formatMessage} from 'umi/locale';
+
   const Sider =Layout.Sider;
   const SubMenu = Menu.SubMenu;
 
   const sideMenu=[
     {
       key: '/',
-      name: '我的首页',
+      name: formatMessage({id:'menu.side.myhome'}),
       icon:'home',
       allow: true,
     },
     {
       key:'user',
-      name: '用户管理',
+      name: formatMessage({id:'menu.side.users'}),
       icon: 'user',
       allow: true,
       submenu:[
         {
           key: '/user',
-          name:'用户列表',
+          name:formatMessage({id:'menu.side.users.list'}),
         },
         {
           key: '/user/permission',
-          name:'用户权限'
+          name:formatMessage({id:'menu.side.users.perm'})
         },
         {
           key: '/user/ldap',
-          name:'LDAP管理'
+          name:formatMessage({id:'menu.side.users.ldap'})
         },
       ]
     },
     {
       key:'equipment',
-      name: '资源管理',
+      name: formatMessage({id:'menu.side.resource'}),
       icon: 'edit',
       allow: true,
       submenu:[
         {
           key: '/equipment/',
-          name:'设备列表',
+          name:formatMessage({id:'menu.side.resource.device'}),
           // allow: false,
         },
         {
           key: '/equipment/groups',
-          name:'设备监控',
+          name:formatMessage({id:'menu.side.resource.monitor'}),
         },
       ]
     },
     {
       key:'system',
-      name: '系统管理',
+      name: formatMessage({id:'menu.side.system'}),
       icon: 'exception',
       allow: true,
       submenu:[
         {
           key: '/system/setting',
-          name:'系统设置',
+          name:formatMessage({id:'menu.side.system.setting'}),
           // allow: false,
         },
         {
           key: '/system/systemlog',
-          name:'系统日志',
+          name:formatMessage({id:'menu.side.system.logs'}),
           // allow: false,
         },
         {
           key: '/system/mailresults',
-          name:'邮件通知',
+          name:formatMessage({id:'menu.side.system.email'}),
         },
       ]
     },

@@ -1,4 +1,4 @@
-import request from '../utils/request'
+import request from 'requestapi'
 export function userlogin (data) {
     return request({
         method: "post",

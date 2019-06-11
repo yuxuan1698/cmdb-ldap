@@ -1,4 +1,3 @@
-import {connect} from 'dva';
 import {PureComponent} from 'react';
 
 import {
@@ -6,12 +5,12 @@ import {
   } from 'antd'
 import css from '../index.less';
 // 国际化
-import {formatMessage} from 'umi/locale';
+import {formatMessage,setLocale} from 'umi/locale';
 import router from 'umi/router';
+import {isNotAuthChangerPassword} from 'utils'
 const {Item,Divider}=Menu
 
 
-@connect(({ login, loading,dispatch }) => ({ login, loading,dispatch }))
 class CMDBUserControl extends PureComponent{
   constructor(props){
     super(props)
@@ -21,8 +20,8 @@ class CMDBUserControl extends PureComponent{
     switch(key){
       case 'logout':
         Modal.confirm({
-          title: '退出登陆提示',
-          content: `${this.props.login.userinfo.nickname}-您确定要退出系统吗？`,
+          title: formatMessage({id:'login.loginout.title'}),
+          content: formatMessage({id:'login.loginout.msg'},{nickname:this.props.login.userinfo.nickname}),
           onCancel: ()=>{Modal.destroyAll()},
           onOk:this.onLogoutHandle.bind(this)
         });
@@ -36,9 +35,6 @@ class CMDBUserControl extends PureComponent{
       case 'user':
         router.push('/user/center')
         break;
-    }
-    if(key==='logout'){
-      
     }
   }
   onLogoutHandle(){
@@ -55,15 +51,16 @@ class CMDBUserControl extends PureComponent{
       router.push('/login')
     }
   }
-  
-  
   componentWillReceiveProps(nextProps){
-    const {login} =nextProps
+    const {login,location} =nextProps
+    const {historyPath,historyParse}=login
+    console.log(this.props)
     if(!login.islogin){
-      router.push({
-        pathname:'/login',
-        query:{from: login.historyPath}
-      })
+      if(!isNotAuthChangerPassword(location))
+        router.push({
+          pathname:'/login',
+          query:{from: historyPath,...historyParse}
+        })
     }
   }
   render(){
@@ -88,7 +85,6 @@ class CMDBUserControl extends PureComponent{
       })}
     </Menu>)
     const nickname = userinfo.nickname ? userinfo.nickname.substring(0, 1).toUpperCase():""
-
     return (
       <Dropdown  overlay={userMenu}  placement="bottomRight">
         <span className={css.headerControlMenu}>
