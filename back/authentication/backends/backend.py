@@ -9,6 +9,7 @@ class ExtraModelBackend(ModelBackend):
     """
     Authenticates against settings.AUTH_USER_MODEL.
     """
+
     def _get_group_permissions(self, user_obj):
         user_groups_field = get_user_model()._meta.get_field('groups')
         user_groups_query = '%s__%s' % (user_groups_field.related_model._meta.model_name,user_groups_field.related_query_name())

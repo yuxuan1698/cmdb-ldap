@@ -13,8 +13,6 @@ logger=CmdbLDAPLogger.get_logger('cmdb_ldap')
 
 def jwt_response_payload_handler(token,userobj=None,request=None):
     """为返回的结果添加用户相关信息"""
-    # logger.info(userobj.get_all_permissions())
-    # logger.info(userobj.is_superuser)
     return {
              'nickname':userobj.nickname,
              'username':userobj.username,

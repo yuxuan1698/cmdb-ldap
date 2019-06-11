@@ -405,10 +405,10 @@ class CmdbLDAP(object):
         modlist=[]
         for it, vl in data.items():
           modlist.append((ldap.MOD_REPLACE,it,vl))
-          try:
-            self.conn.modify_s(i, modlist)
-          except ldap.LDAPError as e:
-            return False,e.args[0]
+        try:
+          self.conn.modify_s(i, modlist)
+        except ldap.LDAPError as e:
+          return False,e.args[0]
       return "保存用户权限成功!", None
     else:
       return None,self.errorMsg
