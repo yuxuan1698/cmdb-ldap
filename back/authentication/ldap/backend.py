@@ -19,7 +19,6 @@ class LDAPBackendAuthentication(LDAPBackend):
     if password or self.settings.PERMIT_EMPTY_PASSWORD:
         ldap_user = LDAPUser(self, username=username.strip(), request=request)
         user = self.authenticate_ldap_user(ldap_user, password)
-        logger.info(user)
     else:
         logger.debug("Rejecting empty password for {}".format(username))
         user = None
@@ -68,6 +67,7 @@ class LDAPUser(_LDAPUser):
         if self.group_names:
             self._get_or_create_user()
             user = self._user
+            
     except self.AuthenticationFailed as e:
         logger.debug(
             "Authentication failed for {}: {}".format(self._username, e))

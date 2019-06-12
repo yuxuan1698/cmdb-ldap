@@ -6,9 +6,12 @@ import PropTypes from 'prop-types';
 import { Table, Icon, Button, Alert,Layout,Input,Tooltip } from 'antd';
 import usercss from "./user.less";
 import CMDBBreadcrumb from "../components/Breadcrumb";
+
 import dynamic from 'umi/dynamic';
 import {UserEditButton,UserBatchButton} from './components/UserEditButton'
 import {formatTimeAndZone} from 'utils'
+import {formatMessage} from 'umi/locale';
+
 const {
   Content
 } = Layout;
@@ -144,57 +147,60 @@ class CMDBUserList extends PureComponent {
         i.departmentNumber.indexOf(this.state.searchFilterVal)>-1 )
     })
     const columns = [{
-      title: '用户名',
+      title: formatMessage({id:'userlist_table_account'}),
       dataIndex: 'uid',
       key: 'uid',
       sorter:()=>{},
     }, {
-      title: '用户姓名',
+      title: formatMessage({id:'userlist_table_username'}),
       dataIndex: 'sn',
       key: 'sn',
     }, {
-      title: '别名',
+      title: formatMessage({id:'userlist_table_cn'}),
       dataIndex: 'cn',
       key: 'cn',
     },{
-      title: '手机号码',
+      title: formatMessage({id:'userlist_table_mobile'}),
       dataIndex: 'mobile',
       key: 'mobile',
     },{
-      title: '职位名称',
+      title: formatMessage({id:'userlist_table_department'}),
       dataIndex: 'departmentNumber',
       key: 'departmentNumber',
     },{
-      title: '所属部门',
+      title: formatMessage({id:'userlist_table_ou'}),
       dataIndex: 'ou',
       key: 'ou',
     }, {
-      title: '邮箱',
+      title: formatMessage({id:'userlist_table_email'}),
       dataIndex: 'mail',
       key: 'mail',
     },{
-      title: '动作',
+      title: formatMessage({id:'userlist_table_action'}),
       dataIndex: 'mail_notification',
       key: 'mail_notification',
       width:80,
       align:"center",
       render:(text)=>{
-        return <Tooltip placement = "top" title='重新发送此用户的邮件'>
+        return <Tooltip placement = "top" title={formatMessage({id:'userlist_table_resetpassword'})}>
           <Button size='small' type="default" style={{padding:"0 4px",borderRadius:30}}  icon='mail'/>
           </Tooltip>
 
       }
     },{
-      title: '状态',
+      title: formatMessage({id:'userlist_table_status'}),
       dataIndex: 'pwdAccountLockedTime',
       key: 'pwdAccountLockedTime',
       width: 50,
       align:"center",
       render:(text)=>{
-          console.log(text)
           return <Tooltip placement = "top"
           title = {
-            text===""?"正常":`锁定时间:${formatTimeAndZone(text[0])}`
+            text===""?formatMessage({id:'userlist_table_status_value'}):
+              formatMessage(
+                {id:'userlist_table_status_value_lock'},
+                {locktime:formatTimeAndZone(text[0])}
+              )
           }
           arrowPointAtCenter >
                   {text===""?(<Icon className={usercss.user_list_unlock} type="check-circle" />):
@@ -202,7 +208,7 @@ class CMDBUserList extends PureComponent {
               </Tooltip>
       }
     },{
-      title: "操作",
+      title: formatMessage({id:'userlist_table_operation'}),
       key: 'action',
       align: 'center',
       width:115,
@@ -219,20 +225,20 @@ class CMDBUserList extends PureComponent {
     }];
     return (
       <Layout className={usercss.userbody}>
-        <CMDBBreadcrumb route={{'用户管理':"",'用户列表':'/user'}} title='用户列表' />
+        <CMDBBreadcrumb route={{breadcrumb_users_manager:"",breadcrumb_users_list:'/user'}} title='breadcrumb_users_list' />
         <Layout style={{margin:"10px 0 0 0"}}>
           <Content>
           <div className={usercss.tableContent}>
             <div className={usercss.usercontrol}>
               <div style={{float:"right"}}>
-                <Alert message={`当前选中[ ${selectedRowKeys.length} ]个用户`} 
+                <Alert message={formatMessage({id:'userlist_table_select_user'},{usercount:selectedRowKeys.length})} 
                 style={{padding: "5px 30px 4px 37px"}}
                 icon={<Icon type='user' style={{top:9}} />}
                 type={selectedRowKeys.length > 0 ? "success" : "info"} showIcon />
               </div>
             <Input.Search
                 allowClear
-                placeholder="请输入查询内容"
+                placeholder={formatMessage({id:'userlist_table_search'})}
                 onChange={e => {
                   this.setState({searchFilterVal:e.target.value})
                 }}
@@ -247,7 +253,7 @@ class CMDBUserList extends PureComponent {
             <Button type="primary" 
               loading={loading.effects['users/getLDAPClassList']} 
               onClick={this.showHideUserDrawer.bind(this)} >
-                <Icon type="user-add" />添加用户
+                <Icon type="user-add" />{formatMessage({id:'userlist_table_adduser'})}
             </Button>
               { loadedDrawer?<DrawerAddUser 
                     showHideUserDrawer={this.showHideUserDrawer.bind(this)} 

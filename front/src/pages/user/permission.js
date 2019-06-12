@@ -97,7 +97,7 @@ class CMDBLdapPermission extends PureComponent {
     const { loading,userlist,dispatch } = this.props
     return (
       <Layout className={usercss.userbody}>
-        <CMDBBreadcrumb route={{ '用户管理': "", '用户权限管理': '/user/permission' }} title='用户权限管理' />
+        <CMDBBreadcrumb route={{breadcrumb_users_manager:"",breadcrumb_user_permission:'/user'}} title='breadcrumb_user_permission' />
         <Layout style={{ margin: "10px 0 0 0" }}>
           <Resizable axis="x" minConstraints={[260, 260]}
             maxConstraints={[520, 520]}

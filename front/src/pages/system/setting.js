@@ -17,7 +17,7 @@ class CMDBSystemSetting extends PureComponent {
   render(){
     return (
       <Layout >
-        <CMDBBreadcrumb route={{'系统设置':"",'基本设置':'/system/setting'}} title='系统基本设置'  />
+        <CMDBBreadcrumb route={{breadcrumb_system_setting:"",breadcrumb_system_basesetting:'/user'}} title='breadcrumb_system_basesetting' />
         <Tabs  
           // renderTabBar={<div><Icon type="setting" theme="filled" />基本设置</div>}
           tabBarStyle={{width:130,backgroundColor: "#f1f1f1",padding:"15px 0 0 0px"}} 

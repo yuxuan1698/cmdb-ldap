@@ -270,7 +270,7 @@ class CMDBLdapGroups extends PureComponent {
 
     return (
     <Layout className={usercss.userbody}>
-      <CMDBBreadcrumb route={{'用户管理':"",'用户组列表':'/user/ldap'}} title='用户组列表'  />
+      <CMDBBreadcrumb route={{breadcrumb_users_manager:"",breadcrumb_ldap_manager:'/user'}} title='breadcrumb_ldap_manager' />
       <Layout style={{margin:"10px 0 0 0"}}>
         <Resizable axis="x"  minConstraints={[220,220]}
             maxConstraints={[520, 520]}

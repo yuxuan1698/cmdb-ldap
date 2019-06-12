@@ -5,6 +5,7 @@ from authentication.serializers import (
   GroupSerializer,
   LdapSerializer,
   ChangePasswordSerializer,
+  ResetPasswordSerializer,
   DeleteUserSerializer,
   CreateUserSerializer,
   UpdateDNSerializer,
@@ -25,9 +26,9 @@ from rest_framework.views import APIView
 from rest_framework import status
 from django.core.cache import cache
 
-from common.utils import CmdbLDAPLogger,LDAPJSONEncoder
+from common.utils import CmdbLDAPLogger,LDAPJSONEncoder,generat_random_password
 from authentication.utils import user_payload_handler
-from crontasks.tasks import send_register_email
+from crontasks.tasks import send_register_email,send_reset_password_email
 from django.contrib.auth.decorators import permission_required
 
 logger=CmdbLDAPLogger().get_logger('cmdb_ldap')
@@ -35,15 +36,15 @@ logger=CmdbLDAPLogger().get_logger('cmdb_ldap')
 
 Users = get_user_model()
 
-cmdbldap={
-  "getClasses":CmdbLDAP(),
-  "getUsers":CmdbLDAP(),
-  "getOUDN":CmdbLDAP(),
-  "updateDN":CmdbLDAP(),
-  "createDN":CmdbLDAP(),
-  "deleteDN":CmdbLDAP(),
-  "all":CmdbLDAP()
-}
+# cmdbldap={
+#   "getClasses":CmdbLDAP(),
+#   "getUsers":CmdbLDAP(),
+#   "getOUDN":CmdbLDAP(),
+#   "updateDN":CmdbLDAP(),
+#   "createDN":CmdbLDAP(),
+#   "deleteDN":CmdbLDAP(),
+#   "all":CmdbLDAP()
+# }
 # threadlock=False
 class LoginViewSet(ObtainJSONWebToken):
   """用户登陆接口"""
@@ -58,7 +59,7 @@ class UserListViewSet(APIView):
     """ 
     获取所有用户的列表信息
     """
-    user_list,errorMsg=cmdbldap['getUsers'].get_user_list()
+    user_list,errorMsg=CmdbLDAP().get_user_list()
     if user_list:
       page=PageNumberPagination()
       page_roles=page.paginate_queryset(queryset=user_list,request=request,view=self)
@@ -78,7 +79,7 @@ class CreateUserViewSet(APIView):
     serializer = CreateUserSerializer(instance=request, data=request.data)
     if serializer.is_valid():
       # serializer.validated_data
-      changeStatus,errorMsg,newUserDn,newUser = cmdbldap['all'].create_ldap_user(request.data)
+      changeStatus,errorMsg,newUserDn,newUser = CmdbLDAP().create_ldap_user(request.data)
       if changeStatus:
         returnData = {"status": changeStatus}
         dbdata=user_payload_handler(request.data,newUserDn,newUser)
@@ -87,12 +88,12 @@ class CreateUserViewSet(APIView):
         dbUsers.save()
         if 'mail' in request.data and changeStatus :
           reqdata={
-            "mail":request.data['mail'],
             "sn":request.data['sn'],
             "userPassword":request.data['userPassword'],
             "username": newUser
             }
-          send_register_email.delay(reqdata['mail'],reqdata,newUser)
+          send_register_email.delay(request.data['mail'],reqdata)
+          logger.info("正发送用户的注册相关信息到用户[%s]"%newUser)
         returnStatus = status.HTTP_200_OK
       else:
         returnData = {"error": errorMsg}
@@ -115,7 +116,7 @@ class UpdateUserViewSet(APIView):
     if serializer.is_valid():
       olddn=request.data['userdn']
       request.data.pop('userdn')
-      changeStatus, errorMsg = cmdbldap['all'].update_ldap_user(request.data,olddn)
+      changeStatus, errorMsg = CmdbLDAP().update_ldap_user(request.data,olddn)
       if changeStatus:
         returnData = {"status": changeStatus}
         returnStatus = status.HTTP_200_OK
@@ -138,7 +139,7 @@ class DeleteUserViewSet(APIView):
     """
     serializer = DeleteUserSerializer(instance=request, data=request.data)
     if serializer.is_valid():
-      changeStatus, errorMsg = cmdbldap['all'].delete_ldap_userdn(request.data)
+      changeStatus, errorMsg = CmdbLDAP().delete_ldap_userdn(request.data)
       if changeStatus:
         usernames = []
         for udn in request.data.get('userdn'):
@@ -164,7 +165,7 @@ class UserAttributeByViewSet(APIView):
     根据用户获取用户信息
     """
     username=kwargs.get('username')
-    userattrs=cmdbldap['all'].get_user_list(username,['*','+'])
+    userattrs=CmdbLDAP().get_user_list(username,['*','+'])
     return JsonResponse(userattrs[0],encoder=LDAPJSONEncoder,safe=False)
 
 class UserPermissionListByViewSet(APIView):
@@ -210,7 +211,7 @@ class GetLdapAllCLassListViewSet(APIView):
     """
     attrsOrClass=cache.get('attrsOrClass')
     if not attrsOrClass:
-      attrsOrClass,errorMsg=cmdbldap['getClasses'].get_attrsorclass_list()
+      attrsOrClass,errorMsg=CmdbLDAP().get_attrsorclass_list()
       cache.set('attrsOrClass',attrsOrClass)
     if attrsOrClass:
       return JsonResponse(attrsOrClass,encoder=LDAPJSONEncoder,safe=False)
@@ -226,7 +227,7 @@ class GetLdapAllAttrsListViewSet(APIView):
     """
     根据用户获取用户信息
     """
-    attrsOrClass,errorMsg=cmdbldap['all'].get_attrsorclass_list(type='attr')
+    attrsOrClass,errorMsg=CmdbLDAP().get_attrsorclass_list(type='attr')
     if attrsOrClass:
       return JsonResponse(attrsOrClass,encoder=LDAPJSONEncoder,safe=False)
     else:
@@ -267,7 +268,7 @@ class UserChangerPasswordSet(APIView):
   def post(self,request,*args,**kwargs):
     serializer=ChangePasswordSerializer(instance=request,data=request.data)
     if serializer.is_valid():
-      changeStatus,errorMsg=cmdbldap['all'].change_self_password(request.data)
+      changeStatus,errorMsg=CmdbLDAP().change_self_password(request.data)
       if changeStatus==True:
         returnData={"status":"密码修改成功！"}
         returnStatus=status.HTTP_200_OK
@@ -279,14 +280,35 @@ class UserChangerPasswordSet(APIView):
       returnData=serializer.errors
       returnStatus=status.HTTP_400_BAD_REQUEST
     return JsonResponse(returnData,status=returnStatus,safe=False)
-    
-class GroupViewSet(APIView):
-  """
-  允许组查看或编辑的API路径。
-  """
-  queryset = Group.objects.all()
-  serializer_class = GroupSerializer
 
+class UserResetPasswordSet(APIView):
+  """
+  重置用户密码
+  """
+  # serializer_class=ChangePasswordSerializer
+  def post(self,request,*args,**kwargs):
+    
+    serializer=ResetPasswordSerializer(instance=request,data=request.data)
+    if serializer.is_valid():
+      userdn=serializer.validated_data.get('userdn')
+      newpassword=generat_random_password(encode=True)
+      resetStatus,errorMsg=CmdbLDAP().reset_user_password(userdn,newpassword)
+      if resetStatus==True:
+        returnData={"status":"用户密码重置成功，请在参见邮件进行密码修改。"}
+        returnStatus=status.HTTP_200_OK
+        username=userdn.split(',')[0].split('=')[1]
+        if username:
+          send_reset_password_email.delay(username,newpassword)
+          logger.info("发送重置密码的邮件到用户[%s]"%username)
+      else:
+        returnData={"error":errorMsg}
+        returnStatus=status.HTTP_400_BAD_REQUEST
+    else:
+      returnData=serializer.errors
+      returnStatus=status.HTTP_400_BAD_REQUEST
+
+    
+    return JsonResponse(returnData,status=returnStatus,safe=False)
 
 class UpdateDNViewSet(APIView):
   """
@@ -301,7 +323,7 @@ class UpdateDNViewSet(APIView):
     if serializer.is_valid():
       olddn=request.data['currentDn']
       request.data.pop('currentDn')
-      changeStatus, errorMsg = cmdbldap['updateDN'].update_ldap_dn(request.data,olddn)
+      changeStatus, errorMsg = CmdbLDAP().update_ldap_dn(request.data,olddn)
       if changeStatus:
         returnData = {"status": changeStatus}
         returnStatus = status.HTTP_200_OK
@@ -326,7 +348,7 @@ class CreateDNViewSet(APIView):
     if serializer.is_valid():
       parentDn=request.data['currentDn']
       request.data.pop('currentDn')
-      changeStatus, errorMsg = cmdbldap['createDN'].create_ldap_entry_dn(request.data,parentDn)
+      changeStatus, errorMsg = CmdbLDAP.create_ldap_entry_dn(request.data,parentDn)
       if changeStatus:
         returnData = {"status": changeStatus}
         returnStatus = status.HTTP_200_OK
@@ -351,7 +373,7 @@ class DeleteDNViewSet(APIView):
     """
     serializer = DeleteDNSerializer(instance=request, data=request.data)
     if serializer.is_valid():
-      changeStatus, errorMsg = cmdbldap['deleteDN'].delete_ldap_dn(
+      changeStatus, errorMsg = CmdbLDAP().delete_ldap_dn(
           request.data)
       if changeStatus:
         returnData = {"status": changeStatus}
@@ -377,7 +399,7 @@ class LockUnLockUserViewSet(APIView):
     serializer = LockUnLockUserSerializer(instance=request, data=request.data)
     if serializer.is_valid():
       logger.info(request.data)
-      changeStatus, errorMsg = cmdbldap['all'].lock_unlock_ldap_user(request.data)
+      changeStatus, errorMsg = CmdbLDAP().lock_unlock_ldap_user(request.data)
       if changeStatus:
         returnData = {"status": changeStatus}
         returnStatus = status.HTTP_200_OK

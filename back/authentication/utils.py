@@ -54,4 +54,3 @@ def check_ldap_password(ldap_password, password):
     hr = sha1(password)
     hr.update(salt)
     return digest == hr.digest()
-

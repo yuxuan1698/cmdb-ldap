@@ -7,7 +7,6 @@ import css from './index.less';
 import { PureComponent } from 'react';
 import CMDBContent from './Content/';
 import CMDBFooter from './Footer';
-import dynamic from 'umi/dynamic';
 
 
 import zh_CN from 'antd/lib/locale-provider/zh_TW';
@@ -17,12 +16,6 @@ class CMDBLayout extends PureComponent {
     super(props)
     this.state={
         collapsed:true,
-        // language: dynamic({
-        //   loader: () => import('antd/lib/locale-provider/zh_TW'),
-        //   loading: (e) => {
-        //     return null
-        //   },
-        // })
     }
   }
   toggleSideMenu = (s) => {
@@ -32,8 +25,6 @@ class CMDBLayout extends PureComponent {
   }
   render(){
     const {children,location}=this.props
-    // const {language}=this.state
-    // console.log(language)
     return (
         <LocaleProvider locale={zh_CN}>
           <Layout className={css.mainLayer}>

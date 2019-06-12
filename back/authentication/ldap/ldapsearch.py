@@ -99,8 +99,22 @@ class CmdbLDAP(object):
     except ldap.LDAPError as e:
       logger.info("LDAP Error: %s"%e)
       return None,"%s"%e
-      
     return True,None
+
+  def reset_user_password(self,dn,password):
+    """ 重置用户密码 """
+    if self.connect() and dn and password :
+      modlist=[]
+      modlist.append((ldap.MOD_REPLACE,'userPassword',[password]))
+      logger.info(modlist)
+      try:
+        self.conn.modify_s(dn, modlist)
+      except ldap.LDAPError as e:
+        return False,e.args[0]
+      return True, None
+    else:
+      return None,self.errorMsg
+
 
   def getobjectclasses(self):
         """
@@ -254,7 +268,7 @@ class CmdbLDAP(object):
     """
     更新用户属性用户
     """
-    
+    returnStatus=False,'字段没有发生变化，修改不成功。'
     rdn_prefix=olddn.split(',')
     rdn_field=rdn_prefix[0].split('=')
     dndata,err=self.get_user_list(rdn_prefix[0])
@@ -267,7 +281,6 @@ class CmdbLDAP(object):
         del data[rdn_field[0]]
     else:
       return False,err
-      
     if dndata:
       olddata=dndata[0][1]
       newdata = convert_string_to_bytes(data)
@@ -276,7 +289,7 @@ class CmdbLDAP(object):
         logger.info("modlist:%s"%modlist)
         try:
           self.conn.modify_s(olddn,modlist)
-          return "更新用户成功",None
+          returnStatus="更新用户成功",None
         except ldap.NAMING_VIOLATION as e:
           logger.error(e)
           return False,"更新字段失败，失败内容:%s"%(e.args[0]['info'] if e.args[0]['info'] else "")
@@ -286,11 +299,11 @@ class CmdbLDAP(object):
       if modrdn!='':
         try:
           self.conn.modrdn_s(olddn,modrdn)
-          return "更新用户成功",None
         except ldap.INVALID_DN_SYNTAX as e:
           logger.error(e)
           return False,"DN修改失败:%s"%(e.args[0]['info'] if e.args[0]['info'] else "")
-      return False,'字段没有发生变化，修改不成功。'
+        returnStatus="更新用户成功",None
+      return returnStatus
 
   def update_ldap_dn(self,data,olddn):
     """

@@ -3,14 +3,15 @@ import {PureComponent} from 'react';
 import {
   Modal,Menu, Dropdown,Button,Tooltip ,Icon
 } from 'antd';
+import {formatMessage} from 'umi/locale';
 const ButtonGroup = Button.Group;
 
 
 export class UserEditButton extends PureComponent {
   onDeleteUser=(delkey)=>{
     Modal.confirm({
-      title: '删除用户提示',
-      content: `你确定要删除用户[${delkey}]吗？删除后无法恢复！`,
+      title: formatMessage({id:'userlist_useredit_del'}),
+      content: formatMessage({id:'userlist_useredit_del_content'},{delkey}),
       onCancel: ()=>{Modal.destroyAll()},
       onOk: this.props.confirmDeletion.bind(this,[delkey])
     })
@@ -20,17 +21,17 @@ export class UserEditButton extends PureComponent {
     return (
       <div>
         <ButtonGroup size="small">
-          <Tooltip placement="topLeft" title={'编辑用户'} getPopupContainer={trigger => trigger.parentNode} >
+          <Tooltip placement="topLeft" title={formatMessage({id:'userlist_useredit_edit'})} getPopupContainer={trigger => trigger.parentNode} >
             <Button type="Default" icon="bars" onClick={()=>{
            this.props.showHideUserDrawer('update',delkey)
           }}/>
           </Tooltip>{
             pwdAccountLockedTime===""?(
-            <Tooltip placement="top" title='锁定用户' getPopupContainer={trigger => trigger.parentNode} >
+            <Tooltip placement="top" title={formatMessage({id:'userlist_useredit_lock'})} getPopupContainer={trigger => trigger.parentNode} >
               <Button type="Default" icon="lock"onClick={()=>{
                 Modal.confirm({
-                  title: '锁定用户',
-                  content: `你确定要锁定用户[${delkey}]吗？`,
+                  title: formatMessage({id:'userlist_useredit_lock'}),
+                  content: formatMessage({id:'userlist_useredit_lock_content'},{delkey}),
                   onCancel: ()=>{Modal.destroyAll()},
                   onOk: ()=>{
                     this.props.onLockUnLockUser({dn:delkey,lock:true})
@@ -39,11 +40,11 @@ export class UserEditButton extends PureComponent {
                 })
               }} />
             </Tooltip>):(
-            <Tooltip placement="top" title='解锁用户' getPopupContainer={trigger => trigger.parentNode} >
+            <Tooltip placement="top" title={formatMessage({id:'userlist_useredit_unlock'})} getPopupContainer={trigger => trigger.parentNode} >
               <Button type="Default" icon="unlock"onClick={()=>{
                 Modal.confirm({
-                  title: '解锁用户',
-                  content: `你确定要解锁用户[${delkey}]吗？`,
+                  title: formatMessage({id:'userlist_useredit_unlock'}),
+                  content: formatMessage({id:'userlist_useredit_lock_content'},{delkey}),
                   onCancel: ()=>{Modal.destroyAll()},
                   onOk: ()=>{
                     this.props.onLockUnLockUser({dn:delkey,lock:false})
@@ -52,7 +53,7 @@ export class UserEditButton extends PureComponent {
               }} />
             </Tooltip>)
           }
-          <Tooltip placement="topRight" title='删除用户' getPopupContainer={trigger => trigger.parentNode} >
+          <Tooltip placement="topRight" title={formatMessage({id:'userlist_useredit_del'})} getPopupContainer={trigger => trigger.parentNode} >
             <Button type="danger" icon="delete" onClick={this.onDeleteUser.bind(this,delkey)} />
           </Tooltip>
         </ButtonGroup>
@@ -65,8 +66,8 @@ export class UserBatchButton extends PureComponent {
 
   onDeleteUser=(userkeys)=>{
     Modal.confirm({
-      title: '删除用户提示',
-      content: `你确定要删除这些用户吗？删除后无法恢复哦！`,
+      title: formatMessage({id:'userlist_useredit_del'}),
+      content: formatMessage({id:'userlist_useredit_delall_content'}),
       onCancel: ()=>{Modal.destroyAll()},
       onOk: this.props.confirmDeletion.bind(this,userkeys)
     })
@@ -77,21 +78,34 @@ export class UserBatchButton extends PureComponent {
     const menu = (
       <Menu>
         <Menu.Item>
-          <a onClick={this.onDeleteUser.bind(this,delkeys)} ><Icon type="usergroup-delete" />批量删除</a>
+          <a onClick={this.onDeleteUser.bind(this,delkeys)} ><Icon type="usergroup-delete" />
+            {formatMessage({id:'userlist_useredit_batchdel'})}
+          </a>
         </Menu.Item>
         <Menu.Divider />
         <Menu.Item>
-          <a target="_blank" ><Icon type="lock" theme="twoTone" />批量锁定</a>
+          <a target="_blank" ><Icon type="lock" theme="twoTone" />
+          {formatMessage({id:'userlist_useredit_batchlock'})}
+          </a>
         </Menu.Item>
         <Menu.Item>
-          <a ><Icon type="unlock" theme="twoTone" />批量解锁</a>
+          <a ><Icon type="unlock" theme="twoTone" />
+          {formatMessage({id:'userlist_useredit_batchunlock'})}
+          </a>
+        </Menu.Item>
+        <Menu.Divider />
+        <Menu.Item>
+          <a ><Icon type="export" />
+          {formatMessage({id:'userlist_useredit_exportuser'})}
+          </a>
         </Menu.Item>
       </Menu>
     )
     return (
       <Dropdown overlay={menu}>
         <Button  {...this.props} >
-          批量操作<Icon type="down" />
+          {formatMessage({id:'userlist_useredit_batch'})}
+          <Icon type="down" />
         </Button>
       </Dropdown>
     );

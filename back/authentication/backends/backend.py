@@ -3,12 +3,28 @@ from django.contrib.auth.models import Permission
 from django.contrib.auth.backends import ModelBackend
 from common.utils import CmdbLDAPLogger
 
+UserModel = get_user_model()
 logger=CmdbLDAPLogger.get_logger('cmdb_ldap')
 
 class ExtraModelBackend(ModelBackend):
     """
     Authenticates against settings.AUTH_USER_MODEL.
     """
+    
+    def authenticate(self, request, username=None, password=None, **kwargs):
+        if username is None:
+            username = kwargs.get(UserModel.USERNAME_FIELD)
+        try:
+            user = UserModel._default_manager.get_by_natural_key(username)
+        except UserModel.DoesNotExist:
+            # Run the default password hasher once to reduce the timing
+            # difference between an existing and a nonexistent user (#20760).
+            UserModel().set_password(password)
+        else:
+            if user.check_password(password) and self.user_can_authenticate(user):
+                # 添加是否分配组权限，如果没有就无权访问
+                if user.get_group_permissions():
+                    return user
 
     def _get_group_permissions(self, user_obj):
         user_groups_field = get_user_model()._meta.get_field('groups')

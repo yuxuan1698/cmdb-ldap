@@ -230,13 +230,23 @@ class ChangePasswordSerializer(Serializer):
         'min_length': '密码确认不能小于6个字符',
         'required'  : '请输入确认密码'
       })
+      
+class ResetPasswordSerializer(Serializer):
+  """
+  效验重置用户密码字段
+  """
+  userdn = CharField(
+    required       = True, 
+    min_length     = 4,
+    error_messages = {
+        'min_length': '用户名不能小于6个字符',
+        'required'  : '缺少用户DN字段'
+      })
+  
   def validate(self, data):
-    # 传进来什么参数，就返回什么参数，一般情况下用attrs
-      if not self.instance.user.is_superuser and str(self.instance.user)!=str(data['username']):
-        raise ValidationError("提交的用户非法！")
-      if data['newpassword'] != data['repassword']:
-        raise ValidationError("两次输入的密码不一致！")
-      return data
+    if not re.match(r"^[^,]+(,.+)+,dc=.+$", data.get('userdn')):
+      raise ValidationError("userdn字段格式不正确!例:cn=xxxx,dc=xxxxxxx,dc=xxx")
+    return data
 
 class UpdateDNSerializer(Serializer):
   """

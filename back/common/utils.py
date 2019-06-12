@@ -118,3 +118,11 @@ def Sign_Url_By_MD5(data):
   m5.update(md5str.encode('utf-8'))
   md5str="{}{}={}".format(md5str,'sign',m5.hexdigest())
   return md5str
+
+def generat_random_password(data='',encode=False):
+  import string
+  import random
+  salt = ''.join(random.sample(string.ascii_letters + string.digits+'_$#@!%^&*()', 12))
+  if encode:
+    return salt.encode('utf-8')
+  return salt
