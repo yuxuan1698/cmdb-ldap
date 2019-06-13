@@ -7,6 +7,7 @@ import {
 
 import {formatTimeAndZone} from 'utils'
 import css from './index.less'
+import {formatMessage} from 'umi/locale';
 
 const color=["blue","cyan","geekblue","magenta","red","volcano","green","orange","gold","lime","purple"];
 const DescriptionItem = ({ title, content,keyval }) => {
@@ -31,52 +32,44 @@ const DescriptionItem = ({ title, content,keyval }) => {
       </div>
 }
 const base_profile={
-  'uid':{name:"用户名",col:12},
-  'sn':{name:"用户姓名",col:12},
-  'cn':{name:"用户别名",col:12},
-  'givenName':{name:"用户附名",col:12},
-  'ou':{name:"用户部门",col:12},
-  'departmentNumber':{name:"用户职位",col:12},
-  'uidNumber':{name:"用户UID",col:12},
-  'gidNumber':{name:"用户组ID",col:12},
-  'loginShell':{name:"用户登陆Shell",col:12},
-  'homeDirectory':{name:"用户目录",col:12},
-  'mail':{name:"邮箱地址",col:12},
-  'mobile':{name:"手机号码",col:12},
-  'entryDN':{name:"用户DN",col:12},
-  'entryUUID':{name:"用户UUID",col:12},
-  'objectClass':{name:"用户属性",col:24},
+  'uid':{name:formatMessage({id:'ldap_uid'}),col:12},
+  'sn':{name:formatMessage({id:'ldap_sn'}),col:12},
+  'cn':{name:formatMessage({id:'ldap_cn'}),col:12},
+  'givenName':{name:formatMessage({id:'ldap_givenName'}),col:12},
+  'ou':{name:formatMessage({id:'ldap_ou'}),col:12},
+  'departmentNumber':{name:formatMessage({id:'ldap_departmentNumber'}),col:12},
+  'uidNumber':{name:formatMessage({id:'ldap_uidNumber'}),col:12},
+  'gidNumber':{name:formatMessage({id:'ldap_gidNumber'}),col:12},
+  'loginShell':{name:formatMessage({id:'ldap_loginShell'}),col:12},
+  'homeDirectory':{name:formatMessage({id:'ldap_homeDirectory'}),col:12},
+  'mail':{name:formatMessage({id:'ldap_mail'}),col:12},
+  'mobile':{name:formatMessage({id:'ldap_mobile'}),col:12},
+  'entryDN':{name:formatMessage({id:'ldap_entryDN'}),col:12},
+  'entryUUID':{name:formatMessage({id:'ldap_entryUUID'}),col:12},
+  'objectClass':{name:formatMessage({id:'ldap_objectClass'}),col:24},
 }
 const extra_profile={
-  'createTimestamp':{name:"创建时间",col:12},
-  'modifyTimestamp':{name:"修改时间",col:12},
-  'pwdChangedTime':{name:"密码修改时间",col:12},
-  'hasSubordinates':{name:"有无下属",col:12},
-  'manager':{name:"用户上级",col:12},
-  'creatorsName':{name:"创建人",col:12},
-  'modifiersName':{name:"修改人",col:12},
-  'memberOf':{name:"用户权限",col:24},
-  'sshPublicKey':{name:"用户公钥",col:24}
+  'createTimestamp':{name:formatMessage({id:'ldap_createTimestamp'}),col:12},
+  'modifyTimestamp':{name:formatMessage({id:'ldap_modifyTimestamp'}),col:12},
+  'pwdChangedTime':{name:formatMessage({id:'ldap_pwdChangedTime'}),col:12},
+  'hasSubordinates':{name:formatMessage({id:'ldap_hasSubordinates'}),col:12},
+  'manager':{name:formatMessage({id:'ldap_manager'}),col:12},
+  'creatorsName':{name:formatMessage({id:'ldap_creatorsName'}),col:12},
+  'modifiersName':{name:formatMessage({id:'ldap_modifiersName'}),col:12},
+  'memberOf':{name:formatMessage({id:'ldap_memberOf'}),col:24},
+  'sshPublicKey':{name:formatMessage({id:'ldap_sshPublicKey'}),col:24}
 }
 const other_profile={
-  'pwdFailureTime':{name:"密码认证失败时间",col:12},
-  'pwdAccountLockedTime':{name:"用户锁定时间",col:12},
-  'description':{name:"备注/描述",col:12},
-  'structuralObjectClass':{name:"结构对象类",col:12},
+  'pwdFailureTime':{name:formatMessage({id:'ldap_pwdFailureTime'}),col:12},
+  'pwdAccountLockedTime':{name:formatMessage({id:'ldap_pwdAccountLockedTime'}),col:12},
+  'description':{name:formatMessage({id:'ldap_description'}),col:12},
+  'structuralObjectClass':{name:formatMessage({id:'ldap_structuralObjectClass'}),col:12},
   'subschemaSubentry':{name:"subschemaSubentry",col:12},
   'entryCSN':{name:"entryCSN",col:24},
 }
 class UserInfo extends PureComponent {
   constructor(props){
     super(props)
-  }
-  onDeleteUser=(delkey)=>{
-    Modal.confirm({
-      title: '删除用户提示',
-      content: `你确定要删除用户[${delkey}]吗？删除后无法恢复！`,
-      onCancel: ()=>{Modal.destroyAll()},
-      onOk: this.props.confirmDeletion.bind(this,[delkey])
-    })
   }
   render(){
     const base_profile_html=[]
@@ -120,7 +113,7 @@ class UserInfo extends PureComponent {
     const loading=this.props.loading.effects['users/getUserAttribute']
     return (
       <Modal  
-        title={<span><Icon type='user'/>用户属性</span>}
+        title={<span><Icon type='user'/>{formatMessage({id:'userlist_user_info'})}</span>}
         destroyOnClose
         centered
         visible={this.props.visible} 
@@ -129,15 +122,15 @@ class UserInfo extends PureComponent {
         bodyStyle={{padding:"15px 25px",overflow:"auto"}}
         onCancel={this.props.handleDisplayModal} >
         <Spin tip="Loading..." spinning={loading}>
-          <Divider style={{margin:"20px 0px"}} orientation="left">基本属性</Divider>
+          <Divider style={{margin:"20px 0px"}} orientation="left">{formatMessage({id:'userlist_user_base_attr'})}</Divider>
           <Row style={{paddingLeft:20}}>
             {base_profile_html}
           </Row>
-          <Divider style={{margin:"20px 0px"}} orientation="left">扩展属性</Divider>
+          <Divider style={{margin:"20px 0px"}} orientation="left">{formatMessage({id:'userlist_user_extra_attr'})}</Divider>
           <Row style={{paddingLeft:20}}>
             {extra_profile_html}
           </Row>
-          <Divider style={{margin:"20px 0px"}} orientation="left">其它属性</Divider>
+          <Divider style={{margin:"20px 0px"}} orientation="left">{formatMessage({id:'userlist_user_other_attr'})}</Divider>
           <Row style={{paddingLeft:20}}>
             {other_profile_html}
           </Row>

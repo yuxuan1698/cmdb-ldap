@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import usercss from "./user.less";
 import CMDBBreadcrumb from "../components/Breadcrumb";
 import dynamic from 'umi/dynamic';
+import {formatMessage} from 'umi/locale';
 
 const {
    Content, Sider,Footer
@@ -76,25 +77,27 @@ class CMDBLdapGroups extends PureComponent {
       < MenuItem onClick = {
         this.handleNewDNItem.bind(this)
       } >
-         <Icon style={{margin:"0 5px 0 -7px"}}  type = "file-add"
-         theme = "twoTone" / > 新建节点
+         <Icon style={{margin:"0 7px 0 -8px"}}  type = "file-add"
+         theme = "twoTone" / > {formatMessage({id:'ldapmanager_add_dn'})}
         </MenuItem>
         < MenuItem onClick = {
           this.handleRemoveDn.bind(this)
         } >
-          < Icon style={{margin:"0 5px 0 -7px"}} type = "delete"
-          theme = "twoTone" / > 删除节点
+          < Icon style={{margin:"0 7px 0 -8px"}} type = "delete"
+          theme = "twoTone" / > {formatMessage({id:'ldapmanager_del_dn'})}
         </MenuItem>
         <MenuItem divider />
         < MenuItem onClick = {
           this.handleFlushAndReset.bind(this)
         } >
-   	      < Icon style={{margin:"0 5px 0 -7px",color:"#1590ff"}} type = "reload" / > 刷新节点
+           < Icon style={{margin:"0 7px 0 -8px",color:"#1590ff"}} 
+            type = "reload" / > {formatMessage({id:'ldapmanager_flush_dn'})}
         </MenuItem>
         <MenuItem divider />
         < MenuItem >
-   	      < Icon style={{margin:"0 5px 0 -7px"}} type = "edit"
-   	      theme = "twoTone" / > 重命名节点
+   	      < Icon style={{margin:"0 7px 0 -8px"}} type = "edit"
+   	      theme = "twoTone" / > 
+           {formatMessage({id:'ldapmanager_rename_dn'})}
         </MenuItem>
     </ContextMenu>)
     return menu
@@ -224,8 +227,8 @@ class CMDBLdapGroups extends PureComponent {
     const {dispatch}=this.props
     if(selectedKeys){
       Modal.confirm({
-        title:"删除提示",
-        content:`你确定要删除这个DN:${selectedKeys},删除后将无法恢复？`,
+        title:formatMessage({id:'ldapmanager_del_tips'}),
+        content:formatMessage({id:'ldapmanager_del_tips_content'},{selectedKeys}),
         onOk: ()=>{
           dispatch({
             type: 'ldap/deleteEntryDn',
@@ -280,7 +283,7 @@ class CMDBLdapGroups extends PureComponent {
             <Layout style={{height:"100%",padding:5,boxShadow:"0px 0px 3px #dcd8d8"}} >
               <Search style={{ marginBottom: 8 }} placeholder="Search(Key Press)" onSearch={this.handleOnChange.bind(this)}  />
               <Content className={usercss.ldap_content_box} >
-                <Spin tip={isNewDn?"新建DN中,无法选择操作.":"Loading..." }
+                <Spin tip={isNewDn?formatMessage({id:'ldapmanager_add_not_opration'}):"Loading..." }
                   wrapperClassName={usercss.tree_not_control_div}
                   indicator={isNewDn?<Icon type="message" theme="twoTone" />:null} 
                   size='large'
@@ -303,17 +306,19 @@ class CMDBLdapGroups extends PureComponent {
               </Content>
               <Footer style={{padding:0,}}>
                 <ButtonGroup size="small" >
-                    <Button title="添加" 
+                    <Button title={formatMessage({id:'ldapmanager_add'})}
                       className={usercss.ldap_button_group} 
                       icon='plus' 
                       onClick={this.handleNewDNItem.bind(this)}/>
-                    < Button title = "删除"
+                    < Button title = {formatMessage({id:'ldapmanager_del'})}
                     disabled = {
                       selectedKeys.length>0 ? false : true
                     }
                       onClick={this.handleRemoveDn.bind(this)}
                       className={usercss.ldap_button_group} icon='minus' />
-                    <Button title="刷新" onClick={this.handleFlushAndReset.bind(this)} className={usercss.ldap_button_group} icon='reload' />
+                    <Button title={formatMessage({id:'ldapmanager_flush'})} 
+                      onClick={this.handleFlushAndReset.bind(this)} 
+                      className={usercss.ldap_button_group} icon='reload' />
                 </ButtonGroup>
               </Footer>
             </Layout>

@@ -5,6 +5,31 @@ import moment from 'moment'
 import md5 from 'js-md5'
 
 let errTitle=''
+// ldap_字段映射
+export function LDAP_MAP_FIELDS_FORMAT(){
+  return {
+    uid:formatMessage({id:'ldap_uid'}),
+    sn:formatMessage({id:'ldap_sn'}),
+    givenName:formatMessage({id:'ldap_givenName'}),
+    mobile:formatMessage({id:'ldap_mobile'}),
+    cn:formatMessage({id:'ldap_cn'}),
+    mail:formatMessage({id:'ldap_mail'}),
+    uidNumber:formatMessage({id:'ldap_uidNumber'}),
+    gidNumber:formatMessage({id:'ldap_gidNumber'}),
+    loginShell:formatMessage({id:'ldap_loginShell'}),
+    departmentNumber:formatMessage({id:'ldap_departmentNumber'}),
+    homeDirectory:formatMessage({id:'ldap_homeDirectory'}),
+    userPassword:formatMessage({id:'ldap_userPassword'}),
+    sshPublicKey:formatMessage({id:'ldap_sshPublicKey'}),
+    manager:formatMessage({id:'ldap_manager'}),
+    description:formatMessage({id:'ldap_description'}),
+    ou:formatMessage({id:'ldap_ou'}),
+    o:formatMessage({id:'ldap_o'}),
+    member:formatMessage({id:'ldap_member'}),
+    uniqueMember:formatMessage({id:'ldap_uniqueMember'}),
+    memberUid:formatMessage({id:'ldap_memberUid'}),
+  }
+}
 // 生成认证请求头
 export function GenerateRequestAuthParams() {
   const header_info=Store.getLocal('userinfo');

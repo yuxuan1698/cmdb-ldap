@@ -46,7 +46,7 @@ class CMDBChangePassword extends PureComponent {
           callback:(data)=>{
             this.handleReset()
             notification.success({
-              message: formatMessage({id:'user.changepassword.success.title'}),
+              message: formatMessage({id:'userlist_userreset_success'}),
               description: formatMessage({id:'user.changepassword.success.msg'},{status:data.status})
             })
           setTimeout(this.handleRelogin.bind(this),1000)

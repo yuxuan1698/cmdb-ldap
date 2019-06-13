@@ -14,6 +14,8 @@ import {
 import { Resizable } from 'react-resizable';
 import css from './index.less'
 import Sider from 'antd/lib/layout/Sider';
+import {formatMessage} from 'umi/locale';
+
 const {TreeNode,DirectoryTree}=Tree
 const {Footer}=Layout
 class LDAPSelectPermission extends PureComponent {
@@ -124,7 +126,7 @@ class LDAPSelectPermission extends PureComponent {
               placement="right" 
               title={item.pop} 
               content={<Button block type='primary' icon='plus' size="small" 
-                    onClick={this.handleAddPermission.bind(this,item.key)} >添加用户到此组</Button>
+                    onClick={this.handleAddPermission.bind(this,item.key)} >{formatMessage({id:'ldap_permission_add_group'})}</Button>
                 } 
               trigger="hover">
             <span >{item.title}{item.description}</span>
@@ -254,8 +256,10 @@ class LDAPSelectPermission extends PureComponent {
         if(currPermissionKeys[i][m].length===0){
           haveError=true
           notification.error({
-            message: "保存权限失败",
-            description: <span>权限组[<strong style={{color:"red"}}>{i.split(',')[0].split('=')[1]}</strong>]所分配的用户为空，最少需要有一人在权限组内。</span>
+            message: formatMessage({id:'ldap_permission_save_field'}),
+            description: <span>
+              {formatMessage({id:'ldap_permission_save_field_msg'},{groupname:i.split(',')[0].split('=')[1]})}
+            </span>
           })
         }
       })
@@ -263,7 +267,7 @@ class LDAPSelectPermission extends PureComponent {
     if(haveError) return haveError
     dispatch({type:'ldap/postLDAPGroupPermission',payload:currPermissionKeys,callback:(d)=>{
       notification.info({
-        message: "保存成功提示",
+        message: formatMessage({id:'ldap_permission_save_success'}),
         description: d.status
       })
       this.props.handleReturnOrReset()
@@ -301,12 +305,12 @@ class LDAPSelectPermission extends PureComponent {
           <Table showHeader
             title={() => {
               return <div>
-                  {selectedRowKeys.length>0?<Button title="移除所选权限项" 
+                  {selectedRowKeys.length>0?<Button title={formatMessage({id:'ldap_permission_remove_choise'})}
                     icon='retweet' 
                     style={{float:"right",top:-4}} 
                     type="danger" 
-                    onClick={this.handleRemovePermissionItem.bind(this)}>移除所选权限项</Button>:""}
-                  <h3 style={{margin:0}}>当前用户[<span style={{color:"blue"}}>{currUser}</span>]的权限。</h3>
+                    onClick={this.handleRemovePermissionItem.bind(this)}>{formatMessage({id:'ldap_permission_remove_choise'})}</Button>:""}
+                  <h3 style={{margin:0}}>{formatMessage({id:'ldap_permission_remove_content'},{currUser})}</h3>
                 </div>
             }}
             className={css.permission_current_status}
@@ -330,17 +334,17 @@ class LDAPSelectPermission extends PureComponent {
             columns={[
               {
                 dataIndex: 'parentname',
-                title: '所属父级组',
+                title: formatMessage({id:'ldap_permission_table_id1'}),
                 key: 'parentname'
               },
               {
                 dataIndex: 'groupname',
-                title: '权限组名',
+                title: formatMessage({id:'ldap_permission_table_id2'}),
                 key: 'groupname'
               },
               {
                 dataIndex: 'description',
-                title: '组描述',
+                title: formatMessage({id:'ldap_permission_table_id3'}),
                 key:'description'
               },
             ]}
@@ -349,12 +353,20 @@ class LDAPSelectPermission extends PureComponent {
           />
           </Layout>
         <Footer className={css.permission_box_footbar}>
-          <Button title="返回" icon='retweet' onClick={this.props.handleReturnOrReset} style={{margin:"0 10px"}} type="dashed"  >返回</Button>
-          <Button title="保存权限" 
+          <Button title={formatMessage({id:'ldap_permission_backup'})} 
+            icon='retweet' 
+            onClick={this.props.handleReturnOrReset} 
+            style={{margin:"0 10px"}} 
+            type="dashed" >
+              {formatMessage({id:'ldap_permission_backup'})}
+            </Button>
+          <Button title={formatMessage({id:'ldap_permission_save'})}
             icon='usergroup-add' 
             disabled={Object.keys(currPermissionKeys).length>0?false:true} 
             onClick={this.handleSavePermissionChange.bind(this)}
-            loading={loading.effects['users/getLDAPUserPermissions']}>保存权限</Button>
+            loading={loading.effects['users/getLDAPUserPermissions']}>
+              {formatMessage({id:'ldap_permission_save'})}
+            </Button>
         </Footer>
       </Layout>
     )

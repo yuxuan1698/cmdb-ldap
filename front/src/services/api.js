@@ -8,6 +8,14 @@ export function UserChangePassword (data) {
         ...data
     })
 }
+// 管理员重置用户密码接口
+export function UserResetPassword(data) {
+    return request({
+        method: "post",
+        url: '/v1/ldap/user/resetpassword/',
+        data
+    })
+}
 // 更新LDAP DN 接口
 export function PostLDAPUpdateDN (data) {
     return request({

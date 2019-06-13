@@ -3,7 +3,7 @@
 import {connect} from 'dva';
 import {PureComponent} from 'react'
 import PropTypes from 'prop-types';
-import { Table, Icon, Button, Alert,Layout,Input,Tooltip } from 'antd';
+import { Table, Icon, Button, Alert,Layout,Input,Tooltip, Modal,notification } from 'antd';
 import usercss from "./user.less";
 import CMDBBreadcrumb from "../components/Breadcrumb";
 
@@ -118,6 +118,22 @@ class CMDBUserList extends PureComponent {
         })
     }
   }
+  handleResetPassword=(userdn,username)=>{
+    Modal.confirm({
+      title: formatMessage({id:'userlist_userreset_password'},{username}),
+      content: formatMessage({id:'userlist_userreset_password_msg'},{username}),
+      onCancel: ()=>{Modal.destroyAll()},
+      onOk: ()=>{
+        const {dispatch}=this.props
+        dispatch({type:'users/resetPasswordAction',payload:{userdn},callback:(data)=>{
+          notification.success({
+            message: formatMessage({id:'userlist_userreset_success'}),
+            description: data.status
+          })
+        }})
+      }
+    })
+  }
   render(){
     const {selectedRowKeys,loadedDrawer,modifyDrawer,modifydata,classobjects}=this.state
     const {userlist,loading,dispatch}=this.props
@@ -181,10 +197,16 @@ class CMDBUserList extends PureComponent {
       key: 'mail_notification',
       width:80,
       align:"center",
-      render:(text)=>{
-        return <Tooltip placement = "top" title={formatMessage({id:'userlist_table_resetpassword'})}>
-          <Button size='small' type="default" style={{padding:"0 4px",borderRadius:30}}  icon='mail'/>
-          </Tooltip>
+      render:(text,record)=>{
+        const username=record[record['userdn'].split(',')[0].split('=')[0]]
+        return <Tooltip placement = "top" 
+                title={formatMessage({id:'userlist_table_resetpassword'},{username})} >
+                <Button size='small' 
+                  type="default" 
+                  style={{padding:"0 4px",borderRadius:30}}
+                  onClick={this.handleResetPassword.bind(this,record['userdn'],username)}
+                  icon='mail'/>
+              </Tooltip>
 
       }
     },{

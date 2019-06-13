@@ -6,6 +6,8 @@ import css from './index.less'
 import {
   Button, Empty,Icon,Dropdown,Menu,Input
 } from 'antd';
+import {formatMessage} from 'umi/locale';
+
 const {Search}=Input
 
 class SelectFieldButton extends PureComponent {
@@ -16,17 +18,17 @@ class SelectFieldButton extends PureComponent {
     }
   }
   initAddFieldMenu=()=>{
-    const {mayField,currField,addInputField,filedToName}=this.props
+    const {mayField,currField,addInputField,LDAP_MAP_FIELDS}=this.props
     let items=mayField
     .filter(it=>{
       return !currField.includes(it) && it.indexOf(this.state.searchValue)>-1?true:false
     }).map(it=>{
       return (<Menu.Item onClick={addInputField.bind(this)} key={it}>
-          <span>{filedToName.hasOwnProperty(it)?`${it}(${filedToName[it]})`:it}</span>
+          <span>{LDAP_MAP_FIELDS.hasOwnProperty(it)?`${it}(${LDAP_MAP_FIELDS[it]})`:it}</span>
         </Menu.Item>)
     })
     if(items.length===0){
-      items= <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="没有找到字段" />
+      items= <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={formatMessage({id:'userlist_useradd_notfount_field'})} />
     }
     return (
       <Menu>
@@ -50,7 +52,8 @@ class SelectFieldButton extends PureComponent {
         disabled={selectedItems.filter(i=>i!=='top').length>0?false:true}
         overlay={this.initAddFieldMenu.bind(this)} >
         <Button block type="dashed"  >
-          <Icon type="plus" /> 添加字段信息
+          <Icon type="plus" /> 
+          {formatMessage({id:'userlist_useradd_addfield_button'})}
         </Button>
       </Dropdown>
     )
@@ -61,6 +64,6 @@ SelectFieldButton.propTypes = {
     currField: PropTypes.array.isRequired,
     selectedItems: PropTypes.array,
     addInputField: PropTypes.func,
-    filedToName: PropTypes.object
+    LDAP_MAP_FIELDS: PropTypes.object
   }; 
 export default SelectFieldButton

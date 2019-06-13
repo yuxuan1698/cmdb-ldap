@@ -8,7 +8,7 @@ import PropTypes from 'prop-types';
 import usercss from "./user.less";
 import CMDBBreadcrumb from "../components/Breadcrumb";
 import dynamic from 'umi/dynamic';
-
+import {formatMessage} from 'umi/locale';
 
 const {
   Content, Sider
@@ -129,7 +129,7 @@ class CMDBLdapPermission extends PureComponent {
               handleReturnOrReset={this.handleReturnOrReset.bind(this)}
               selectKey={selectKey} />:
               <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} 
-                description="请先选择需要用户......" 
+                description={formatMessage({id:'ldap_permission_choise'})}
                 className={usercss.right_empty_center} /> }
           </Content>
         </Layout>

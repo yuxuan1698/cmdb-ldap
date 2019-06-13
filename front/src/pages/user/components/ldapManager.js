@@ -10,32 +10,13 @@ import {connect} from 'dva';
 import PropTypes from 'prop-types';
 import css from './index.less'
 import SelectFieldButton from "./SelectFieldButton";
+import {formatMessage} from 'umi/locale';
+import {LDAP_MAP_FIELDS_FORMAT} from 'utils'
+
+const LDAP_MAP_FIELDS=LDAP_MAP_FIELDS_FORMAT()
 
 const { Option } = Select;
 const { Content,Footer } = Layout;
-
-const filedToName={
-  uid:'用户名',
-  sn:'用户姓名',
-  givenName:'用户附名',
-  mobile:'手机号码',
-  cn:'用户别名',
-  mail:'邮箱EMail',
-  uidNumber:'用户UID',
-  gidNumber:'用户组ID',
-  loginShell:'登陆SHELL',
-  departmentNumber:'职位名称',
-  homeDirectory:'用户目录',
-  userPassword:'用户密码',
-  sshPublicKey:'用户公钥',
-  uniqueMember:'唯一成员',
-  manager:'领导/上级',
-  description:'描述内容',
-  ou:'所属部门',
-  o:'组织单位',
-  member:'成员',
-  memberUid:'Unix组成员'
-}
 
 @Form.create()
 @connect(({users,loading})=>({userdnlist:Object.values(users.userlist),loading}))
@@ -54,6 +35,7 @@ class CMDBLDAPManager extends PureComponent {
     }
   }
   componentWillMount=()=>{
+    console.log(LDAP_MAP_FIELDS)
     const { selectdata }=this.props
     if(selectdata.hasOwnProperty('objectClass')){
       this.setState({
@@ -169,7 +151,7 @@ class CMDBLDAPManager extends PureComponent {
       if (!err) {
         if(isNewDn){
           dispatch({type:'ldap/postLDAPCreateDN',payload: {...values,currentDn},callback: ()=>{
-            message.success('Entry创建成功！',5)
+            message.success(formatMessage({id:'ldapmanager_create_entry_success'}),5)
             dispatch({type:'ldap/getLDAPGroupsList'})
             this.props.handleFlushAndReset()
           }})
@@ -180,7 +162,7 @@ class CMDBLDAPManager extends PureComponent {
             }else{
               this.props.handleUpdateLocalDn(values)
             }
-            message.success('数据保存成功！',5)
+            message.success(formatMessage({id:'ldapmanager_save_success'}),5)
           }})
         }
       }
@@ -190,8 +172,8 @@ class CMDBLDAPManager extends PureComponent {
     let {mustField,currField}=this.state
     if(mustField.includes(key)){
       notification.error({
-        message:"字段删除失败",
-        description: "此字段为必须字段，无法删除！"
+        message:formatMessage({id:'userlist_useradd_delfield_tips'}),
+        description: formatMessage({id:'userlist_useradd_delfield_failed'})
       })
     }else{
       this.setState({currField:currField.filter(i=>i!==key)})
@@ -225,13 +207,16 @@ class CMDBLDAPManager extends PureComponent {
                     <Form layout="horizontal" onSubmit={this.handleSubmit} >
                       <Row gutter={18} >
                         <Col span={24} >
-                          <Form.Item label='字段归属(objectClass)' >
+                          <Form.Item label={formatMessage({id:'userlist_useradd_field_parent'})+"(objectClass)"} >
                             {getFieldDecorator('objectClass', {
                               initialValue:this.state.selectedItems,
-                              rules: [{ required: true, message: '请选择属性归属类(objectClass)' }],
+                              rules: [{ 
+                                required: true, 
+                                message: formatMessage({id:'userlist_useradd_field_choise'})+"(objectClass)" 
+                              }],
                             })(<Select
                                 mode="multiple" showArrow autoFocus allowClear
-                                placeholder="请选择属性归属类(objectClass)"
+                                placeholder={formatMessage({id:'userlist_useradd_field_choise'})+"(objectClass)"}
                                 onChange={this.handleClassObjectsChange.bind(this)}
                                 loading={loading.effects['users/getLDAPClassList']}
                                 onMouseLeave={this.handleNewClassObject.bind(this)}
@@ -249,19 +234,19 @@ class CMDBLDAPManager extends PureComponent {
                         {this.state.currField.map((i)=>{
                           let inputField=<Input className={css.add_user_field_width}
                                           type="text"
-                                          placeholder={(filedToName[i]?filedToName[i]:i)+`(${i})`}/>
+                                          placeholder={(LDAP_MAP_FIELDS[i]?LDAP_MAP_FIELDS[i]:i)+`(${i})`}/>
                           if(i==='userPassword'){
                             inputField = <Input.Password 
-                              placeholder={(filedToName[i] ? filedToName[i] : i) + `(${i})`} />
+                              placeholder={(LDAP_MAP_FIELDS[i] ? LDAP_MAP_FIELDS[i] : i) + `(${i})`} />
                           }
                           if(i==='gidNumber' || i==='uidNumber'){
                             inputField = <InputNumber 
-                              placeholder={(filedToName[i] ? filedToName[i] : i) + `(${i})`}
+                              placeholder={(LDAP_MAP_FIELDS[i] ? LDAP_MAP_FIELDS[i] : i) + `(${i})`}
                               className={css.add_user_field_width}  min={1000} max={65535} />
                           }
                           if(i==='sshPublicKey' || i==='description'){
                             inputField = <Input.TextArea 
-                              placeholder={(filedToName[i] ? filedToName[i] : i) + `(${i})`} 
+                              placeholder={(LDAP_MAP_FIELDS[i] ? LDAP_MAP_FIELDS[i] : i) + `(${i})`} 
                               autosize={{ minRows: 2, maxRows: 5 }} />
                           }
                           if(['member','manager','uniqueMember','seeAlso','memberUid'].includes(i)){
@@ -271,7 +256,7 @@ class CMDBLDAPManager extends PureComponent {
                                       loading={loading.effects['users/getUserList']}
                                       notFoundContent={<div style={{textAlign:"center"}}><Icon type='loading' style={{ fontSize: 60 }} /></div>}
                                       onDropdownVisibleChange={this.handelOnSyncLoadUserDn.bind(this)}
-                                      placeholder={`请选择属性领导/上级(${i})`} >
+                                      placeholder={formatMessage({id:'userlist_useradd_choise_commander'},{i})} >
                                       {userdnlist.filter(s=>!(curval && curval.includes(s[0]))).map(item => {
                                         let value=(i==='memberUid'?item[0].split(',')[0].split('=')[1]:item[0])
                                         return (<Option key={value} value={value}>
@@ -283,12 +268,18 @@ class CMDBLDAPManager extends PureComponent {
                           }
                           return (
                             <Col span={24} key={i} >
-                            <Form.Item  labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label={filedToName[i]?`${filedToName[i]}(${i})`:i} hasFeedback required>
+                            <Form.Item  labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label={LDAP_MAP_FIELDS[i]?`${LDAP_MAP_FIELDS[i]}(${i})`:i} hasFeedback required>
                               {getFieldDecorator(i, {
                                   initialValue: (selectdata.hasOwnProperty(i) && i!=='userPassword')?(i==='gidNumber' || i==='uidNumber'?parseInt(selectdata[i],10):selectdata[i]):[],
-                                  rules: [{ required: i==='userPassword'?false:true, message: `请输入${filedToName[i]?filedToName[i]:i}(${i})` }],
+                                  rules: [{ 
+                                    required: i==='userPassword'?false:true, 
+                                    message: formatMessage(
+                                      {id:'userlist_useradd_input_tips'},
+                                      {fieldname:LDAP_MAP_FIELDS[i],fieldval:i}
+                                    )
+                                  }],
                               })(inputField)}
-                              {!this.state.mustField.includes(i)?<Tooltip placement="top" title="删除字段">
+                              {!this.state.mustField.includes(i)?<Tooltip placement="top" title={formatMessage({id:'userlist_useradd_del_field'})}>
                                     <Icon className={css.delete_field_icon}
                                       type="minus-circle-o"
                                       theme="twoTone"
@@ -306,7 +297,7 @@ class CMDBLDAPManager extends PureComponent {
                               selectedItems={selectedItems} 
                               currField={currField}
                               mayField={mayField}
-                              filedToName={filedToName}/>
+                              LDAP_MAP_FIELDS={LDAP_MAP_FIELDS}/>
                           </Form.Item>
                         </div>
                       </Row>
@@ -315,11 +306,11 @@ class CMDBLDAPManager extends PureComponent {
                   <Col span={8} >
                     <Alert
                       style={{margin:"42px 0px 0px 0px",padding:"15px 15px 15px 44px"}}
-                      message="温馨提示"
+                      message={formatMessage({id:'ldapmanager_tips'})}
                       description={<ul style={{listStyle: "initial",padding:"5px 0px 0 5px"}}>
-                        <li>在新建DN时，必须选择objectClass,所有字段规属objectClass。</li>
-                        <li>在新建DN时，字段以uid,cn,o为顺序，做为dn 字段，优先级以从前到后。</li>
-                        <li>密码字段默认不显示密码，如果不修改密码就留空但不要删除字段。</li>
+                        <li>{formatMessage({id:'ldapmanager_content_li1'})}</li>
+                        <li>{formatMessage({id:'ldapmanager_content_li2'})}</li>
+                        <li>{formatMessage({id:'ldapmanager_content_li3'})}</li>
                       </ul>}
                       type="info"
                       icon={<Icon type="warning" style={{left:10}} theme="twoTone" /> }
@@ -338,8 +329,10 @@ class CMDBLDAPManager extends PureComponent {
                     isNewDn?'plus':"save"
                   }
                   type = "primary" > {
-                    loaded||loaded_update ? "加载中.." : (isNewDn ?"新建":"保存")
-                  } < /Button>
+                    loaded||loaded_update ?formatMessage({id:'ldapmanager_loading'}) : (isNewDn ?
+                      formatMessage({id:'ldapmanager_newadd'}):
+                      formatMessage({id:'ldapmanager_save'}))
+                  } </Button>
                  
               </Footer>
           </Fragment>           
