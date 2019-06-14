@@ -71,8 +71,8 @@
           // allow: false,
         },
         {
-          key: '/system/mailresults',
-          name:formatMessage({id:'menu.side.system.email'}),
+          key: '/system/cronlogs',
+          name:formatMessage({id:'breadcrumb_system_crontab'}),
         },
       ]
     },

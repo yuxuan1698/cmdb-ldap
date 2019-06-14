@@ -290,16 +290,13 @@ class CmdbLDAP(object):
         try:
           self.conn.modify_s(olddn,modlist)
           returnStatus="更新用户成功",None
-        except ldap.NAMING_VIOLATION as e:
-          logger.error(e)
-          return False,"更新字段失败，失败内容:%s"%(e.args[0]['info'] if e.args[0]['info'] else "")
-        except ldap.CONSTRAINT_VIOLATION as e:
+        except ldap.LDAPError as e:
           logger.error(e)
           return False,"更新字段失败，失败内容:%s"%(e.args[0]['info'] if e.args[0]['info'] else "")
       if modrdn!='':
         try:
           self.conn.modrdn_s(olddn,modrdn)
-        except ldap.INVALID_DN_SYNTAX as e:
+        except ldap.LDAPError as e:
           logger.error(e)
           return False,"DN修改失败:%s"%(e.args[0]['info'] if e.args[0]['info'] else "")
         returnStatus="更新用户成功",None

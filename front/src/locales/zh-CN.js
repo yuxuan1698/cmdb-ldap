@@ -147,7 +147,6 @@ export default {
   ldap_departmentNumber:'职位名称',
   ldap_homeDirectory:'用户目录',
   ldap_userPassword:'用户密码',
-  ldap_sshPublicKey:'用户公钥',
   ldap_manager:'领导/上级',
   ldap_description:'备注/描述',
   ldap_ou:'所属部门',
@@ -204,7 +203,9 @@ export default {
   'ldap_permission_backup':'返回',
   'ldap_permission_save':'保存权限',
   'ldap_permission_choise':'请先选择需要用户......',
-  
+  // System 设置
+  'breadcrumb_system_crontablogs':'后台任务日志',
+  'breadcrumb_system_crontab':'后台任务'
 
 }
 

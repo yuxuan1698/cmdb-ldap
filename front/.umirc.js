@@ -42,7 +42,7 @@ export default {
   },
   theme: {
     "primary-color": "#1DA57A",
-    'border-radius-base': '3px',
+    'border-radius-base': '2px',
     'link-color': '#1DA57A',
     'error-color': '#f5222d',
     'layout-header-height': '54px',
@@ -51,7 +51,11 @@ export default {
     'layout-sider-background':"#1da57a",
     'tabs-title-font-size':'14px',
     'switch-sm-height':'18px',
-    'tabs-bar-margin':'0px -px 8px 0px'
+    'tabs-bar-margin':'0px -px 8px 0px',
+    'table-border-radius-base':0,
+    'table-header-bg':'#e8e8e8',
+    'popover-bg':'#fbfbfb',
+    'tooltip-max-width':"450px"
   },
   proxy: {
     "/api": {

@@ -15,6 +15,7 @@ import {formatMessage} from 'umi/locale';
 const {
   Content
 } = Layout;
+
 const DrawerAddUser = dynamic({
   loader: () => import('./components/addUser'),
   loading: (e) => {
@@ -171,26 +172,32 @@ class CMDBUserList extends PureComponent {
       title: formatMessage({id:'userlist_table_username'}),
       dataIndex: 'sn',
       key: 'sn',
+      sorter:()=>{},
     }, {
       title: formatMessage({id:'userlist_table_cn'}),
       dataIndex: 'cn',
       key: 'cn',
+      sorter:()=>{},
     },{
       title: formatMessage({id:'userlist_table_mobile'}),
       dataIndex: 'mobile',
       key: 'mobile',
+      sorter:()=>{},
     },{
       title: formatMessage({id:'userlist_table_department'}),
       dataIndex: 'departmentNumber',
       key: 'departmentNumber',
+      sorter:()=>{},
     },{
       title: formatMessage({id:'userlist_table_ou'}),
       dataIndex: 'ou',
       key: 'ou',
+      sorter:()=>{},
     }, {
       title: formatMessage({id:'userlist_table_email'}),
       dataIndex: 'mail',
       key: 'mail',
+      sorter:()=>{},
     },{
       title: formatMessage({id:'userlist_table_action'}),
       dataIndex: 'mail_notification',
@@ -249,8 +256,7 @@ class CMDBUserList extends PureComponent {
       <Layout className={usercss.userbody}>
         <CMDBBreadcrumb route={{breadcrumb_users_manager:"",breadcrumb_users_list:'/user'}} title='breadcrumb_users_list' />
         <Layout style={{margin:"10px 0 0 0"}}>
-          <Content>
-          <div className={usercss.tableContent}>
+          <Content className={usercss.tableContent}>
             <div className={usercss.usercontrol}>
               <div style={{float:"right"}}>
                 <Alert message={formatMessage({id:'userlist_table_select_user'},{usercount:selectedRowKeys.length})} 
@@ -307,8 +313,7 @@ class CMDBUserList extends PureComponent {
               hasData 
               loading={loading.effects['users/getUserList']} 
               size='small'
-              // bordered 
-              bodyStyle={{margin:0}}
+              bodyStyle={{margin:"0px"}}
               rowSelection={{
                 selectedRowKeys,
                 onChange: this.onSelectChange.bind(this),
@@ -320,7 +325,6 @@ class CMDBUserList extends PureComponent {
               }}
               columns={columns} 
               dataSource={tableData} />
-          </div>
           </Content>
           <UserInfo visible={this.state.displayuser} 
             loading={this.props.loading}

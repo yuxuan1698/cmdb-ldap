@@ -122,3 +122,12 @@ export function PostLDAPGroupPermissions (data) {
         data: data,
     })
 }
+// 获取权限组列表
+export function GetSystemCrontabLogsApi(data) {
+
+    return request({
+        method: "get",
+        url: '/v1/system/cronlogs/',
+        params:data
+    })
+}

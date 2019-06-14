@@ -16,7 +16,7 @@ class CMDBSystemSetting extends PureComponent {
   render(){
     return (
       <Layout >
-        <CMDBBreadcrumb route={{breadcrumb_system_setting:"",breadcrumb_system_logs:'/user'}} title='breadcrumb_system_logs' />
+        <CMDBBreadcrumb route={{breadcrumb_system_setting:"",breadcrumb_system_logs:'/system/systemlog'}} title='breadcrumb_system_logs' />
       </Layout>
       )
   }

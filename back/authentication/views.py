@@ -1,4 +1,4 @@
-from django.contrib.auth.models import Group
+# from django.contrib.auth.models import Group
 from django.http import JsonResponse
 from authentication.serializers import (
   LdapUserSerializer, 

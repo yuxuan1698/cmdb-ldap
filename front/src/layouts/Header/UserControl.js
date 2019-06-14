@@ -54,7 +54,6 @@ class CMDBUserControl extends PureComponent{
   componentWillReceiveProps(nextProps){
     const {login,location} =nextProps
     const {historyPath,historyParse}=login
-    console.log(this.props)
     if(!login.islogin){
       if(!isNotAuthChangerPassword(location))
         router.push({
