@@ -53,7 +53,7 @@ export default {
     'switch-sm-height':'18px',
     'tabs-bar-margin':'0px -px 8px 0px',
     'table-border-radius-base':0,
-    'table-header-bg':'#e8e8e8',
+    // 'table-header-bg':'#e8e8e8',
     'popover-bg':'#fbfbfb',
     'tooltip-max-width':"450px"
   },
