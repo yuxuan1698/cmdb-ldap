@@ -205,7 +205,10 @@ export default {
   'ldap_permission_choise':'请先选择需要用户......',
   // System 设置
   'breadcrumb_system_crontablogs':'后台任务日志',
-  'breadcrumb_system_crontab':'后台任务'
+  'breadcrumb_system_crontab':'后台任务',
+  // equipment 设备管理
+  'equipment_host_list':'云主机列表',
+  'equipment_host_list_manager':'管理云主机列表',
 
 }
 

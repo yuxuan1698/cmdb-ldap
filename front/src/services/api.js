@@ -131,3 +131,18 @@ export function GetSystemCrontabLogsApi(data) {
         params:data
     })
 }
+// 获取aliclound Ecs 列表
+export function GetAliCloundEcsListApi(data) {
+    return request({
+        method: "get",
+        url: '/v1/device/aliclound/ecs/',
+        params:data
+    })
+}
+// 获取aliclound Regions 列表
+export function GetAliCloundRegionsListApi() {
+    return request({
+        method: "get",
+        url: '/v1/device/aliclound/regions/',
+    })
+}

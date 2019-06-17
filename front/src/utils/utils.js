@@ -1,4 +1,4 @@
-import { Store } from "./store";
+import { Store } from "cmdbstore";
 import { notification,message,Alert,Icon } from 'antd';
 import {formatMessage} from 'umi/locale';
 import moment from 'moment'

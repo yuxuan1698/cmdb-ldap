@@ -6,7 +6,6 @@ import CMDBBreadcrumb from "../components/Breadcrumb";
 import {Layout,Table,Tooltip,Popover,Tag,Input } from 'antd';
 import {formatMessage} from 'umi/locale';
 import css from './index.less'
-import { Button } from 'antd/lib/radio';
 const {
   Content
 } = Layout;
@@ -45,19 +44,6 @@ class CMDBSystemSetting extends PureComponent {
     const {pageSize,page}=this.state
     this.handleGetData(page,pageSize)
   }
-  handleTableChange = (pagination, filters, sorter) => {
-    const {
-      sortname
-    } = this.state
-    const {
-      field,order
-    } = sorter
-    if(field){
-      this.setState({
-        sortname:order
-      })
-    }
-  }
   render(){
     const {
       data,
@@ -67,23 +53,22 @@ class CMDBSystemSetting extends PureComponent {
     } = this.state
     const {loading}=this.props
     const columns = [{
-        title: "ID",
         key: "ID",
-        width: 40,
+        title: 'ID',
+        render:(text,record,index)=>`${index+1}`,
+        width: 30,
         dataIndex: "id",
-        onCell: () => {
-          return {
-            style: {
-              textAlign: "center"
-            }
-          }
-        },
+        onCell:()=>{
+          return {style:{
+            textAlign:"center"
+          }}
+        }
       },
       {
         title: '任务名称/ID',
         key: 'task_name',
         dataIndex: 'task_name',
-        sorter: () => {},
+        sorter: (a,b)=> a['task_name'] < b['task_name']?-1:(a['task_name'] > b['task_name']?1:0),
         onCell: () => {
           return {
             style: {
@@ -107,10 +92,7 @@ class CMDBSystemSetting extends PureComponent {
         width: 100,
         key: 'status',
         dataIndex: 'status',
-        sorter: (a,b)=>{
-          console.log(sortname)
-          return sortname === 'descend' ? a['status'] < b['status'] : a['status'] > b['status']
-        },
+        sorter: (a,b)=> a['status'] < b['status']?-1:(a['status'] > b['status']?1:0),
         onCell: () => {
           return {
             style: {
@@ -129,7 +111,7 @@ class CMDBSystemSetting extends PureComponent {
       {
         title: '完成时间',
         key: 'date_done',
-        sorter: () => {},
+        sorter: (a,b)=> a['date_done'] < b['date_done']?-1:(a['date_done'] > b['date_done']?1:0),
         width: 210,
         onCell: () => {
           return {
@@ -148,7 +130,7 @@ class CMDBSystemSetting extends PureComponent {
         title: '任务参数',
         key: 'task_args',
         dataIndex: 'task_args',
-        sorter: () => {},
+        sorter: (a,b)=> a['task_args'] < b['task_args']?-1:(a['task_args'] > b['task_args']?1:0),
         onCell: () => {
           return {
             style: {
@@ -175,13 +157,12 @@ class CMDBSystemSetting extends PureComponent {
                 }
               } > {
                 text
-              } <
-              /Popover>:<Tooltip placement="top" 
+              } </Popover>:<Tooltip placement="top" 
             title = {
               text
             } > {
               text
-            } < /Tooltip>
+            } </Tooltip>
           }
         }
       },
@@ -189,7 +170,7 @@ class CMDBSystemSetting extends PureComponent {
         title: '返回内容',
         key: 'result',
         dataIndex: 'result',
-        sorter: () => {},
+        sorter: (a,b)=> a['result'] < b['result']?-1:(a['result'] > b['result']?1:0),
         onCell: () => {
           return {
             style: {
@@ -201,18 +182,18 @@ class CMDBSystemSetting extends PureComponent {
             }
           }
         },
-        render: (text) => < Tooltip placement = "topLeft"
+        render: (text) => <Tooltip placement = "topLeft"
         title = {
           text
         } > {
           text
-        } < /Tooltip>
+        } </Tooltip>
       },
       {
         title: '执行错误内容',
         key: 'traceback',
         dataIndex: 'traceback',
-        sorter: () => {},
+        sorter: (a,b)=> a['traceback'] < b['traceback']?-1:(a['traceback'] > b['traceback']?1:0),
         onCell: () => {
           return {
             style: {
@@ -240,8 +221,7 @@ class CMDBSystemSetting extends PureComponent {
                 }
               } > {
                 text
-              } <
-              /Popover>
+              } </Popover>
           }
         }
       },
@@ -276,9 +256,6 @@ class CMDBSystemSetting extends PureComponent {
                 }
               bordered
               bodyStyle={{margin:"0px"}}
-              onChange = {
-                this.handleTableChange
-              }
               columns={columns} 
               dataSource={data} 
               loading={Boolean(loading.effects['system/getSystemCronLogs'])}

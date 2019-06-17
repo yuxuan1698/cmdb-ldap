@@ -100,8 +100,11 @@ class CmdbJson(LDAPJSONEncoder):
     """
     JSON数据格式化
     """
+    # @staticmethod
     def encode(self,data):
       return json.loads(data)
+      
+    # @staticmethod
     def decode(self,data):
       return json.loads(self.default(data))
 

@@ -254,7 +254,11 @@ if AUTH_LDAP                              :
 AUTH_USER_MODEL                           = "authentication.Users"
 # AUTH_GROUP_MODEL                          = "authentication.UserGroups"
 
-
+# Ali Cloud Config配置
+ALI_CLOUND={
+    'ACCESSKEY':'LTAIUWuSChF0IY7L',
+    'ACCESSSECRET':'9e1QiG9cRDTIGJnUcOQMK27C1ohu8v',
+}
 
 # 日志部分
 # Django的日志配置项
