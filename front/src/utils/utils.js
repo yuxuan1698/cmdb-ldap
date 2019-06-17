@@ -109,6 +109,14 @@ export function formatTimeAndZone(timeString){
     ).add(timezone,"minutes").format("YYYY/MM/DD HH:mm:ss")
   }
 }
+// 格式化日期并进行时区转换
+export function formatAliCloundTime(beginTime,EndTime){
+  if(EndTime){
+    return moment(EndTime).diff(moment(beginTime), 'days')
+  }else{
+    return moment(beginTime).utc().format("YYYY年MM月DD日 HH:mm")
+  }
+}
 
 // 判断是否是登陆状态
 export function isLoginStatus(data){

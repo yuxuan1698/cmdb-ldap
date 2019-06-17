@@ -71,7 +71,7 @@ class CMDBSelectRegions extends PureComponent {
       // }
     >
     {this.state.regions.map(it=>{
-      return <Option style={{fontSize:14}} value={it.RegionId}>
+      return <Option key={it.RegionId} style={{fontSize:14}} value={it.RegionId}>
       {FLAGS.hasOwnProperty(it.RegionId)?<span style={{fontSize:18,paddingTop:1,float:"left"}}>{FLAGS[it.RegionId][0]}</span>:""}
       {it.LocalName}{(FLAGS.hasOwnProperty(it.RegionId) && FLAGS[it.RegionId].length>1)?`(${FLAGS[it.RegionId][1]})`:""}
       </Option>}

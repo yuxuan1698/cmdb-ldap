@@ -3,9 +3,10 @@
 import {connect} from 'dva';
 import {PureComponent} from 'react'
 import CMDBBreadcrumb from "../components/Breadcrumb";
-import {Layout,Table,Tooltip,Popover,Tag,Input,Select } from 'antd';
+import {Layout,Table,Tooltip,Popover,Tag,Input,Select,Icon } from 'antd';
 import CMDBSelectRegions from "./components/SelectRegions"
 import {formatMessage} from 'umi/locale';
+import { formatAliCloundTime } from 'utils'
 import css from './index.less'
 const {
   Content
@@ -18,10 +19,10 @@ const columns = [
   key: 'InstanceId',
   dataIndex: 'InstanceId',
   sorter: (a,b)=> a['InstanceId'] < b['InstanceId']?-1:(a['InstanceId'] > b['InstanceId']?1:0),
+  width:150,
   onCell: () => {
     return {
       style: {
-        maxWidth: 100,
         overflow: 'hidden',
         whiteSpace: 'nowrap',
         textOverflow: 'ellipsis',
@@ -31,17 +32,17 @@ const columns = [
   },
   render: (text, record) => < Tooltip placement = "top"
   title = {
-    `任务ID:${record.task_id}`
+    `实例ID:${record.InstanceId}`
   } > {
-    <span style={{fontSize:12}}>{text}<br/ >{record.InstanceName}</span>
+    <span style={{fontSize:12}}>{text}<br/ >({record.InstanceName})</span>
   } </Tooltip>
 },
 {
   title: '实例状态',
   width: 100,
-  key: 'status',
-  dataIndex: 'status',
-  sorter: (a,b)=> a['status'] < b['status']?-1:(a['status'] > b['status']?1:0),
+  key: 'Status',
+  dataIndex: 'Status',
+  sorter: (a,b)=> a['Status'] < b['Status']?-1:(a['Status'] > b['Status']?1:0),
   onCell: () => {
     return {
       style: {
@@ -53,100 +54,68 @@ const columns = [
     if (text) {
       return text === 'SUCCESS' ? <Tag color = "#87d068" > {
         text
-      } </Tag>:<Tag color="#f50">{text}</Tag >
-    }
-  }
-},
-{
-  title: '完成时间',
-  key: 'date_done',
-  sorter: (a,b)=> a['date_done'] < b['date_done']?-1:(a['date_done'] > b['date_done']?1:0),
-  width: 210,
-  onCell: () => {
-    return {
-      style: {
-        maxWidth: 120,
-        overflow: 'hidden',
-        whiteSpace: 'nowrap',
-        textOverflow: 'ellipsis',
-        cursor: 'pointer'
-      }
-    }
-  },
-  dataIndex: 'date_done',
-},
-{
-  title: '任务参数',
-  key: 'task_args',
-  dataIndex: 'task_args',
-  sorter: (a,b)=> a['task_args'] < b['task_args']?-1:(a['task_args'] > b['task_args']?1:0),
-  onCell: () => {
-    return {
-      style: {
-        maxWidth: 180,
-        overflow: 'hidden',
-        whiteSpace: 'nowrap',
-        textOverflow: 'ellipsis',
-        cursor: 'pointer'
-      }
-    }
-  },
-  render: (text) => {
-    if (text) {
-      return text.length > 50 ? < Popover placement = "topLeft"
-      title = {
-        '任务参数'
-      }
-      content = {
-        text
-      }
-      overlayStyle = {
-          {
-            maxWidth: 650
+      } </Tag>:<Tag color="green" style={{
+        padding: "1px", 
+        borderRadius: 18}} > 
+        < Icon type = 'play-circle'
+          style = {
+            {
+              float: "left",
+              margin: 2,
+              fontSize: 16
+            }
           }
-        } > {
-          text
-        } </Popover>:<Tooltip placement="top" 
-      title = {
-        text
+      / > 
+      < span style = {
+        {
+          marginRight: 4
+        }
       } > {
         text
-      } </Tooltip>
+      } </span> </Tag >
     }
   }
 },
 {
-  title: '返回内容',
-  key: 'result',
-  dataIndex: 'result',
-  sorter: (a,b)=> a['result'] < b['result']?-1:(a['result'] > b['result']?1:0),
-  onCell: () => {
-    return {
-      style: {
-        maxWidth: 180,
-        overflow: 'hidden',
-        whiteSpace: 'nowrap',
-        textOverflow: 'ellipsis',
-        cursor: 'pointer'
+  title: '产品到期时间',
+  key: 'ExpiredTime',
+  dataIndex: 'ExpiredTime',
+  sorter: (a,b)=> a['ExpiredTime'] < b['ExpiredTime']?-1:(a['ExpiredTime'] > b['ExpiredTime']?1:0),
+  width: 160,
+  render:(text,record)=>{
+    if(text){
+      return <div style={{fontSize:12}} > <span> {
+        formatAliCloundTime(text)
+      } </span><br /> <span> 剩余 {
+        formatAliCloundTime(new Date(),text)
       }
+       天 </span></div>
     }
-  },
-  render: (text) => <Tooltip placement = "topLeft"
-  title = {
-    text
-  } > {
-    text
-  } </Tooltip>
+  }
 },
 {
-  title: '执行错误内容',
-  key: 'traceback',
-  dataIndex: 'traceback',
-  sorter: (a,b)=> a['traceback'] < b['traceback']?-1:(a['traceback'] > b['traceback']?1:0),
+  title: '公网/内网IP',
+  key: 'HostName',
+  dataIndex: 'HostName',
+  width:100,
+  render: (text,record) => {
+    if (text) {
+      return <div style={{fontSize:12}} > {
+        record.PublicIpAddress.IpAddress
+      } < br /> < span > (私){
+        record.NetworkInterfaces.NetworkInterface[0].PrimaryIpAddress
+      } </span> </div >
+    }
+  }
+},
+{
+  title: '配置',
+  key: 'Cpu',
+  dataIndex: 'Cpu',
+  sorter: (a,b)=> a['Cpu'] < b['Cpu']?-1:(a['Cpu'] > b['Cpu']?1:0),
   onCell: () => {
     return {
       style: {
-        maxWidth: 180,
         overflow: 'hidden',
         whiteSpace: 'nowrap',
         textOverflow: 'ellipsis',
@@ -154,23 +123,9 @@ const columns = [
       }
     }
   },
-  render: (text) => {
+  render: (text,record) => {
     if (text) {
-      return <Popover placement = "left"
-      title = {
-        '执行错误内容'
-      }
-      content = {
-        text
-      }
-      trigger = "click"
-      overlayStyle = {
-          {
-            maxWidth: 650,
-          }
-        } > {
-          text
-        } </Popover>
+      return <div>{text} vCPU {parseInt(record.Memory/1024,10) }GiB</div>
     }
   }
 },
@@ -236,7 +191,7 @@ class CMDBSystemSetting extends PureComponent {
                 onChange:this.handleAliCloundEcsList.bind(this),
                 onShowSizeChange:this.handleAliCloundEcsList.bind(this)
               }} 
-              rowKey={record=>record.task_id}
+              rowKey={record=>record.InstanceId}
               title={()=><div><Input.Search
                   allowClear
                   placeholder={formatMessage({id:'userlist_table_search'})}
