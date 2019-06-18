@@ -81,7 +81,7 @@ class CMDBSystemSetting extends PureComponent {
         {
         title: '实例名称/ID',
         key: 'InstanceId',
-        width:200,
+        width:180,
         dataIndex: 'InstanceId',
         sorter: (a,b)=> a['InstanceId'] < b['InstanceId']?-1:(a['InstanceId'] > b['InstanceId']?1:0),
         onCell: () => {

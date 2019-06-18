@@ -135,7 +135,7 @@ export function GetSystemCrontabLogsApi(data) {
 export function GetAliCloundEcsListApi(data) {
     return request({
         method: "get",
-        url: '/v1/device/aliclound/ecs/',
+        url: '/v1/aliclound/ecs/',
         params:data
     })
 }
@@ -143,6 +143,6 @@ export function GetAliCloundEcsListApi(data) {
 export function GetAliCloundRegionsListApi() {
     return request({
         method: "get",
-        url: '/v1/device/aliclound/regions/',
+        url: '/v1/aliclound/regions/',
     })
 }

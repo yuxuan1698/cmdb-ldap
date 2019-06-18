@@ -4,6 +4,8 @@ from aliyunsdkcore.acs_exception.exceptions import ServerException
 from aliyunsdkecs.request.v20140526.DescribeInstancesRequest import DescribeInstancesRequest
 from aliyunsdkecs.request.v20140526.DescribeRegionsRequest import DescribeRegionsRequest
 from aliyunsdkecs.request.v20140526.StopInstanceRequest import StopInstanceRequest
+from aliyunsdkcas.request.v20180813.DescribeCertificateStatusCountRequest import DescribeCertificateStatusCountRequest
+from aliyunsdkcas.request.v20180813.DescribeCertificateListRequest import DescribeCertificateListRequest
 from common.utils import CmdbLDAPLogger
 from django.conf import settings
 logger=CmdbLDAPLogger().get_logger('django.server')
@@ -32,6 +34,36 @@ class AliClound():
         req=DescribeInstancesRequest()
         req.set_PageSize(PageSize)
         req.set_PageNumber(Page)
+        req.set_accept_format('json')
+        try:
+            data=client.do_action(req)
+            if data:
+                return data
+            else:
+                return False
+        except Exception as e:
+            logger.error(e)
+            return False
+
+    def getAliCloundCertificateStatusCount(self):
+        client=AcsClient(self.secreyKey,self.accesssecret)
+        req = DescribeCertificateStatusCountRequest()
+        req.set_accept_format('json')
+        try:
+            data=client.do_action(req)
+            if data:
+                return data
+            else:
+                return False
+        except Exception as e:
+            logger.error(e)
+            return False
+
+    def getAliCloundCertificateList(self,status=''):
+        client=AcsClient(self.secreyKey,self.accesssecret)
+        req = DescribeCertificateListRequest()
+        if status!='':
+            req.set_Status(status)
         req.set_accept_format('json')
         try:
             data=client.do_action(req)

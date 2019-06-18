@@ -6,10 +6,14 @@ from rest_framework import routers
 from .views import (
     getCrontabLogsViewSet,
     getAliCloundEcsListSet,
-    getAliCloundRegionListSet
+    getAliCloundRegionListSet,
+    getAliCloundCerificateCountSet,
+    getAliCloundCerificateListSet
     )
 urlpatterns = [
     path('system/cronlogs/', getCrontabLogsViewSet.as_view(),name='system-mailresults'),
-    path('device/aliclound/ecs/', getAliCloundEcsListSet.as_view(),name='device-aliclound-ecs'),
-    path('device/aliclound/regions/', getAliCloundRegionListSet.as_view(),name='device-aliclound-regions'),
+    path('aliclound/ecs/', getAliCloundEcsListSet.as_view(),name='aliclound-ecs'),
+    path('aliclound/regions/', getAliCloundRegionListSet.as_view(),name='aliclound-regions'),
+    path('aliclound/cerificate/list/',getAliCloundCerificateListSet.as_view(), name='aliclound-cerificate-list'),
+    path('aliclound/cerificate/count/', getAliCloundCerificateCountSet.as_view(),name='aliclound-cerificate-count'),
 ]

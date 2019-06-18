@@ -76,13 +76,33 @@ class getAliCloundRegionListSet(APIView):
     else:
       return JsonResponse({'error':'获取Rigion信息出错，请检查！'},status=status.HTTP_400_BAD_REQUEST,safe=False)
 
+class getAliCloundCerificateCountSet(APIView):
+  """
+  列出阿里云主机列表
+  """
+  def get(self,request, *args, **kwargs):
+    # cacheRigions=cache.get('cacheRigions')
+    # if not cacheRigions:
+    CertificateCount = aliClound.getAliCloundCertificateStatusCount()
+      # cache.set('CertificateCount',CertificateCount)
+    if CertificateCount:
+      data=CmdbJson().decode(CertificateCount)
+      # response = []
+      # if 'Regions' in data:
+      # response=data.get('Regions').get('Region')
+      return JsonResponse(data, safe=False)
+    else:
+      return JsonResponse({'error':'获取Rigion信息出错，请检查！'},status=status.HTTP_400_BAD_REQUEST,safe=False)
 
-
-# class GetGroupViewSet(APIView):
-#   """
-#   允许用户查看或编辑的API路径test。
-#   """
-#   serializer_class=UserGroupSerializer
-  
-#   def listgroups():
-#     queryset = Users.objects.all()
+class getAliCloundCerificateListSet(APIView):
+  """
+  列出阿里云证书列表
+  """
+  def get(self,request, *args, **kwargs):
+    status = request.GET.get('status') or ''
+    CertificateList = aliClound.getAliCloundCertificateList(status)
+    if CertificateList:
+      data=CmdbJson().decode(CertificateList)
+      return JsonResponse(data, safe=False)
+    else:
+      return JsonResponse({'error':'获取Rigion信息出错，请检查！'},status=status.HTTP_400_BAD_REQUEST,safe=False)
