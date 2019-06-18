@@ -55,7 +55,8 @@ export default {
     'table-border-radius-base':0,
     'table-header-bg':'#e8e8e8',
     'popover-bg':'#fbfbfb',
-    'tooltip-max-width':"450px"
+    'tooltip-max-width':"450px",
+    'tooltip-arrow-width':"7px"
   },
   proxy: {
     "/api": {

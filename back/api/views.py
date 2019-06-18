@@ -42,12 +42,13 @@ class getAliCloundEcsListSet(APIView):
   def get(self,request, *args, **kwargs):
     PageSize=request.GET.get('pageSize') or 15
     Page=request.GET.get('page') or 1
-    RegionId=request.GET.get('regionId') or 'cn-shenzhen'
+    RegionId=request.GET.get('region') or 'cn-shenzhen'
     response = {}
-    cacheEcs=cache.get('cacheEcs_%s%s'%(Page,PageSize))
-    if not cacheEcs:
-      cacheEcs=aliClound.getAliCloundEcsList(RegionId,PageSize,Page)
-      cache.set('cacheEcs_%s%s'%(Page,PageSize),cacheEcs)
+    logger.info(RegionId)
+    # cacheEcs=cache.get('cacheEcs_%s%s'%(Page,PageSize))
+    # if not cacheEcs:
+    cacheEcs=aliClound.getAliCloundEcsList(RegionId,PageSize,Page)
+      # cache.set('cacheEcs_%s%s'%(Page,PageSize),cacheEcs)
     if cacheEcs:
       data=CmdbJson().decode(cacheEcs)
       response['total']=data.get('TotalCount')

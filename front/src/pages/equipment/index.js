@@ -3,133 +3,15 @@
 import {connect} from 'dva';
 import {PureComponent} from 'react'
 import CMDBBreadcrumb from "../components/Breadcrumb";
-import {Layout,Table,Tooltip,Popover,Tag,Input,Select,Icon } from 'antd';
+import {Layout,Table,Tooltip,Tag,Input,Icon } from 'antd';
 import CMDBSelectRegions from "./components/SelectRegions"
 import {formatMessage} from 'umi/locale';
 import { formatAliCloundTime } from 'utils'
 import css from './index.less'
+import linuxlogo from './linux.png'
 const {
   Content
 } = Layout;
-const { Option } = Select;
-
-const columns = [
-  {
-  title: '实例名称/ID',
-  key: 'InstanceId',
-  dataIndex: 'InstanceId',
-  sorter: (a,b)=> a['InstanceId'] < b['InstanceId']?-1:(a['InstanceId'] > b['InstanceId']?1:0),
-  width:150,
-  onCell: () => {
-    return {
-      style: {
-        overflow: 'hidden',
-        whiteSpace: 'nowrap',
-        textOverflow: 'ellipsis',
-        cursor: 'pointer'
-      }
-    }
-  },
-  render: (text, record) => < Tooltip placement = "top"
-  title = {
-    `实例ID:${record.InstanceId}`
-  } > {
-    <span style={{fontSize:12}}>{text}<br/ >({record.InstanceName})</span>
-  } </Tooltip>
-},
-{
-  title: '实例状态',
-  width: 100,
-  key: 'Status',
-  dataIndex: 'Status',
-  sorter: (a,b)=> a['Status'] < b['Status']?-1:(a['Status'] > b['Status']?1:0),
-  onCell: () => {
-    return {
-      style: {
-        textAlign: "center"
-      }
-    }
-  },
-  render: (text) => {
-    if (text) {
-      return text === 'SUCCESS' ? <Tag color = "#87d068" > {
-        text
-      } </Tag>:<Tag color="green" style={{
-        padding: "1px", 
-        borderRadius: 18}} > 
-        < Icon type = 'play-circle'
-          style = {
-            {
-              float: "left",
-              margin: 2,
-              fontSize: 16
-            }
-          }
-      / > 
-      < span style = {
-        {
-          marginRight: 4
-        }
-      } > {
-        text
-      } </span> </Tag >
-    }
-  }
-},
-{
-  title: '产品到期时间',
-  key: 'ExpiredTime',
-  dataIndex: 'ExpiredTime',
-  sorter: (a,b)=> a['ExpiredTime'] < b['ExpiredTime']?-1:(a['ExpiredTime'] > b['ExpiredTime']?1:0),
-  width: 160,
-  render:(text,record)=>{
-    if(text){
-      return <div style={{fontSize:12}} > <span> {
-        formatAliCloundTime(text)
-      } </span><br /> <span> 剩余 {
-        formatAliCloundTime(new Date(),text)
-      }
-       天 </span></div>
-    }
-  }
-},
-{
-  title: '公网/内网IP',
-  key: 'HostName',
-  dataIndex: 'HostName',
-  width:100,
-  render: (text,record) => {
-    if (text) {
-      return <div style={{fontSize:12}} > {
-        record.PublicIpAddress.IpAddress
-      } < br /> < span > (私){
-        record.NetworkInterfaces.NetworkInterface[0].PrimaryIpAddress
-      } </span> </div >
-    }
-  }
-},
-{
-  title: '配置',
-  key: 'Cpu',
-  dataIndex: 'Cpu',
-  sorter: (a,b)=> a['Cpu'] < b['Cpu']?-1:(a['Cpu'] > b['Cpu']?1:0),
-  onCell: () => {
-    return {
-      style: {
-        overflow: 'hidden',
-        whiteSpace: 'nowrap',
-        textOverflow: 'ellipsis',
-        cursor: 'pointer'
-      }
-    }
-  },
-  render: (text,record) => {
-    if (text) {
-      return <div>{text} vCPU {parseInt(record.Memory/1024,10) }GiB</div>
-    }
-  }
-},
-];
 @connect(({ loading }) => ({ loading }))
 class CMDBSystemSetting extends PureComponent {
   constructor(props){
@@ -140,22 +22,46 @@ class CMDBSystemSetting extends PureComponent {
       page:1,
       pageSize:15,
       region:'cn-shenzhen',
-      selectedRowKeys:[]
+      selectedRowKeys:[],
+      regions:[],
+      regionNames:{}
     }
   }
-
-  handleAliCloundEcsList=(page,pageSize,region)=>{
+  handleAliCloundSetRegion=(regions)=>{
+    this.setState({...regions})
+  }
+  handleAliCloundRegionChange(region){
     const {dispatch}=this.props
-    let payload={page,pageSize}
-    if(region) payload=Object.assign({...payload,region})
-
+    const {page,pageSize}=this.state
+    let payload={page,pageSize,region}
     dispatch({type:'equipment/getAliCloundEcsList',payload,callback:(data)=>{
       this.setState(Object.assign({...data},payload))
     }})
   }
+  handleAliCloundEcsList=(page,pageSize)=>{
+    const {dispatch}=this.props
+    let payload={page,pageSize,region:this.state.region}
+    dispatch({type:'equipment/getAliCloundEcsList',payload,callback:(data)=>{
+      this.setState(Object.assign({...data},payload))
+    }})
+  }
+  handleAliCloundRegions(){
+    const {dispatch}=this.props
+    const {pageSize,page,region}=this.state
+    dispatch({type:'equipment/getAliCloundRegionsList',callback:(data)=>{
+      let regionNames={}
+      Object.values(data).map(i=>regionNames[i.RegionId]=i.LocalName)
+      this.setState({regions:Object.values(data),regionNames:regionNames})
+      this.handleAliCloundEcsList(page,pageSize,region)
+    }})
+  }
   componentDidMount(){
     const {pageSize,page,region}=this.state
-    this.handleAliCloundEcsList(page,pageSize,region)
+    if(this.state.regions.length===0){
+       this.handleAliCloundRegions()
+    }else{
+      this.handleAliCloundEcsList(page,pageSize,region)
+    }
   }
   onSelectChange=(selectedRowKeys)=>{
     this.setState({selectedRowKeys})
@@ -166,11 +72,190 @@ class CMDBSystemSetting extends PureComponent {
       pageSize,
       total,
       region,
-      selectedRowKeys
+      selectedRowKeys,
+      regions,
+      regionNames
     } = this.state
-    console.log(this.state)
-    const {loading,dispatch}=this.props
-   
+    const {loading}=this.props
+    const columns = [
+        {
+        title: '实例名称/ID',
+        key: 'InstanceId',
+        width:200,
+        dataIndex: 'InstanceId',
+        sorter: (a,b)=> a['InstanceId'] < b['InstanceId']?-1:(a['InstanceId'] > b['InstanceId']?1:0),
+        onCell: () => {
+          return {
+            style: {
+              overflow: 'hidden',
+              whiteSpace: 'nowrap',
+              textOverflow: 'ellipsis',
+              cursor: 'pointer'
+            }
+          }
+        },
+        render: (text, record) => < Tooltip placement = "top"
+        title = {
+          `实例ID:${record.InstanceId}`
+        } > {
+          <span style={{fontSize:12}}>{text}<br/ >({record.InstanceName})</span>
+        } </Tooltip>
+      },
+      {
+        title: '实例状态',
+        width: 100,
+        key: 'Status',
+        dataIndex: 'Status',
+        sorter: (a,b)=> a['Status'] < b['Status']?-1:(a['Status'] > b['Status']?1:0),
+        onCell: () => {
+          return {
+            style: {
+              textAlign: "center"
+            }
+          }
+        },
+        render: (text) => {
+          if (text) {
+            return text === 'SUCCESS' ? <Tag color = "#87d068" > {
+              text
+            } </Tag>:<Tag color="green" style={{
+              padding: "0px", 
+              borderRadius: 18}} > 
+              < Icon type = 'play-circle'
+                style = {{float: "left",
+                    margin: 2,
+                    fontSize: 16}} /> 
+            < span style = {{marginRight: 4}} > {
+              text
+            } </span> </Tag >
+          }
+        }
+      },
+      {
+        title: '产品到期时间',
+        key: 'ExpiredTime',
+        width:190,
+        dataIndex: 'ExpiredTime',
+        sorter: (a,b)=> a['ExpiredTime'] < b['ExpiredTime']?-1:(a['ExpiredTime'] > b['ExpiredTime']?1:0),
+        render:(text,record)=>{
+          if(text){
+            let diff_day=formatAliCloundTime(new Date(),text)
+            return <Tooltip placement = "top" 
+                    title={()=><div style={{fontSize:12}}>剩余 { diff_day<30?<span style={{color:"red"}}>{diff_day}</span>:diff_day } 天</div>} > 
+                      <div> { formatAliCloundTime(text) } 到期</div>
+                      <div> 剩余 { diff_day<30?<span style={{color:"red"}}>{diff_day}</span>:diff_day } 天 </div>
+                  </Tooltip>
+          }
+        }
+      },
+      {
+        title: '公网/内网IP',
+        key: 'NetworkInterfaces',
+        dataIndex: 'NetworkInterfaces',
+        render: (text,record) => {
+          if (text) {
+            return <Tooltip placement = "top"
+                    title={<div style={{fontSize:12}}>(私){record.NetworkInterfaces.NetworkInterface.map(i=>i.PrimaryIpAddress).join('、')}</div>}
+                    >
+                {record.PublicIpAddress.IpAddress.length>0?<div>(公){record.PublicIpAddress.IpAddress}</div>:""} 
+                <div>(私){record.NetworkInterfaces.NetworkInterface.map(i=>i.PrimaryIpAddress).join('、')}</div> 
+            </Tooltip> 
+          }
+        }
+      },
+      {
+        title: '配置参数',
+        key: 'Cpu',
+        dataIndex: 'Cpu',
+        sorter: (a,b)=> a['Cpu'] < b['Cpu']?-1:(a['Cpu'] > b['Cpu']?1:0),
+        onCell: () => {
+          return {
+            style: {
+              overflow: 'hidden',
+              whiteSpace: 'nowrap',
+              textOverflow: 'ellipsis',
+              cursor: 'pointer'
+            }
+          }
+        },
+        render: (text,record) => {
+          if (text) {
+            return <Tooltip placement = "top"
+                      title = {()=>{
+                          return <div style={{fontSize:12}}>{text} vCPU / {parseInt(record.Memory/1024,10) }GiB / {record.InternetMaxBandwidthOut}Mbps(峰值)<br/>
+                          {record.InstanceType}</div>
+                        }
+                      } >
+                      {text} vCPU / {parseInt(record.Memory/1024,10) }GiB / {record.InternetMaxBandwidthOut}Mbps(峰值)<br/>
+                      {record.InstanceType}
+                    </Tooltip>
+            }
+          }
+      },
+      {
+        title: '系统类型',
+        key: 'OSType',
+        dataIndex: 'OSType',
+        sorter: (a,b)=> a['OSType'] < b['OSType']?-1:(a['OSType'] > b['OSType']?1:0),
+        render: (text,record) => {
+          if (text) {
+            return <div>
+                <div>{record.OSName}</div>
+                <div>{text==='linux'?<span>{text}<img src={linuxlogo} /></span>:text}(
+                  {record.InstanceChargeType==='PrePaid'?"预付费":record.InstanceChargeType})</div>
+              </div>
+            }
+          }
+      },
+      {
+        title: '主机名称',
+        key: 'HostName',
+        dataIndex: 'HostName',
+        sorter: (a,b)=> a['HostName'] < b['HostName']?-1:(a['HostName'] > b['HostName']?1:0),
+      },
+      {
+        title: '主机标签',
+        key: 'Tags',
+        dataIndex: 'Tags',
+        render: (text,record) => {
+          if (text) {
+            return record.Tags.Tag.map(i=>{
+              return <Tag key={i.TagValue+""+Math.random()} color={i.TagValue==='prod'?"blue":"cyan"}>{i.TagValue}</Tag>
+            })
+            }
+          }
+      },
+      {
+        title: '区域/区域组',
+        key: 'RegionId',
+        width:120,
+        dataIndex: 'RegionId',
+        sorter: (a,b)=> a['RegionId'] < b['RegionId']?-1:(a['RegionId'] > b['RegionId']?1:0),
+        render: (text,record) => {
+          if (text) {
+            return <div>
+              <div>{regionNames.hasOwnProperty(text)?regionNames[text]:text}</div>
+              <div>{record.ZoneId}</div>
+            </div>
+            }
+          }
+      },
+      {
+        title: '监控数据',
+        key: 'qq',
+        width:80,
+        dataIndex: 'qq',
+        render: (text) => {
+            return <div style={{textAlign:"center"}}>
+              <Tooltip placement="top"
+                title={<div style={{fontSize:12}}>查看监控数据</div>} >
+                  <Icon type='line-chart' style={{fontSize:16,cursor:"pointer",color:"green"}} />
+                </Tooltip>
+              
+            </div>
+          }
+      },
+    ];
     return (
       <Layout >
         <CMDBBreadcrumb 
@@ -179,7 +264,7 @@ class CMDBSystemSetting extends PureComponent {
             equipment_host_list:'/system/cronlogs'
           }} 
           title='equipment_host_list_manager' />
-          <Content className={css.tableContent}>
+          <Content className={css.aliecs_extra_css}>
             <Table pagination={{
                 size:"small",
                 showSizeChanger:true,
@@ -195,8 +280,14 @@ class CMDBSystemSetting extends PureComponent {
               title={()=><div><Input.Search
                   allowClear
                   placeholder={formatMessage({id:'userlist_table_search'})}
-                  style={{ transition:"all .2s ease-out",width:300 }}
-                /><CMDBSelectRegions dispatch={dispatch} loading={loading} region={region} /></div>
+                  style={{ transition:"all .2s ease-out",width:300,float:"right" }}
+                /><strong>区域选择:</strong><CMDBSelectRegions 
+                  loading={loading} 
+                  region={region} 
+                  regions={regions}
+                  handleAliCloundRegionChange={this.handleAliCloundRegionChange.bind(this)} 
+                  handleAliCloundSetRegion={this.handleAliCloundSetRegion.bind(this)} 
+                  /></div>
                 }
               bordered
               bodyStyle={{margin:"0px"}}

@@ -37,20 +37,7 @@ class CMDBSelectRegions extends PureComponent {
     super(props)
     this.state={
       regions:[],
-      defaultRegion:'cn-shenzhen'
     }
-  }
-  handleAliCloundRegions=()=>{
-    const {dispatch}=this.props
-    dispatch({type:'equipment/getAliCloundRegionsList',callback:(data)=>{
-      this.setState({regions:Object.values(data)})
-    }})
-  }
-  componentDidMount(){
-    this.handleAliCloundRegions()
-  }
-  handleSelectRegionsChange=(e)=>{
-    console.log(e)
   }
   render(){
     const {regions}=this.state
@@ -62,7 +49,7 @@ class CMDBSelectRegions extends PureComponent {
       optionFilterProp="children"
       defaultValue={region}
       loading={Boolean(loading.effects['equipment/getAliCloundRegionsList'])}
-      onChange={this.handleSelectRegionsChange.bind(this)}
+      onChange={this.props.handleAliCloundRegionChange.bind(this)}
       // onFocus={onFocus}
       // onBlur={onBlur}
       // onSearch={onSearch}
@@ -70,7 +57,7 @@ class CMDBSelectRegions extends PureComponent {
       //   option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
       // }
     >
-    {this.state.regions.map(it=>{
+    {this.props.regions.map(it=>{
       return <Option key={it.RegionId} style={{fontSize:14}} value={it.RegionId}>
       {FLAGS.hasOwnProperty(it.RegionId)?<span style={{fontSize:18,paddingTop:1,float:"left"}}>{FLAGS[it.RegionId][0]}</span>:""}
       {it.LocalName}{(FLAGS.hasOwnProperty(it.RegionId) && FLAGS[it.RegionId].length>1)?`(${FLAGS[it.RegionId][1]})`:""}
