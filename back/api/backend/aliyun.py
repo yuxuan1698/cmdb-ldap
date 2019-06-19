@@ -6,6 +6,8 @@ from aliyunsdkecs.request.v20140526.DescribeRegionsRequest import DescribeRegion
 from aliyunsdkecs.request.v20140526.StopInstanceRequest import StopInstanceRequest
 from aliyunsdkcas.request.v20180813.DescribeCertificateStatusCountRequest import DescribeCertificateStatusCountRequest
 from aliyunsdkcas.request.v20180813.DescribeCertificateListRequest import DescribeCertificateListRequest
+from aliyunsdkots.request.v20160620.ListTagsRequest import ListTagsRequest
+
 from common.utils import CmdbLDAPLogger
 from django.conf import settings
 logger=CmdbLDAPLogger().get_logger('django.server')
@@ -60,8 +62,30 @@ class AliClound():
             return False
 
     def getAliCloundCertificateList(self,status=''):
+        """
+        获取证书列表
+        """
         client=AcsClient(self.secreyKey,self.accesssecret)
         req = DescribeCertificateListRequest()
+        if status!='':
+            req.set_Status(status)
+        req.set_accept_format('json')
+        try:
+            data=client.do_action(req)
+            if data:
+                return data
+            else:
+                return False
+        except Exception as e:
+            logger.error(e)
+            return False
+
+    def getAliCloundTagsList(self,status=''):
+        """
+        获取标签列表
+        """
+        client=AcsClient(self.secreyKey,self.accesssecret)
+        req = ListTagsRequest()
         if status!='':
             req.set_Status(status)
         req.set_accept_format('json')

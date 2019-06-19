@@ -106,3 +106,16 @@ class getAliCloundCerificateListSet(APIView):
       return JsonResponse(data, safe=False)
     else:
       return JsonResponse({'error':'获取Rigion信息出错，请检查！'},status=status.HTTP_400_BAD_REQUEST,safe=False)
+
+class getAliCloundTagsListSet(APIView):
+  """
+  列出阿里云证书列表
+  """
+  def get(self,request, *args, **kwargs):
+    status = request.GET.get('status') or ''
+    TagsList = aliClound.getAliCloundTagsList(status)
+    if TagsList:
+      data=CmdbJson().decode(TagsList)
+      return JsonResponse(data, safe=False)
+    else:
+      return JsonResponse({'error':'获取Rigion信息出错，请检查！'},status=status.HTTP_400_BAD_REQUEST,safe=False)

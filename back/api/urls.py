@@ -8,12 +8,14 @@ from .views import (
     getAliCloundEcsListSet,
     getAliCloundRegionListSet,
     getAliCloundCerificateCountSet,
-    getAliCloundCerificateListSet
+    getAliCloundCerificateListSet,
+    getAliCloundTagsListSet
     )
 urlpatterns = [
     path('system/cronlogs/', getCrontabLogsViewSet.as_view(),name='system-mailresults'),
     path('aliclound/ecs/', getAliCloundEcsListSet.as_view(),name='aliclound-ecs'),
     path('aliclound/regions/', getAliCloundRegionListSet.as_view(),name='aliclound-regions'),
+    path('aliclound/tags/list/',getAliCloundTagsListSet.as_view(), name='aliclound-cerificate-list'),
     path('aliclound/cerificate/list/',getAliCloundCerificateListSet.as_view(), name='aliclound-cerificate-list'),
     path('aliclound/cerificate/count/', getAliCloundCerificateCountSet.as_view(),name='aliclound-cerificate-count'),
 ]

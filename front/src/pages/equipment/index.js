@@ -3,7 +3,7 @@
 import {connect} from 'dva';
 import {PureComponent} from 'react'
 import CMDBBreadcrumb from "../components/Breadcrumb";
-import {Layout,Table,Tooltip,Tag,Input,Icon } from 'antd';
+import {Layout,Table,Tooltip,Tag,Input,Icon,Cascader } from 'antd';
 import CMDBSelectRegions from "./components/SelectRegions"
 import {formatMessage} from 'umi/locale';
 import { formatAliCloundTime } from 'utils'
@@ -24,7 +24,8 @@ class CMDBSystemSetting extends PureComponent {
       region:'cn-shenzhen',
       selectedRowKeys:[],
       regions:[],
-      regionNames:{}
+      regionNames:{},
+      Tags:[]
     }
   }
   handleAliCloundSetRegion=(regions)=>{
@@ -41,8 +42,28 @@ class CMDBSystemSetting extends PureComponent {
   handleAliCloundEcsList=(page,pageSize)=>{
     const {dispatch}=this.props
     let payload={page,pageSize,region:this.state.region}
+    let Tags=[]
     dispatch({type:'equipment/getAliCloundEcsList',payload,callback:(data)=>{
-      this.setState(Object.assign({...data},payload))
+      let tmp={}
+      data.ecslist.map(i=>{
+        if(i.hasOwnProperty('Tags')){
+          i.Tags.Tag.map(s=>{
+            if(tmp.hasOwnProperty(s.TagKey) && tmp[s.TagKey]!==undefined){
+              tmp[s.TagKey]=Array.from(new Set([...tmp[s.TagKey],s.TagValue===""?s.TagKey:s.TagValue]))
+            }else{
+              tmp[s.TagKey]=[s.TagValue===""?s.TagKey:s.TagValue]
+            }
+            console.log([s.TagValue===""?s.TagKey:s.TagValue])
+            console.log(tmp[s.TagKey])
+          })
+        }
+      })
+      Object.keys(tmp).map(n=>{
+        let tt={label:n,value:n}
+        if(tmp[n]) tt['children']=tmp[n].map(k=>{return {label:k,value:k} })
+        Tags.push(tt)
+      })
+      this.setState(Object.assign({...data,Tags},payload))
     }})
   }
   handleAliCloundRegions(){
@@ -66,6 +87,9 @@ class CMDBSystemSetting extends PureComponent {
   onSelectChange=(selectedRowKeys)=>{
     this.setState({selectedRowKeys})
   }
+  handleCascaderChange(e){
+    console.log(e)
+  }
   render(){
     const {
       ecslist,
@@ -74,8 +98,10 @@ class CMDBSystemSetting extends PureComponent {
       region,
       selectedRowKeys,
       regions,
-      regionNames
+      regionNames,
+      Tags
     } = this.state
+    console.log(Tags)
     const {loading}=this.props
     const columns = [
         {
@@ -217,10 +243,20 @@ class CMDBSystemSetting extends PureComponent {
         title: '主机标签',
         key: 'Tags',
         dataIndex: 'Tags',
+        filterDropdown:()=>{
+          return <Cascader options={Tags} 
+            expandTrigger="hover"
+            autoFocus
+            // style={{margin:2}}
+            suffixIcon={<Icon type="tags" theme="twoTone" />}
+            onChange={this.handleCascaderChange.bind(this)} 
+            placeholder="请选择过滤标签" />
+        },
+        // filters: [{ text: 'Male', value: 'male' }, { text: 'Female', value: 'female' }],
         render: (text,record) => {
           if (text) {
             return record.Tags.Tag.map(i=>{
-              return <Tag key={i.TagValue+""+Math.random()} color={i.TagValue==='prod'?"blue":"cyan"}>{i.TagValue}</Tag>
+              return <Tag key={i.TagValue+""+Math.random()} color={i.TagValue==='prod'?"blue":"cyan"}>{i.TagValue===""?i.TagKey:i.TagValue}</Tag>
             })
             }
           }
@@ -241,14 +277,16 @@ class CMDBSystemSetting extends PureComponent {
           }
       },
       {
-        title: '监控数据',
+        title: '监控',
         key: 'qq',
-        width:80,
+        width:60,
         dataIndex: 'qq',
+        
         render: (text) => {
             return <div style={{textAlign:"center"}}>
               <Tooltip placement="top"
                 title={<div style={{fontSize:12}}>查看监控数据</div>} >
+                  <Icon type='line-chart' style={{fontSize:16,cursor:"pointer",color:"green"}} />
                   <Icon type='line-chart' style={{fontSize:16,cursor:"pointer",color:"green"}} />
                 </Tooltip>
               
@@ -277,17 +315,19 @@ class CMDBSystemSetting extends PureComponent {
                 onShowSizeChange:this.handleAliCloundEcsList.bind(this)
               }} 
               rowKey={record=>record.InstanceId}
-              title={()=><div><Input.Search
-                  allowClear
-                  placeholder={formatMessage({id:'userlist_table_search'})}
-                  style={{ transition:"all .2s ease-out",width:300,float:"right" }}
-                /><strong>区域选择:</strong><CMDBSelectRegions 
-                  loading={loading} 
-                  region={region} 
-                  regions={regions}
-                  handleAliCloundRegionChange={this.handleAliCloundRegionChange.bind(this)} 
-                  handleAliCloundSetRegion={this.handleAliCloundSetRegion.bind(this)} 
-                  /></div>
+              title={()=><div>
+                  <Input.Search
+                    allowClear
+                    placeholder={formatMessage({id:'userlist_table_search'})}
+                    style={{ transition:"all .2s ease-out",width:300,float:"right" }}
+                  /><strong>区域选择:</strong><CMDBSelectRegions 
+                    loading={loading} 
+                    region={region} 
+                    regions={regions}
+                    handleAliCloundRegionChange={this.handleAliCloundRegionChange.bind(this)} 
+                    handleAliCloundSetRegion={this.handleAliCloundSetRegion.bind(this)} 
+                    />
+                  </div>
                 }
               bordered
               bodyStyle={{margin:"0px"}}
