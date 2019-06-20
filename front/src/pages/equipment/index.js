@@ -3,7 +3,7 @@
 import {connect} from 'dva';
 import {PureComponent} from 'react'
 import CMDBBreadcrumb from "../components/Breadcrumb";
-import {Layout,Table,Tooltip,Tag,Input,Icon,Cascader } from 'antd';
+import {Layout,Table,Tooltip,Tag,Input,Icon,Cascader, notification } from 'antd';
 import CMDBSelectRegions from "./components/SelectRegions"
 import {formatMessage} from 'umi/locale';
 import { formatAliCloundTime } from 'utils'
@@ -12,6 +12,12 @@ import linuxlogo from './linux.png'
 const {
   Content
 } = Layout;
+const InstanceStatus={
+  'Starting':['启动中','blue','play-circle'],
+  'Running':['运行中','green','play-circle'],
+  'Stopped':['已停止','red','pause-circle']
+}
+
 @connect(({ loading }) => ({ loading }))
 class CMDBSystemSetting extends PureComponent {
   constructor(props){
@@ -25,45 +31,65 @@ class CMDBSystemSetting extends PureComponent {
       selectedRowKeys:[],
       regions:[],
       regionNames:{},
-      Tags:[]
+      Tags:[],
+      currTag:[],
     }
   }
   handleAliCloundSetRegion=(regions)=>{
     this.setState({...regions})
   }
   handleAliCloundRegionChange(region){
-    const {dispatch}=this.props
     const {page,pageSize}=this.state
-    let payload={page,pageSize,region}
-    dispatch({type:'equipment/getAliCloundEcsList',payload,callback:(data)=>{
-      this.setState(Object.assign({...data},payload))
-    }})
+    this.handleAliCloundEcsList(page,pageSize,region)
   }
-  handleAliCloundEcsList=(page,pageSize)=>{
+  handleAliCloundEcsList=(page,pageSize,region)=>{
     const {dispatch}=this.props
-    let payload={page,pageSize,region:this.state.region}
-    let Tags=[]
+    const {currTag}=this.state
+    let payload={page,pageSize,region:region?region:this.state.region}
+    if(currTag.length>0){
+      payload['tagkey']=currTag[0]
+      payload['tagvalue']=currTag[1]
+      payload['page']=1
+    }
+    dispatch({type:'equipment/getAliCloundTagsList',payload:{region:payload['region']},callback:(data)=>{
+      if(data.hasOwnProperty('Tags')){
+        let tagobj={}
+        data.Tags.Tag.map(i=>{
+          if(tagobj.hasOwnProperty(i.TagKey) && tagobj[i.TagKey].length>0 ){
+            tagobj[i.TagKey]=Array.from(new Set([...tagobj[i.TagKey],i.TagValue]))
+          }else{
+            tagobj[i.TagKey]=[i.TagValue===""?i.TagKey:i.TagValue]
+          }
+        })
+        let Tags=[]
+        Object.keys(tagobj).map(s=>{
+          let val=tagobj[s]===""?s:tagobj[s]
+          let tTags={
+            label:s,
+            value:s,
+            children:tagobj[s].map(k=>{
+              return {label:k,value:k}
+            })
+          }
+          Tags.push(tTags)
+        })
+        this.setState({Tags})
+      }else{
+        notification.error({
+          message:'error',
+          description: 'error'
+        })
+      }
+    }})
     dispatch({type:'equipment/getAliCloundEcsList',payload,callback:(data)=>{
-      let tmp={}
-      data.ecslist.map(i=>{
-        if(i.hasOwnProperty('Tags')){
-          i.Tags.Tag.map(s=>{
-            if(tmp.hasOwnProperty(s.TagKey) && tmp[s.TagKey]!==undefined){
-              tmp[s.TagKey]=Array.from(new Set([...tmp[s.TagKey],s.TagValue===""?s.TagKey:s.TagValue]))
-            }else{
-              tmp[s.TagKey]=[s.TagValue===""?s.TagKey:s.TagValue]
-            }
-            console.log([s.TagValue===""?s.TagKey:s.TagValue])
-            console.log(tmp[s.TagKey])
-          })
-        }
-      })
-      Object.keys(tmp).map(n=>{
-        let tt={label:n,value:n}
-        if(tmp[n]) tt['children']=tmp[n].map(k=>{return {label:k,value:k} })
-        Tags.push(tt)
-      })
-      this.setState(Object.assign({...data,Tags},payload))
+      if(data.hasOwnProperty('ecslist')){
+        this.setState(Object.assign({...data},payload))
+      }else{
+        notification.error({
+          message:'error',
+          description: 'error'
+        })
+      }
     }})
   }
   handleAliCloundRegions(){
@@ -88,20 +114,25 @@ class CMDBSystemSetting extends PureComponent {
     this.setState({selectedRowKeys})
   }
   handleCascaderChange(e){
-    console.log(e)
+    this.setState({currTag:e,currTag:e})
+    setTimeout(()=>{
+      let {page,pageSize,region}=this.state
+      this.handleAliCloundEcsList(page,pageSize,region)
+    },100) 
   }
   render(){
     const {
       ecslist,
       pageSize,
+      page,
       total,
       region,
       selectedRowKeys,
       regions,
       regionNames,
-      Tags
+      Tags,
+      currTag
     } = this.state
-    console.log(Tags)
     const {loading}=this.props
     const columns = [
         {
@@ -144,15 +175,15 @@ class CMDBSystemSetting extends PureComponent {
           if (text) {
             return text === 'SUCCESS' ? <Tag color = "#87d068" > {
               text
-            } </Tag>:<Tag color="green" style={{
+            } </Tag>:<Tag color={InstanceStatus[text][1]} style={{
               padding: "0px", 
               borderRadius: 18}} > 
-              < Icon type = 'play-circle'
+              < Icon type ={InstanceStatus[text][2]}
                 style = {{float: "left",
                     margin: 2,
                     fontSize: 16}} /> 
             < span style = {{marginRight: 4}} > {
-              text
+              InstanceStatus[text][0]
             } </span> </Tag >
           }
         }
@@ -178,6 +209,11 @@ class CMDBSystemSetting extends PureComponent {
         title: '公网/内网IP',
         key: 'NetworkInterfaces',
         dataIndex: 'NetworkInterfaces',
+        sorter: (a,b)=> {
+          let aip=a.NetworkInterfaces.NetworkInterface.map(s=>s.PrimaryIpAddress).join()
+          let bip=b.NetworkInterfaces.NetworkInterface.map(s=>s.PrimaryIpAddress).join()
+          return  aip < bip?-1:(aip > bip?1:0)
+        },
         render: (text,record) => {
           if (text) {
             return <Tooltip placement = "top"
@@ -247,6 +283,7 @@ class CMDBSystemSetting extends PureComponent {
           return <Cascader options={Tags} 
             expandTrigger="hover"
             autoFocus
+            value={currTag}
             // style={{margin:2}}
             suffixIcon={<Icon type="tags" theme="twoTone" />}
             onChange={this.handleCascaderChange.bind(this)} 
@@ -281,7 +318,6 @@ class CMDBSystemSetting extends PureComponent {
         key: 'qq',
         width:60,
         dataIndex: 'qq',
-        
         render: (text) => {
             return <div style={{textAlign:"center"}}>
               <Tooltip placement="top"
@@ -305,6 +341,7 @@ class CMDBSystemSetting extends PureComponent {
           <Content className={css.aliecs_extra_css}>
             <Table pagination={{
                 size:"small",
+                current:page,
                 showSizeChanger:true,
                 showQuickJumper:true,
                 defaultPageSize:pageSize,
@@ -325,8 +362,20 @@ class CMDBSystemSetting extends PureComponent {
                     region={region} 
                     regions={regions}
                     handleAliCloundRegionChange={this.handleAliCloundRegionChange.bind(this)} 
-                    handleAliCloundSetRegion={this.handleAliCloundSetRegion.bind(this)} 
                     />
+                    {currTag.length>0?<Tag
+                      closable
+                      style={{
+                          padding: "5px 5px 5px 8px",
+                          float: "right"
+                        }}
+                      color="magenta"
+                      onClose={e => {
+                        e.preventDefault();
+                        this.handleCascaderChange([])
+                      }} >
+                      {currTag.join(":")}
+                    </Tag>:''}
                   </div>
                 }
               bordered

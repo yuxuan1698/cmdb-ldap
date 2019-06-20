@@ -179,7 +179,10 @@ class CMDBUserList extends PureComponent {
       key: 'cn',
       sorter: (a,b)=> a['cn'] < b['cn']?-1:(a['cn'] > b['cn']?1:0),
     },{
-      title: formatMessage({id:'userlist_table_mobile'}),
+      title: ()=><span>
+      <Icon type="phone" theme="twoTone" style={{marginRight:2}} />
+        {formatMessage({id:'userlist_table_mobile'})}
+      </span>,
       dataIndex: 'mobile',
       key: 'mobile',
       sorter: (a,b)=> a['mobile'] < b['mobile']?-1:(a['mobile'] > b['mobile']?1:0),
@@ -189,12 +192,18 @@ class CMDBUserList extends PureComponent {
       key: 'departmentNumber',
       sorter: (a,b)=> a['departmentNumber'] < b['departmentNumber']?-1:(a['departmentNumber'] > b['departmentNumber']?1:0),
     },{
-      title: formatMessage({id:'userlist_table_ou'}),
+      title: ()=><span>
+      <Icon type="apartment" style={{marginRight:2,color:"#188fff"}} />
+        {formatMessage({id:'userlist_table_ou'})}
+      </span>,
       dataIndex: 'ou',
       key: 'ou',
       sorter: (a,b)=> a['ou'] < b['ou']?-1:(a['ou'] > b['ou']?1:0),
     }, {
-      title: formatMessage({id:'userlist_table_email'}),
+      title: ()=><span>
+        <Icon type="mail" theme="twoTone" style={{marginRight:2}} />
+          {formatMessage({id:'userlist_table_email'})}
+        </span> ,
       dataIndex: 'mail',
       key: 'mail',
       sorter: (a,b)=> a['mail'] < b['mail']?-1:(a['mail'] > b['mail']?1:0),

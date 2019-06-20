@@ -135,7 +135,7 @@ export function GetSystemCrontabLogsApi(data) {
 export function GetAliCloundEcsListApi(data) {
     return request({
         method: "get",
-        url: '/v1/aliclound/ecs/',
+        url: '/v1/aliclound/ecs/list/',
         params:data
     })
 }
@@ -143,6 +143,14 @@ export function GetAliCloundEcsListApi(data) {
 export function GetAliCloundRegionsListApi() {
     return request({
         method: "get",
-        url: '/v1/aliclound/regions/',
+        url: '/v1/aliclound/regions/list/',
+    })
+}
+// 获取aliclound Tags 列表
+export function GetAliCloundTagsListApi(data) {
+    return request({
+        method: "get",
+        url: '/v1/aliclound/tags/list/',
+        params:data
     })
 }

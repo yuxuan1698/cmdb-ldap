@@ -43,12 +43,15 @@ class getAliCloundEcsListSet(APIView):
     PageSize=request.GET.get('pageSize') or 15
     Page=request.GET.get('page') or 1
     RegionId=request.GET.get('region') or 'cn-shenzhen'
+    tagkey=request.GET.get('tagkey') 
+    tagvalue=request.GET.get('tagvalue')
+    Tags=[]
+    if tagkey and tagvalue:
+      Tags=[{'Key':tagkey,'Value':"" if tagkey==tagvalue else tagvalue}]
+    # logger.info(Tags[0].get('Key'))
     response = {}
-    logger.info(RegionId)
-    # cacheEcs=cache.get('cacheEcs_%s%s'%(Page,PageSize))
-    # if not cacheEcs:
-    cacheEcs=aliClound.getAliCloundEcsList(RegionId,PageSize,Page)
-      # cache.set('cacheEcs_%s%s'%(Page,PageSize),cacheEcs)
+    logger.info(Tags)
+    cacheEcs=aliClound.getAliCloundEcsList(RegionId,PageSize,Page,Tags)
     if cacheEcs:
       data=CmdbJson().decode(cacheEcs)
       response['total']=data.get('TotalCount')
@@ -56,7 +59,7 @@ class getAliCloundEcsListSet(APIView):
       response['ecslist']=data.get('Instances').get('Instance')
       return JsonResponse(response, safe=False)
     else:
-      return JsonResponse({'error':'获取Rigion信息出错，请检查！'},status=status.HTTP_400_BAD_REQUEST,safe=False)
+      return JsonResponse({'error':'获取ECS列表信息出错，请检查！'},status=status.HTTP_400_BAD_REQUEST,safe=False)
 
 class getAliCloundRegionListSet(APIView):
   """
@@ -81,15 +84,9 @@ class getAliCloundCerificateCountSet(APIView):
   列出阿里云主机列表
   """
   def get(self,request, *args, **kwargs):
-    # cacheRigions=cache.get('cacheRigions')
-    # if not cacheRigions:
     CertificateCount = aliClound.getAliCloundCertificateStatusCount()
-      # cache.set('CertificateCount',CertificateCount)
     if CertificateCount:
       data=CmdbJson().decode(CertificateCount)
-      # response = []
-      # if 'Regions' in data:
-      # response=data.get('Regions').get('Region')
       return JsonResponse(data, safe=False)
     else:
       return JsonResponse({'error':'获取Rigion信息出错，请检查！'},status=status.HTTP_400_BAD_REQUEST,safe=False)
@@ -109,13 +106,25 @@ class getAliCloundCerificateListSet(APIView):
 
 class getAliCloundTagsListSet(APIView):
   """
-  列出阿里云证书列表
+  列出阿里云ECS Tags列表
   """
   def get(self,request, *args, **kwargs):
-    status = request.GET.get('status') or ''
-    TagsList = aliClound.getAliCloundTagsList(status)
+    RegionId = request.GET.get('region') or ''
+    TagsList = aliClound.getAliCloundTagsList(RegionId)
     if TagsList:
       data=CmdbJson().decode(TagsList)
       return JsonResponse(data, safe=False)
     else:
-      return JsonResponse({'error':'获取Rigion信息出错，请检查！'},status=status.HTTP_400_BAD_REQUEST,safe=False)
+      return JsonResponse({'error':'获取Tags信息出错，请检查！'},status=status.HTTP_400_BAD_REQUEST,safe=False)
+class getAliCloundEcsAllStatusSet(APIView):
+  """
+  列出阿里云ECS Tags列表
+  """
+  def get(self,request, *args, **kwargs):
+    RegionId = request.GET.get('region') or ''
+    TagsList = aliClound.getAliCloundEcsAllStatus()
+    if TagsList:
+      data=CmdbJson().decode(TagsList)
+      return JsonResponse(data, safe=False)
+    else:
+      return JsonResponse({'error':'获取Tags信息出错，请检查！'},status=status.HTTP_400_BAD_REQUEST,safe=False)

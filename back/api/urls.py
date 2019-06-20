@@ -6,6 +6,7 @@ from rest_framework import routers
 from .views import (
     getCrontabLogsViewSet,
     getAliCloundEcsListSet,
+    getAliCloundEcsAllStatusSet,
     getAliCloundRegionListSet,
     getAliCloundCerificateCountSet,
     getAliCloundCerificateListSet,
@@ -13,8 +14,9 @@ from .views import (
     )
 urlpatterns = [
     path('system/cronlogs/', getCrontabLogsViewSet.as_view(),name='system-mailresults'),
-    path('aliclound/ecs/', getAliCloundEcsListSet.as_view(),name='aliclound-ecs'),
-    path('aliclound/regions/', getAliCloundRegionListSet.as_view(),name='aliclound-regions'),
+    path('aliclound/ecs/list/', getAliCloundEcsListSet.as_view(),name='aliclound-ecs'),
+    path('aliclound/ecs/allstatus/', getAliCloundEcsAllStatusSet.as_view(),name='aliclound-ecs'),
+    path('aliclound/regions/list/', getAliCloundRegionListSet.as_view(),name='aliclound-regions'),
     path('aliclound/tags/list/',getAliCloundTagsListSet.as_view(), name='aliclound-cerificate-list'),
     path('aliclound/cerificate/list/',getAliCloundCerificateListSet.as_view(), name='aliclound-cerificate-list'),
     path('aliclound/cerificate/count/', getAliCloundCerificateCountSet.as_view(),name='aliclound-cerificate-count'),
