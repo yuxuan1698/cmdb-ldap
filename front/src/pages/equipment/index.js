@@ -33,6 +33,7 @@ class CMDBSystemSetting extends PureComponent {
       regionNames:{},
       Tags:[],
       currTag:[],
+      searchValue:""
     }
   }
   handleAliCloundSetRegion=(regions)=>{
@@ -45,11 +46,12 @@ class CMDBSystemSetting extends PureComponent {
   handleAliCloundEcsList=(page,pageSize,region)=>{
     const {dispatch}=this.props
     const {currTag}=this.state
-    let payload={page,pageSize,region:region?region:this.state.region}
+    let payload={page,pageSize,region:region?region:this.state.region,searchValue:""}
+    let query={}
     if(currTag.length>0){
-      payload['tagkey']=currTag[0]
-      payload['tagvalue']=currTag[1]
-      payload['page']=1
+      query['tagkey']=currTag[0]
+      query['tagvalue']=currTag[1]
+      query['page']=1
     }
     dispatch({type:'equipment/getAliCloundTagsList',payload:{region:payload['region']},callback:(data)=>{
       if(data.hasOwnProperty('Tags')){
@@ -81,7 +83,7 @@ class CMDBSystemSetting extends PureComponent {
         })
       }
     }})
-    dispatch({type:'equipment/getAliCloundEcsList',payload,callback:(data)=>{
+    dispatch({type:'equipment/getAliCloundEcsList',payload:Object.assign({...payload},query),callback:(data)=>{
       if(data.hasOwnProperty('ecslist')){
         this.setState(Object.assign({...data},payload))
       }else{
@@ -120,6 +122,9 @@ class CMDBSystemSetting extends PureComponent {
       this.handleAliCloundEcsList(page,pageSize,region)
     },100) 
   }
+  handleSearchChange=(e)=>{
+    this.setState({searchValue:e.target.value})
+  }
   render(){
     const {
       ecslist,
@@ -131,9 +136,11 @@ class CMDBSystemSetting extends PureComponent {
       regions,
       regionNames,
       Tags,
-      currTag
+      currTag,
+      searchValue
     } = this.state
     const {loading}=this.props
+    console.log(ecslist)
     const columns = [
         {
         title: '实例名称/ID',
@@ -355,6 +362,8 @@ class CMDBSystemSetting extends PureComponent {
               title={()=><div>
                   <Input.Search
                     allowClear
+                    value={searchValue}
+                    onChange={this.handleSearchChange.bind(this)}
                     placeholder={formatMessage({id:'userlist_table_search'})}
                     style={{ transition:"all .2s ease-out",width:300,float:"right" }}
                   /><strong>区域选择:</strong><CMDBSelectRegions 
@@ -381,7 +390,24 @@ class CMDBSystemSetting extends PureComponent {
               bordered
               bodyStyle={{margin:"0px"}}
               columns={columns} 
-              dataSource={ecslist} 
+              dataSource={ecslist.filter(i=>{
+                if(searchValue!==""){
+                  return i.InstanceId.indexOf(searchValue) >= 0 || 
+                    i.OSName.indexOf(searchValue)>=0 ||
+                    i.OSType.indexOf(searchValue)>=0 ||
+                    i.RegionId.indexOf(searchValue)>=0 ||
+                    i.Status.indexOf(searchValue)>=0 ||
+                    i.ZoneId.indexOf(searchValue)>=0 ||
+                    i.PublicIpAddress.IpAddress.join().indexOf(searchValue)>=0 ||
+                    i.NetworkInterfaces.NetworkInterface[0].PrimaryIpAddress.indexOf(searchValue)>=0 ||
+                    i.InstanceType.indexOf(searchValue)>=0 ||
+                    i.InstanceName.indexOf(searchValue)>=0 ||
+                    i.HostName.indexOf(searchValue)>=0 ||
+                    i.ExpiredTime.indexOf(searchValue)>=0 
+                }else{
+                  return true
+                }
+              })} 
               rowSelection={{
                 selectedRowKeys,
                 onChange: this.onSelectChange.bind(this),
