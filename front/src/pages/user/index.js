@@ -263,7 +263,7 @@ class CMDBUserList extends PureComponent {
     }];
     return (
       <Layout className={usercss.userbody}>
-        <CMDBBreadcrumb route={{breadcrumb_users_manager:"",breadcrumb_users_list:'/user'}} title='breadcrumb_users_list' />
+        <CMDBBreadcrumb route={{'menu.side.users.ldap':"",breadcrumb_users_list:'/user'}} title='breadcrumb_users_list' />
         <Layout style={{margin:"10px 0 0 0"}}>
           <Content className={usercss.tableContent}>
             <div className={usercss.usercontrol}>

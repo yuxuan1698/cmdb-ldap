@@ -19,7 +19,7 @@
     },
     {
       key:'user',
-      name: formatMessage({id:'menu.side.users'}),
+      name: formatMessage({id:'menu.side.users.ldap'}),
       icon: 'user',
       allow: true,
       submenu:[
