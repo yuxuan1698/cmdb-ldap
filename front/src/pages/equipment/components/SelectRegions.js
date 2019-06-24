@@ -50,12 +50,6 @@ class CMDBSelectRegions extends PureComponent {
       defaultValue={region}
       loading={Boolean(loading.effects['equipment/getAliCloundRegionsList'])}
       onChange={this.props.handleAliCloundRegionChange.bind(this)}
-      // onFocus={onFocus}
-      // onBlur={onBlur}
-      // onSearch={onSearch}
-      // filterOption={(input, option) =>
-      //   option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-      // }
     >
     {this.props.regions.map(it=>{
       return <Option key={it.RegionId} style={{fontSize:14}} value={it.RegionId}>

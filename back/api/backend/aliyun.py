@@ -7,6 +7,8 @@ from aliyunsdkecs.request.v20140526.DescribeTagsRequest import DescribeTagsReque
 from aliyunsdkecs.request.v20140526.DescribeInstanceStatusRequest import DescribeInstanceStatusRequest
 from aliyunsdkcas.request.v20180813.DescribeCertificateStatusCountRequest import DescribeCertificateStatusCountRequest
 from aliyunsdkcas.request.v20180813.DescribeCertificateListRequest import DescribeCertificateListRequest
+from aliyunsdkcas.request.v20180813.DescribeOrderListRequest import DescribeOrderListRequest
+from aliyunsdkcas.request.v20180813.DescribeLocationListRequest import DescribeLocationListRequest
 # from aliyunsdkots.request.v20160620.ListTagsRequest import ListTagsRequest
 
 from common.utils import CmdbLDAPLogger
@@ -64,15 +66,32 @@ class AliClound():
         except Exception as e:
             logger.error(e)
             return False
+    def getAliCloundCertificateLocationList(self):
+        client=AcsClient(self.secreyKey,self.accesssecret)
+        req = DescribeLocationListRequest()
+        req.set_accept_format('json')
+        try:
+            data=client.do_action_with_exception(req)
+            if data:
+                return data
+            else:
+                return False
+        except Exception as e:
+            logger.error(e)
+            return False
 
-    def getAliCloundCertificateList(self,status=''):
+    def getAliCloundCertificateList(self,Status='',PageSize=15,Page=1):
         """
         获取证书列表
         """
         client=AcsClient(self.secreyKey,self.accesssecret)
-        req = DescribeCertificateListRequest()
-        if status!='':
-            req.set_Status(status)
+        if Status!='REVOKED':
+            req = DescribeCertificateListRequest()
+        else:
+            req = DescribeOrderListRequest()
+        req.set_Status(Status)
+        req.set_CurrentPage(Page)
+        req.set_ShowSize(PageSize)
         req.set_accept_format('json')
         try:
             data=client.do_action_with_exception(req)
@@ -102,11 +121,11 @@ class AliClound():
             logger.error(e)
             return False
 
-    def getAliCloundEcsAllStatus(self,RegionIds=['cn-shenzhen']):
+    def getAliCloundEcsAllStatus(self,RegionIds='cn-shenzhen'):
         """
         获取标签列表
         """
-        client=AcsClient(self.secreyKey,self.accesssecret)
+        client=AcsClient(self.secreyKey,self.accesssecret,RegionIds)
         req = DescribeInstanceStatusRequest()
         # req.set_ResourceType('instance')
         req.set_accept_format('json')

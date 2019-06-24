@@ -1,7 +1,8 @@
 import { 
     GetAliCloundEcsListApi,
     GetAliCloundRegionsListApi,
-    GetAliCloundTagsListApi
+    GetAliCloundTagsListApi,
+    GetAliCloundCerificateListApi
   } from '../../../services/api';
   
   export default {
@@ -24,6 +25,12 @@ import {
         },
         *getAliCloundTagsList({ payload,callback }, { call }) {
           const data = yield call(GetAliCloundTagsListApi, payload)
+          if (data) {
+            callback(data)
+          }
+        },
+        *getAliCloundCerificateList({ payload,callback }, { call }) {
+          const data = yield call(GetAliCloundCerificateListApi, payload)
           if (data) {
             callback(data)
           }

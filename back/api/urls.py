@@ -10,6 +10,7 @@ from .views import (
     getAliCloundRegionListSet,
     getAliCloundCerificateCountSet,
     getAliCloundCerificateListSet,
+    getAliCloundCerificateLocationsSet,
     getAliCloundTagsListSet
     )
 urlpatterns = [
@@ -19,5 +20,6 @@ urlpatterns = [
     path('aliclound/regions/list/', getAliCloundRegionListSet.as_view(),name='aliclound-regions'),
     path('aliclound/tags/list/',getAliCloundTagsListSet.as_view(), name='aliclound-cerificate-list'),
     path('aliclound/cerificate/list/',getAliCloundCerificateListSet.as_view(), name='aliclound-cerificate-list'),
+    path('aliclound/cerificate/locations/',getAliCloundCerificateLocationsSet.as_view(), name='aliclound-cerificate-list'),
     path('aliclound/cerificate/count/', getAliCloundCerificateCountSet.as_view(),name='aliclound-cerificate-count'),
 ]

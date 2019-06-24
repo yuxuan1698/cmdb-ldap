@@ -56,6 +56,7 @@ export default {
   'menu.side.users.ldap':'LDAP管理',
   'menu.side.resource':'资源管理',
   'menu.side.resource.device':'设备列表',
+  'menu.side.resource.cerification':'证书列表',
   'menu.side.resource.monitor':'设备监控',
   'menu.side.system':'系统管理',
   'menu.side.system.setting':'系统设置',
@@ -209,6 +210,7 @@ export default {
   // equipment 设备管理
   'equipment_host_list':'云主机列表',
   'equipment_host_list_manager':'管理云主机列表',
+  'equipment_cerificate_list':'管理云证书列表',
 
 }
 

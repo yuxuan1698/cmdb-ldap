@@ -96,13 +96,30 @@ class getAliCloundCerificateListSet(APIView):
   列出阿里云证书列表
   """
   def get(self,request, *args, **kwargs):
-    status = request.GET.get('status') or ''
-    CertificateList = aliClound.getAliCloundCertificateList(status)
+    certicateStatus = request.GET.get('status') or ''
+    PageSize=request.GET.get('pageSize') or 15
+    Page=request.GET.get('page') or 1
+    RegionId=request.GET.get('region') or 'cn-shenzhen'
+
+    CertificateList = aliClound.getAliCloundCertificateList(certicateStatus,PageSize,Page)
     if CertificateList:
       data=CmdbJson().decode(CertificateList)
       return JsonResponse(data, safe=False)
     else:
       return JsonResponse({'error':'获取Rigion信息出错，请检查！'},status=status.HTTP_400_BAD_REQUEST,safe=False)
+
+class getAliCloundCerificateLocationsSet(APIView):
+  """
+  列出阿里云证书列表
+  """
+  def get(self,request, *args, **kwargs):
+    status = request.GET.get('status') or ''
+    CertificateLocation = aliClound.getAliCloundCertificateLocationList()
+    if CertificateLocation:
+      data=CmdbJson().decode(CertificateLocation)
+      return JsonResponse(data, safe=False)
+    else:
+      return JsonResponse({'error':'获取Certificate Location信息出错，请检查！'},status=status.HTTP_400_BAD_REQUEST,safe=False)
 
 class getAliCloundTagsListSet(APIView):
   """

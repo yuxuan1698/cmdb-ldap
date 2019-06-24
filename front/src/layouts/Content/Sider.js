@@ -49,6 +49,10 @@
           // allow: false,
         },
         {
+          key: '/equipment/cerificate/',
+          name:formatMessage({id:'menu.side.resource.cerification'}),
+        },
+        {
           key: '/equipment/groups',
           name:formatMessage({id:'menu.side.resource.monitor'}),
         },

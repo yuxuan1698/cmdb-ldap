@@ -1,4 +1,4 @@
-import { getLDAPObjectClassList } from '../services/api';
+import { getLDAPObjectClassList,GetAliCloundCerificateCountApi } from '../services/api';
 import { Modal } from 'antd';
 export default {
     namespace: 'global',
@@ -27,17 +27,12 @@ export default {
           })
         }
       },
-      // *changeLanguage({ }, { call,put }) {
-      //   const data = yield call(getLDAPObjectClassList)
-      //   if (data) {
-      //     yield put({
-      //       type:'classobjects', 
-      //       payload: {
-      //         classobjects: data,
-      //       }
-      //     })
-      //   }
-      // },
+      *loadAllStatus({ callback }, { call }) {
+        const data = yield call(GetAliCloundCerificateCountApi)
+        if (data) {
+          callback(data)
+        }
+      },
     },
     reducers: {
       // LDAP classObjects

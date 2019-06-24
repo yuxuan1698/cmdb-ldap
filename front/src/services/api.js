@@ -154,3 +154,19 @@ export function GetAliCloundTagsListApi(data) {
         params:data
     })
 }
+// 获取aliclound 证书状态统计
+export function GetAliCloundCerificateCountApi(data) {
+    return request({
+        method: "get",
+        url: '/v1/aliclound/cerificate/count/',
+        params:data
+    })
+}
+// 获取aliclound 证书状态统计
+export function GetAliCloundCerificateListApi(data) {
+    return request({
+        method: "get",
+        url: '/v1/aliclound/cerificate/list/',
+        params:data
+    })
+}
