@@ -7,6 +7,8 @@ from django.core.serializers import serialize
 from common.utils import CmdbLDAPLogger,CmdbJson
 from django.core.cache import cache
 from api.backend.aliyun import AliClound
+from .serializers import CerificateInvalidSerializer
+from common.utils import check_cerificate_invalidtime
 
 aliClound=AliClound()
 logger=CmdbLDAPLogger().get_logger('django.server')
@@ -133,6 +135,7 @@ class getAliCloundTagsListSet(APIView):
       return JsonResponse(data, safe=False)
     else:
       return JsonResponse({'error':'获取Tags信息出错，请检查！'},status=status.HTTP_400_BAD_REQUEST,safe=False)
+
 class getAliCloundEcsAllStatusSet(APIView):
   """
   列出阿里云ECS Tags列表
@@ -145,3 +148,27 @@ class getAliCloundEcsAllStatusSet(APIView):
       return JsonResponse(data, safe=False)
     else:
       return JsonResponse({'error':'获取Tags信息出错，请检查！'},status=status.HTTP_400_BAD_REQUEST,safe=False)
+
+
+
+class getCheckCerificateInvalidViewSet(APIView):
+  """
+  检查证书过期时间
+  """
+  def get(self,request, *args, **kwargs):
+    serializer = CerificateInvalidSerializer(instance=request, data=request.GET)
+    if serializer.is_valid():
+      domain = serializer.validated_data.get('domain')
+      port = serializer.validated_data.get('port')
+      if port:
+        invalid= check_cerificate_invalidtime(domain,port)
+      else:
+        invalid,msg= check_cerificate_invalidtime(domain)
+      if invalid:
+        return JsonResponse(msg, safe=False)
+      else:
+        return JsonResponse({'error':msg},status=status.HTTP_400_BAD_REQUEST,safe=False)
+      logger.info(invalid)
+    else:
+      return JsonResponse(serializer.errors,status=status.HTTP_400_BAD_REQUEST,safe=False)
+    return JsonResponse({'error':'获取域名信息出错或者超时，请检查！'},status=status.HTTP_400_BAD_REQUEST,safe=False)

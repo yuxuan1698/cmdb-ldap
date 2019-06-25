@@ -6,7 +6,7 @@ import base64
 import io,os
 import qrcode
 
-
+socketNum=0
 
 class SendEMail(EmailMultiAlternatives):
   """docstring for SendEMail"""
@@ -129,3 +129,27 @@ def generat_random_password(data='',encode=False):
   if encode:
     return salt.encode('utf-8')
   return salt
+
+
+def check_cerificate_invalidtime(domain,port=443):
+  from datetime import datetime
+  from OpenSSL.SSL import TLSv1_METHOD, Context, Connection
+  import socket
+  client = socket.socket()
+  try:
+    client.connect((domain, port))
+    ssl = Connection(Context(TLSv1_METHOD), client)
+    ssl.set_connect_state()
+    ssl.set_tlsext_host_name(domain.encode('utf-8'))
+    ssl.do_handshake()
+    cerificate=ssl.get_peer_certificate()
+
+    invalid=cerificate.get_notAfter().decode()[0:-1]
+    invalidtime = datetime.strptime(invalid, '%Y%m%d%H%M%S')
+    diff_day = invalidtime - datetime.now()
+    return True,{"invaliddate":invalidtime,"invalidday":diff_day.days}
+  except Exception as e:
+    return False,e.args
+  finally:
+    client.close()
+    pass

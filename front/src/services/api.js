@@ -170,3 +170,11 @@ export function GetAliCloundCerificateListApi(data) {
         params:data
     })
 }
+// 检查aliclound 证书与部署主机上的证书失效时间是否一至
+export function GetAliCloundCerificateInvalidApi(data) {
+    return request({
+        method: "get",
+        url: '/v1/aliclound/cerificate/invalid/',
+        params:data
+    })
+}

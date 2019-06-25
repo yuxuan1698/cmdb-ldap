@@ -5,7 +5,9 @@ from rest_framework_jwt.utils import jwt_payload_handler,jwt_encode_handler
 from django.contrib.auth import get_user_model
 from django.conf import settings
 from celery import shared_task
+from .celery import app
 from common.utils import CmdbLDAPLogger,Sign_Url_By_MD5
+from api.backend.aliyun import AliClound
 import os
 
 logger=CmdbLDAPLogger().get_logger('cmdb_ldap')
@@ -78,3 +80,11 @@ def send_reset_password_email(username,resetPassword):
   else:
     logger.warn("未找到此用户[%s]的相关信息，未发送重置邮件。"%username)
   return False
+
+
+@app.task(bind=True)
+def getAliyunCerificateList(self):
+    aliClound=AliClound()
+    listdata=aliClound.getAliCloundCertificateList()
+    logger.info(listdata)
+    print('在此调用实现了定时任务功能的函数或方法')

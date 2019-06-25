@@ -8,7 +8,6 @@ import CMDBSelectRegions from "./components/SelectRegions"
 import {formatMessage} from 'umi/locale';
 import { formatAliCloundTime } from 'utils'
 import css from './index.less'
-import linuxlogo from './linux.png'
 const {
   Content
 } = Layout;
@@ -31,6 +30,15 @@ class CMDBSystemSetting extends PureComponent {
       searchValue:""
     }
   }
+  CheckCerificateStatus(domain){
+    const {dispatch}=this.props
+    return new Promise(resolve=>{
+      dispatch({type:'equipment/getAliCloundCerificateInvalid',payload:{domain},callback:(data)=>{
+        resolve(data)
+     }})
+    })
+  }
+
   handleAliCloundSetRegion=(regions)=>{
     this.setState({...regions})
   }
@@ -45,8 +53,9 @@ class CMDBSystemSetting extends PureComponent {
     dispatch({type:'equipment/getAliCloundCerificateList',payload,callback:(data)=>{
       console.log(data)
       if(data.hasOwnProperty('CertificateList') || data.hasOwnProperty('OrderList')){
+        let cerifiData=data.CertificateList || data.OrderList
         this.setState({
-            cerificates:data.CertificateList || data.OrderList,
+            cerificates:cerifiData,
             total:data.TotalCount,
             page:data.CurrentPage,
             currStatus:status
@@ -205,15 +214,39 @@ class CMDBSystemSetting extends PureComponent {
       },
       {
         title: '部署检测',
-        key: 'deplay',
-        dataIndex: 'deplay',
-        sorter: (a,b)=> a['deplay'] < b['deplay']?-1:(a['deplay'] > b['deplay']?1:0),
+        key: 'ischecked',
+        dataIndex: 'ischecked',
+        sorter: (a,b)=> a['ischecked'] < b['ischecked']?-1:(a['ischecked'] > b['ischecked']?1:0),
+        onCell:()=>{
+          return {
+            style:{
+              textAlign:"center"
+            }
+          }
+        },
+        render:(text,record)=>{
+          if(text){
+            return text
+          }else{
+            return <div><Icon type="sync" spin />检测中...</div>
+          }
+        }
       },
       {
         title: '返回状态',
         key: 'callbackstatus',
         dataIndex: 'callbackstatus',
         sorter: (a,b)=> a['callbackstatus'] < b['callbackstatus']?-1:(a['callbackstatus'] > b['callbackstatus']?1:0),
+        onCell:()=>{
+          return {
+            style:{
+              textAlign:"center"
+            }
+          }
+        },
+        render:(text)=>{
+          return "-"
+        }
       },
     ];
     return (

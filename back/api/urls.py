@@ -11,7 +11,8 @@ from .views import (
     getAliCloundCerificateCountSet,
     getAliCloundCerificateListSet,
     getAliCloundCerificateLocationsSet,
-    getAliCloundTagsListSet
+    getAliCloundTagsListSet,
+    getCheckCerificateInvalidViewSet
     )
 urlpatterns = [
     path('system/cronlogs/', getCrontabLogsViewSet.as_view(),name='system-mailresults'),
@@ -22,4 +23,5 @@ urlpatterns = [
     path('aliclound/cerificate/list/',getAliCloundCerificateListSet.as_view(), name='aliclound-cerificate-list'),
     path('aliclound/cerificate/locations/',getAliCloundCerificateLocationsSet.as_view(), name='aliclound-cerificate-list'),
     path('aliclound/cerificate/count/', getAliCloundCerificateCountSet.as_view(),name='aliclound-cerificate-count'),
+    path('aliclound/cerificate/invalid/', getCheckCerificateInvalidViewSet.as_view(),name='aliclound-cerificate-invalid'),
 ]
