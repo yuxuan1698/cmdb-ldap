@@ -10,6 +10,7 @@ from aliyunsdkcas.request.v20180813.DescribeCertificateStatusCountRequest import
 from aliyunsdkcas.request.v20180813.DescribeCertificateListRequest import DescribeCertificateListRequest
 from aliyunsdkcas.request.v20180813.DescribeOrderListRequest import DescribeOrderListRequest
 from aliyunsdkcas.request.v20180813.DescribeLocationListRequest import DescribeLocationListRequest
+from aliyunsdkdomain.request.v20180129.QueryDomainListRequest import QueryDomainListRequest
 # from aliyunsdkots.request.v20160620.ListTagsRequest import ListTagsRequest
 
 from common.utils import CmdbLDAPLogger
@@ -147,6 +148,25 @@ class AliClound():
         client=AcsClient(self.secreyKey,self.accesssecret,RegionIds)
         req = DescribeInstancesFullStatusRequest()
         # req.set_ResourceType('instance')
+        req.set_accept_format('json')
+        try:
+            data=client.do_action_with_exception(req)
+            if data:
+                return data
+            else:
+                return False
+        except Exception as e:
+            logger.error(e)
+            return False
+
+    def getAliCloundDomainList(self):
+        """
+        获取域名列表
+        """
+        client=AcsClient(self.secreyKey,self.accesssecret)
+        req = QueryDomainListRequest()
+        req.set_PageNum(1)
+        req.set_PageSize(50)
         req.set_accept_format('json')
         try:
             data=client.do_action_with_exception(req)

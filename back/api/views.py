@@ -172,3 +172,16 @@ class getCheckCerificateInvalidViewSet(APIView):
     else:
       return JsonResponse(serializer.errors,status=status.HTTP_400_BAD_REQUEST,safe=False)
     return JsonResponse({'error':'获取域名信息出错或者超时，请检查！'},status=status.HTTP_400_BAD_REQUEST,safe=False)
+
+
+class getAliCloundEcsDomainListSet(APIView):
+  """
+  列出阿里云域名列表
+  """
+  def get(self,request, *args, **kwargs):
+    DomainList = aliClound.getAliCloundDomainList()
+    if DomainList:
+      data=CmdbJson().decode(DomainList)
+      return JsonResponse(data, safe=False)
+    else:
+      return JsonResponse({'error':'获取domain信息出错，请检查！'},status=status.HTTP_400_BAD_REQUEST,safe=False)

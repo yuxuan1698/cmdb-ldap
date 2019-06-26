@@ -6,8 +6,9 @@ from django.contrib.auth import get_user_model
 from django.conf import settings
 from celery import shared_task
 from .celery import app
-from common.utils import CmdbLDAPLogger,Sign_Url_By_MD5
+from common.utils import CmdbLDAPLogger,Sign_Url_By_MD5,CmdbJson
 from api.backend.aliyun import AliClound
+from api.models.cerificate import Cerificate
 import os
 
 logger=CmdbLDAPLogger().get_logger('cmdb_ldap')
@@ -86,5 +87,10 @@ def send_reset_password_email(username,resetPassword):
 def getAliyunCerificateList(self):
     aliClound=AliClound()
     listdata=aliClound.getAliCloundCertificateList()
+
+    if listdata:
+      data=CmdbJson().decode(listdata)
+      Cerificate.objects.bulk_create(data['CertificateList'])
+
     logger.info(listdata)
     print('在此调用实现了定时任务功能的函数或方法')

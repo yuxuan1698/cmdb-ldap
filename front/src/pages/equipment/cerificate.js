@@ -19,6 +19,7 @@ class CMDBSystemSetting extends PureComponent {
     super(props)
     this.state={
       cerificates:[],
+      cerificateStatus:{},
       total:0,
       page:1,
       pageSize:15,
@@ -30,10 +31,12 @@ class CMDBSystemSetting extends PureComponent {
       searchValue:""
     }
   }
-  CheckCerificateStatus(domain){
+  CheckCerificateStatus=(domain)=>{
     const {dispatch}=this.props
+    let {cerificateStatus}=this.state
     return new Promise(resolve=>{
       dispatch({type:'equipment/getAliCloundCerificateInvalid',payload:{domain},callback:(data)=>{
+        this.setState({cerificateStatus:Object.assign(cerificateStatus,{[domain]:data})})
         resolve(data)
      }})
     })
@@ -48,18 +51,28 @@ class CMDBSystemSetting extends PureComponent {
   }
   handleAliCloundCerificateList=(page,pageSize,region,status)=>{
     const {dispatch}=this.props
-    let payload={page,pageSize,region:region?region:this.state.region}
-    if(status) payload['status']=status
+    console.log(pageSize)
+    let payload={page,pageSize,region:region?region:this.state.region,status:status || this.state.currStatus}
+    let currStatus={currStatus:status || this.state.currStatus}
     dispatch({type:'equipment/getAliCloundCerificateList',payload,callback:(data)=>{
-      console.log(data)
       if(data.hasOwnProperty('CertificateList') || data.hasOwnProperty('OrderList')){
         let cerifiData=data.CertificateList || data.OrderList
         this.setState({
             cerificates:cerifiData,
             total:data.TotalCount,
             page:data.CurrentPage,
-            currStatus:status
+            pageSize,
+            ...currStatus
           })
+        setTimeout(async ()=>{
+          let {cerificateStatus}=this.state
+          for (let s of cerifiData){
+            let firstDomain=s.Domain.split(',')[0]
+            let diff_day=formatAliCloundTime(new Date(),s.AfterDate)
+            if(cerificateStatus.hasOwnProperty(firstDomain) || (s.StatusCode==='REVOKED' || diff_day<0)) continue
+            let data=await this.CheckCerificateStatus(firstDomain)
+          }
+        },1000)
       }else{
         notification.error({
           message:'error',
@@ -100,6 +113,7 @@ class CMDBSystemSetting extends PureComponent {
   render(){
     const {
       cerificates,
+      cerificateStatus,
       pageSize,
       total,
       region,
@@ -225,10 +239,15 @@ class CMDBSystemSetting extends PureComponent {
           }
         },
         render:(text,record)=>{
-          if(text){
-            return text
+          if(cerificateStatus.hasOwnProperty(record.Domain)){
+            return "检测完成."
           }else{
-            return <div><Icon type="sync" spin />检测中...</div>
+            let diff_day=formatAliCloundTime(new Date(),record.AfterDate)
+            if (record.StatusCode!=='REVOKED' && diff_day>=0){
+              return <div><Icon type="sync" spin />检测中...</div>
+            }else{
+              return <div>已失效</div>
+            }
           }
         }
       },
@@ -236,16 +255,16 @@ class CMDBSystemSetting extends PureComponent {
         title: '返回状态',
         key: 'callbackstatus',
         dataIndex: 'callbackstatus',
-        sorter: (a,b)=> a['callbackstatus'] < b['callbackstatus']?-1:(a['callbackstatus'] > b['callbackstatus']?1:0),
-        onCell:()=>{
-          return {
-            style:{
-              textAlign:"center"
-            }
+        width:190,
+        render:(text,record)=>{
+          if(cerificateStatus.hasOwnProperty(record.Domain)){
+            return <div>
+              <div>{formatAliCloundTime(cerificateStatus[record.Domain]['invaliddate'])} 到期</div>
+              <div>还剩 <span style={{color:"red"}}>{cerificateStatus[record.Domain]['invalidday']}</span> 天</div>
+            </div>
+          }else{
+            return "-"
           }
-        },
-        render:(text)=>{
-          return "-"
         }
       },
     ];

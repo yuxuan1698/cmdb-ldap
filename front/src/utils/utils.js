@@ -110,11 +110,14 @@ export function formatTimeAndZone(timeString){
   }
 }
 // 格式化日期并进行时区转换
-export function formatAliCloundTime(beginTime,EndTime){
+export function formatAliCloundTime(beginTime,EndTime,Format){
+  if(Format){
+    return moment(EndTime).utc().format(Format)
+  }
   if(EndTime){
     return moment(EndTime).diff(moment(beginTime), 'days')
   }else{
-    return moment(beginTime).utc().format("YYYY年MM月DD日 HH:mm")
+      return moment(beginTime).utc().format("YYYY年MM月DD日 HH:mm")
   }
 }
 

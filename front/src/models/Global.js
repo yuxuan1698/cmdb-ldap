@@ -1,4 +1,4 @@
-import { getLDAPObjectClassList,GetAliCloundCerificateCountApi } from '../services/api';
+import { getLDAPObjectClassList,GetAliCloundCerificateCountApi,GetAliCloundDomainListApi } from '../services/api';
 import { Modal } from 'antd';
 export default {
     namespace: 'global',
@@ -29,6 +29,12 @@ export default {
       },
       *loadAllStatus({ callback }, { call }) {
         const data = yield call(GetAliCloundCerificateCountApi)
+        if (data) {
+          callback(data)
+        }
+      },
+      *getAliyunDomainList({ callback }, { call }) {
+        const data = yield call(GetAliCloundDomainListApi)
         if (data) {
           callback(data)
         }

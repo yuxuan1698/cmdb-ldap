@@ -38,9 +38,7 @@ import {
         },
         *getAliCloundCerificateInvalid({ payload,callback }, { call }) {
           const data = yield call(GetAliCloundCerificateInvalidApi, payload)
-          if (data) {
-            callback(data)
-          }
+          callback(data)
         },
       },
       reducers: {

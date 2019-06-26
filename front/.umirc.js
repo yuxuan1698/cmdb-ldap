@@ -38,6 +38,7 @@ export default {
   alias:{
     utils: resolve(__dirname,'./src/utils/utils'),
     cmdbstore: resolve(__dirname,'./src/utils/store'),
+    api: resolve(__dirname,'./src/services/api'),
     requestapi: resolve(__dirname,'./src/utils/request') ,
   },
   theme: {
@@ -56,7 +57,9 @@ export default {
     'table-header-bg':'#e8e8e8',
     'popover-bg':'#fbfbfb',
     'tooltip-max-width':"450px",
-    'tooltip-arrow-width':"7px"
+    'tooltip-arrow-width':"7px",
+    'card-head-padding':"8px",
+    'card-padding-base':'16px',
   },
   proxy: {
     "/api": {
