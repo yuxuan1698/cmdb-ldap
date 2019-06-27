@@ -348,7 +348,7 @@ class CreateDNViewSet(APIView):
     if serializer.is_valid():
       parentDn=request.data['currentDn']
       request.data.pop('currentDn')
-      changeStatus, errorMsg = CmdbLDAP.create_ldap_entry_dn(request.data,parentDn)
+      changeStatus, errorMsg = CmdbLDAP().create_ldap_entry_dn(request.data,parentDn)
       if changeStatus:
         returnData = {"status": changeStatus}
         returnStatus = status.HTTP_200_OK

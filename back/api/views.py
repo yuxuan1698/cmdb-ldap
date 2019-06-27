@@ -50,9 +50,7 @@ class getAliCloundEcsListSet(APIView):
     Tags=[]
     if tagkey and tagvalue:
       Tags=[{'Key':tagkey,'Value':"" if tagkey==tagvalue else tagvalue}]
-    # logger.info(Tags[0].get('Key'))
     response = {}
-    logger.info(Tags)
     cacheEcs=aliClound.getAliCloundEcsList(RegionId,PageSize,Page,Tags)
     if cacheEcs:
       data=CmdbJson().decode(cacheEcs)
@@ -168,7 +166,6 @@ class getCheckCerificateInvalidViewSet(APIView):
         return JsonResponse(msg, safe=False)
       else:
         return JsonResponse({'error':msg},status=status.HTTP_400_BAD_REQUEST,safe=False)
-      logger.info(invalid)
     else:
       return JsonResponse(serializer.errors,status=status.HTTP_400_BAD_REQUEST,safe=False)
     return JsonResponse({'error':'获取域名信息出错或者超时，请检查！'},status=status.HTTP_400_BAD_REQUEST,safe=False)

@@ -60,12 +60,12 @@ class CMDBBase extends PureComponent {
     const {loading}=this.props
 
     return <div style={{width:"100%"}}>
-      <div style={{ background: '#ECECEC', padding: '10px' }}>
+      <div style={{ background: '#FFF', padding: '10px',boxShadow: "#dcd8d8 0px 0px 3px" }}>
       <Row gutter={8}>
           <Col span={12}>
-          <Card headStyle={{minHeight:40}} bodyStyle={{padding:"8px 5px"}} title="阿里云ECS主机检测">
+          <Card headStyle={{minHeight:40}} bodyStyle={{padding:"8px 5px"}} style={{boxShadow: "#dcd8d8 0px 0px 3px"}} title="阿里云ECS主机检测">
               <Col span={8}>
-                <Card>
+                <Card >
                   <Statistic
                     title="ECS主机数量"
                     value={Issued}
@@ -76,7 +76,7 @@ class CMDBBase extends PureComponent {
                 </Card>
               </Col>
             </Card>
-            <Card style={{marginTop:10}} headStyle={{minHeight:40}} bodyStyle={{padding:"8px 5px"}} title="阿里云证书检测">
+            <Card style={{marginTop:10,boxShadow: "#dcd8d8 0px 0px 3px"}} headStyle={{minHeight:40}} bodyStyle={{padding:"8px 5px"}}  title="阿里云证书检测">
               <Col span={8}>
                 <Card>
                   <Statistic
@@ -112,7 +112,7 @@ class CMDBBase extends PureComponent {
             </Card>
           </Col>
           <Col span={12}>
-            <Card headStyle={{minHeight:40}} bodyStyle={{padding:"8px 8px"}} title="阿里云域名过期检测">
+            <Card headStyle={{minHeight:40}} bodyStyle={{padding:"8px 8px"}} style={{boxShadow: "#dcd8d8 0px 0px 3px"}} title="阿里云域名过期检测">
               <Table columns={columns} 
                 showHeader={false} 
                 bordered
