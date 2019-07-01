@@ -1,7 +1,7 @@
 from django.conf import settings
 from hashlib import sha1
 from base64 import (b64encode as encode,
-                   b64encode as decode)
+                    b64encode as decode)
 import os
 # from django.core.mail import send_mail
 from django.core.mail import EmailMultiAlternatives
@@ -9,32 +9,38 @@ from django.conf import settings
 from common.utils import CmdbLDAPLogger
 from authentication.models import Users
 from django.contrib.auth import backends
-logger=CmdbLDAPLogger.get_logger('cmdb_ldap')
+logger = CmdbLDAPLogger.get_logger('cmdb_ldap')
 
-def jwt_response_payload_handler(token,userobj=None,request=None):
+
+def jwt_response_payload_handler(token, userobj=None, request=None):
     """为返回的结果添加用户相关信息"""
     return {
-             'nickname':userobj.nickname,
-             'username':userobj.username,
-             'email':userobj.email,
-             'token_prefix': settings.JWT_AUTH.get('JWT_AUTH_HEADER_PREFIX') or 'JWT',
-             'token':token,
-             'permission':"all" if userobj.is_superuser else userobj.get_all_permissions()
-            }
+        'nickname': userobj.nickname,
+        'username': userobj.username,
+        'email': userobj.email,
+        'token_prefix': settings.JWT_AUTH.get('JWT_AUTH_HEADER_PREFIX') or 'JWT',
+        'token': token,
+        'permission': "all" if userobj.is_superuser else userobj.get_all_permissions()
+    }
+
+
 def reflush_secretkey(userModel):
     """返回用户UUID"""
-    return userModel.secretkey 
-    
-def user_payload_handler(data,newUserDn,newUser):
+    return userModel.secretkey
+
+
+def user_payload_handler(data, newUserDn, newUser):
     dbdata = {
         "username": newUser,
         "nickname": data.get('sn') or '',
         "email": data.get('mail') or '',
-        "department":data.get('ou') or '',
-        "mobile":data.get('mobile') or '',
+        "department": data.get('ou') or '',
+        "mobile": data.get('mobile') or '',
         "userdn": newUserDn
     }
     return dbdata
+
+
 def generate_ldap_password(password):
     """
     SSHA密码生成
@@ -43,6 +49,7 @@ def generate_ldap_password(password):
     shapass = sha1(password.encode('utf-8'))
     shapass.update(salt)
     return str(b"{SSHA}" + encode(shapass.digest() + salt), encoding='utf-8')
+
 
 def check_ldap_password(ldap_password, password):
     """

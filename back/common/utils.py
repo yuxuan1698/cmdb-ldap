@@ -145,9 +145,7 @@ def check_cerificate_invalidtime(domain,port=443):
     cerificate=ssl.get_peer_certificate()
 
     invalid=cerificate.get_notAfter().decode()[0:-1]
-    print(invalid)
     invalidtime = datetime.strptime(invalid, '%Y%m%d%H%M%S')
-    print(invalidtime)
     diff_day = invalidtime - datetime.now()
     return True,{"invaliddate":invalidtime,"invalidday":diff_day.days}
   except Exception as e:

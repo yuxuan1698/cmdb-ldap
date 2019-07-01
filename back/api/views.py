@@ -139,11 +139,10 @@ class getAliCloundEcsAllStatusSet(APIView):
   列出阿里云ECS Tags列表
   """
   def get(self,request, *args, **kwargs):
-    RegionId = request.GET.get('region') or ''
+    # RegionId = request.GET.get('region') or ''
     TagsList = aliClound.getAliCloundEcsAllStatus()
     if TagsList:
-      data=CmdbJson().decode(TagsList)
-      return JsonResponse(data, safe=False)
+      return JsonResponse(TagsList, safe=False)
     else:
       return JsonResponse({'error':'获取Tags信息出错，请检查！'},status=status.HTTP_400_BAD_REQUEST,safe=False)
 
@@ -182,3 +181,15 @@ class getAliCloundEcsDomainListSet(APIView):
       return JsonResponse(data, safe=False)
     else:
       return JsonResponse({'error':'获取domain信息出错，请检查！'},status=status.HTTP_400_BAD_REQUEST,safe=False)
+
+class getAliCloundDashboardStatusSet(APIView):
+  """
+  列出面板数据
+  """
+  def get(self,request, *args, **kwargs):
+    DashboardData = aliClound.getAliCloundDashboardStatus()
+    if DashboardData:
+      data=CmdbJson().decode(DashboardData)
+      return JsonResponse(data, safe=False)
+    else:
+      return JsonResponse({'error':'获取Dashboard信息出错，请检查！'},status=status.HTTP_400_BAD_REQUEST,safe=False)

@@ -13,10 +13,12 @@ from .views import (
     getAliCloundCerificateLocationsSet,
     getAliCloundTagsListSet,
     getCheckCerificateInvalidViewSet,
-    getAliCloundEcsDomainListSet
+    getAliCloundEcsDomainListSet,
+    getAliCloundDashboardStatusSet
     )
 urlpatterns = [
     path('system/cronlogs/', getCrontabLogsViewSet.as_view(),name='system-mailresults'),
+    path('aliclound/dashborad/status/', getAliCloundDashboardStatusSet.as_view(),name='aliclound-ecs'),
     path('aliclound/domain/list/', getAliCloundEcsDomainListSet.as_view(),name='aliclound-ecs'),
     path('aliclound/ecs/list/', getAliCloundEcsListSet.as_view(),name='aliclound-ecs'),
     path('aliclound/ecs/allstatus/', getAliCloundEcsAllStatusSet.as_view(),name='aliclound-ecs'),

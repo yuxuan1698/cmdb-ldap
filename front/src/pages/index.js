@@ -14,8 +14,8 @@ const columns = [{
   }
 }, {
   title: "过期",
-  dataIndex: 'ExpirationDate',
-  key: 'ExpirationDate',
+  dataIndex: 'ExpirationDated',
+  key: 'ExpirationDated',
   render:(text,record)=>{
     return <div style={{fontSize:12}}>{formatAliCloundTime(false,record.RegistrationDate,"YYYY年MM月DD日")}~{formatAliCloundTime(false,text,"YYYY年MM月DD日")}</div>
   }
@@ -42,6 +42,11 @@ class CMDBBase extends PureComponent {
         Payed:0,
         WillExpired:0,
       },
+      ecs:{
+        count:0,
+        runCount:0,
+        expireWill:0,
+      },
       domains:[]
     }
   }
@@ -53,30 +58,57 @@ class CMDBBase extends PureComponent {
     dispatch({type:'global/getAliyunDomainList',callback:(data)=>{
       this.setState({domains:data.Data.Domain})
     }})
+    dispatch({type:'global/getAliyunEcsStatusCount',callback:(data)=>{
+      this.setState({ecs:data})
+    }})
   }
   render(){
     const {Issued,WillExpired,Checking}=this.state.cerificate
+    const {ecs}=this.state
     const {domains}=this.state
     const {loading}=this.props
-
+    console.log(ecs)
     return <div style={{width:"100%"}}>
       <div style={{ background: '#FFF', padding: '10px',boxShadow: "#dcd8d8 0px 0px 3px" }}>
       <Row gutter={8}>
           <Col span={12}>
           <Card headStyle={{minHeight:40}} bodyStyle={{padding:"8px 5px"}} style={{boxShadow: "#dcd8d8 0px 0px 3px"}} title="阿里云ECS主机检测">
-              <Col span={8}>
-                <Card >
+          <Col span={8}>
+                <Card>
                   <Statistic
-                    title="ECS主机数量"
-                    value={Issued}
+                    title="ECS主机数"
+                    value={ecs.count}
                     suffix="个"
                     valueStyle={{ color: '#3f8600' }}
                     // prefix={<Icon type="arrow-up" />}
                   />
                 </Card>
               </Col>
+              <Col span={8}>
+                <Card>
+                  <Statistic
+                    title="运行ECS的主机"
+                    value={ecs.runCount}
+                    suffix="个"
+                    valueStyle={{ color: '#03A9F4' }}
+                    // prefix={<Icon type="arrow-up" />}
+                  />
+                </Card>
+              </Col>
+              <Col span={8}>
+                <Card>
+                  <Statistic
+                    title="即将过期的ECS主机"
+                    value={ecs.expireWill}
+                    valueStyle={{ color: 'red' }}
+                    suffix="个"
+                  />
+                </Card>
+              </Col>
             </Card>
-            <Card style={{marginTop:10,boxShadow: "#dcd8d8 0px 0px 3px"}} headStyle={{minHeight:40}} bodyStyle={{padding:"8px 5px"}}  title="阿里云证书检测">
+          </Col>
+          <Col span={12}>
+          <Card style={{boxShadow: "#dcd8d8 0px 0px 3px"}} headStyle={{minHeight:40}} bodyStyle={{padding:"8px 5px"}}  title="阿里云证书检测">
               <Col span={8}>
                 <Card>
                   <Statistic
@@ -111,23 +143,21 @@ class CMDBBase extends PureComponent {
               </Col>
             </Card>
           </Col>
+        </Row>
+        <Row gutter={8} style={{marginTop:10}}>
           <Col span={12}>
             <Card headStyle={{minHeight:40}} bodyStyle={{padding:"8px 8px"}} style={{boxShadow: "#dcd8d8 0px 0px 3px"}} title="阿里云域名过期检测">
-              <Table columns={columns} 
-                showHeader={false} 
-                bordered
-                size="small"
-                loading={Boolean(loading.effects['global/getAliyunDomainList'])}
-                bodyStyle={{margin:"0px"}}
-                pagination={false}
-                dataSource={domains}/>
+                <Table columns={columns} 
+                  showHeader={false} 
+                  bordered
+                  size="small"
+                  rowKey="DomainName"
+                  loading={Boolean(loading.effects['global/getAliyunDomainList'])}
+                  bodyStyle={{margin:"0px"}}
+                  pagination={false}
+                  dataSource={domains}/>
 
-            </Card>
-          </Col>
-        </Row>
-        <Row gutter={8}>
-          <Col span={12}>
-            
+              </Card>
           </Col>
           <Col span={12}>
             <Card>

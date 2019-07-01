@@ -186,3 +186,12 @@ export function GetAliCloundDomainListApi(data) {
         params:data
     })
 }
+
+// 检查aliclound 证书与部署主机上的证书失效时间是否一至
+export function GetAliCloundEcsStatusCountApi(data) {
+    return request({
+        method: "get",
+        url: '/v1/aliclound/ecs/allstatus/',
+        params:data
+    })
+}

@@ -6,7 +6,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, GroupManager, Permission
 from django.utils.translation import ugettext_lazy as _
 # from .permission import Permissions
-from .u
+# from .u
 __all__ = ['UserGroups']
 
 

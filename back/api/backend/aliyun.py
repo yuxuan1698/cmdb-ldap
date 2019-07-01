@@ -6,15 +6,20 @@ from aliyunsdkecs.request.v20140526.DescribeRegionsRequest import DescribeRegion
 from aliyunsdkecs.request.v20140526.DescribeTagsRequest import DescribeTagsRequest
 from aliyunsdkecs.request.v20140526.DescribeInstanceMonitorDataRequest import DescribeInstanceMonitorDataRequest
 from aliyunsdkecs.request.v20140526.DescribeInstancesFullStatusRequest import DescribeInstancesFullStatusRequest
+from aliyunsdkecs.request.v20140526.DescribeDisksFullStatusRequest import DescribeDisksFullStatusRequest
 from aliyunsdkcas.request.v20180813.DescribeCertificateStatusCountRequest import DescribeCertificateStatusCountRequest
 from aliyunsdkcas.request.v20180813.DescribeCertificateListRequest import DescribeCertificateListRequest
 from aliyunsdkcas.request.v20180813.DescribeOrderListRequest import DescribeOrderListRequest
 from aliyunsdkcas.request.v20180813.DescribeLocationListRequest import DescribeLocationListRequest
 from aliyunsdkdomain.request.v20180129.QueryDomainListRequest import QueryDomainListRequest
-# from aliyunsdkots.request.v20160620.ListTagsRequest import ListTagsRequest
 
-from common.utils import CmdbLDAPLogger
+from datetime import datetime
+from django.core.cache import cache
 from django.conf import settings
+from common.utils import (
+    CmdbLDAPLogger,
+    CmdbJson
+    )
 logger=CmdbLDAPLogger().get_logger('django.server')
 
 class AliClound():
@@ -58,10 +63,10 @@ class AliClound():
     def getAliCloundEcsMonitorDataList(self,InstanceID='',StartTime="",EndTime=""):
         client=AcsClient(self.secreyKey,self.accesssecret)
         req=DescribeInstanceMonitorDataRequest()
-        req.set_PageSize(PageSize)
-        req.set_PageNumber(Page)
-        if len(Tags)>0:
-            req.set_Tags(Tags)
+        # req.set_PageSize(PageSize)
+        # req.set_PageNumber(Page)
+        # if len(Tags)>0:
+        #     req.set_Tags(Tags)
         req.set_accept_format('json')
         try:
             data=client.do_action_with_exception(req)
@@ -145,19 +150,25 @@ class AliClound():
         """
         获取标签列表
         """
-        client=AcsClient(self.secreyKey,self.accesssecret,RegionIds)
-        req = DescribeInstancesFullStatusRequest()
-        # req.set_ResourceType('instance')
-        req.set_accept_format('json')
-        try:
-            data=client.do_action_with_exception(req)
-            if data:
-                return data
-            else:
-                return False
-        except Exception as e:
-            logger.error(e)
-            return False
+        ecsData=cache.get('ecsData')
+        if not ecsData:
+            ecsData={"count": 0,
+                    "runCount":0,
+                    "expireWill":0}
+            ecsList = self.getAliCloundEcsList(PageSize=100)
+            data=CmdbJson().decode(ecsList)
+            ecsData['count']=data.get('TotalCount')
+            ecslist=data.get('Instances').get('Instance')
+            for a in ecslist:
+                expiredtime=a.get('ExpiredTime')
+                invalidtime = datetime.strptime(expiredtime, '%Y-%m-%dT%H:%MZ')
+                diff_day = invalidtime - datetime.now()
+                if diff_day.days<=30:
+                     ecsData['expireWill']+=1
+                if a.get('Status')=='Running':
+                    ecsData['runCount']+=1
+            cache.set('ecsData',ecsData)
+        return ecsData
 
     def getAliCloundDomainList(self):
         """
@@ -177,3 +188,5 @@ class AliClound():
         except Exception as e:
             logger.error(e)
             return False
+
+
