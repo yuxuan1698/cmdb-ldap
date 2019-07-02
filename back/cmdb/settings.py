@@ -207,7 +207,7 @@ CACHES                                    = {
 
 
 #LDAP认证
-# AUTHENTICATION_BACKENDS                   = ['django.contrib.auth.backends.ModelBackend',]  ExtraModelBackend
+# AUTHENTICATION_BACKENDS                 = ['django.contrib.auth.backends.ModelBackend',]  ExtraModelBackend
 AUTHENTICATION_BACKENDS                   = ['authentication.backends.ExtraModelBackend']  
 
 # Auth LDAP settings
@@ -252,12 +252,26 @@ AUTH_LDAP_BACKEND                         = 'authentication.ldap.backend.LDAPBac
 if AUTH_LDAP                              : 
     AUTHENTICATION_BACKENDS.insert(0, AUTH_LDAP_BACKEND)
 AUTH_USER_MODEL                           = "authentication.Users"
-# AUTH_GROUP_MODEL                          = "authentication.UserGroups"
+# AUTH_GROUP_MODEL                        = "authentication.UserGroups"
 
 # Ali Cloud Config配置
-ALI_CLOUND={
-    'ACCESSKEY':'LTAIUWuSChF0IY7L',
-    'ACCESSSECRET':'9e1QiG9cRDTIGJnUcOQMK27C1ohu8v',
+# ALI_CLOUND                              = {
+#     'ACCESSKEY'                         : 'LTAIUWuSChF0IY7L',
+#     'ACCESSSECRET'                      : '9e1QiG9cRDTIGJnUcOQMK27C1ohu8v',
+# }
+ALI_CLOUND_API_ACCOUNT                    = {
+    # 物必达帐号
+    'wbd'                                 : {
+        'ACCESSKEY'                       : 'LTAIUWuSChF0IY7L',
+        'ACCESSSECRET'                    : '9e1QiG9cRDTIGJnUcOQMK27C1ohu8v',
+        'Name'                            : "物必达(iwubida)"
+    },
+    # 94赖账号
+    'lazy'                                : {
+        'ACCESSKEY'                       : 'LTAIBsNvE3dgppCx',
+        'ACCESSSECRET'                    : 'IBeSKdl1DdxbcqjoahXL1zB8m1196n',
+        'Name'                            : "就是赖(94lazy)"
+    }
 }
 
 # 日志部分

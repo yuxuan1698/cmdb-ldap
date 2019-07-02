@@ -4,8 +4,6 @@
 import {PureComponent} from 'react'
 import {Select } from 'antd';
 import {formatMessage} from 'umi/locale';
-import { Store } from "cmdbstore";
-import css from '../index.less'
 
 const { Option } = Select;
 

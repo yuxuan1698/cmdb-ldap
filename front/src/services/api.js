@@ -195,3 +195,10 @@ export function GetAliCloundEcsStatusCountApi(data) {
         params:data
     })
 }
+// 获取组列表API
+export function GetAliCloundAccountNameListApi () {
+    return request({
+        method: "get",
+        url: `/v1/aliclound/account/namelist/`
+    })
+}

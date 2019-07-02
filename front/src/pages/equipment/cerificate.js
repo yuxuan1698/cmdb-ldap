@@ -5,6 +5,7 @@ import {PureComponent} from 'react'
 import CMDBBreadcrumb from "../components/Breadcrumb";
 import {Layout,Table,Tooltip,Tag,Input,Icon,Select, notification } from 'antd';
 import CMDBSelectRegions from "./components/SelectRegions"
+import CMDBSelectAccount from "./components/SelectAccount"
 import {formatMessage} from 'umi/locale';
 import { formatAliCloundTime } from 'utils'
 import css from './index.less'
@@ -12,8 +13,7 @@ const {
   Content
 } = Layout;
 const { Option } = Select;
-
-@connect(({ loading }) => ({ loading }))
+@connect(({ loading,equipment }) => ({ loading,equipment }))
 class CMDBSystemSetting extends PureComponent {
   constructor(props){
     super(props)
@@ -41,18 +41,31 @@ class CMDBSystemSetting extends PureComponent {
      }})
     })
   }
-
   handleAliCloundSetRegion=(regions)=>{
     this.setState({...regions})
   }
   handleAliCloundRegionChange(region){
-    const {page,pageSize}=this.state
-    this.handleAliCloundCerificateList(page,pageSize,region)
+    const {pageSize}=this.state
+    this.handleAliCloundCerificateList(1,pageSize,region)
+  }
+  handleAliCloundAccountNameChange=(e)=>{
+    const {pageSize}=this.state
+    const {dispatch}=this.props
+    dispatch({type:'equipment/setAliCloundAlicurrAccountName',payload:e})
+    setTimeout(()=>this.handleAliCloundCerificateList(1,pageSize),200)
   }
   handleAliCloundCerificateList=(page,pageSize,region,status)=>{
     const {dispatch}=this.props
-    console.log(pageSize)
-    let payload={page,pageSize,region:region?region:this.state.region,status:status || this.state.currStatus}
+    const {currAccount}=this.props.equipment
+    let payload={
+          page,
+          pageSize,
+          region:region?region:this.state.region,
+          status:status || this.state.currStatus
+        }
+    if(currAccount!==""){
+      payload['currAccount']=currAccount
+    }
     let currStatus={currStatus:status || this.state.currStatus}
     dispatch({type:'equipment/getAliCloundCerificateList',payload,callback:(data)=>{
       if(data.hasOwnProperty('CertificateList') || data.hasOwnProperty('OrderList')){
@@ -60,8 +73,8 @@ class CMDBSystemSetting extends PureComponent {
         this.setState({
             cerificates:cerifiData,
             total:data.TotalCount,
-            page:data.CurrentPage,
             pageSize,
+            page,
             ...currStatus
           })
         setTimeout(async ()=>{
@@ -70,7 +83,7 @@ class CMDBSystemSetting extends PureComponent {
             let firstDomain=s.Domain.split(',')[0]
             let diff_day=formatAliCloundTime(new Date(),s.AfterDate)
             if(cerificateStatus.hasOwnProperty(firstDomain) || (s.StatusCode==='REVOKED' || diff_day<0)) continue
-            let data=await this.CheckCerificateStatus(firstDomain)
+            await this.CheckCerificateStatus(firstDomain)
           }
         },1000)
       }else{
@@ -106,14 +119,15 @@ class CMDBSystemSetting extends PureComponent {
     this.setState({searchValue:e.target.value})
   }
   handleCerificateStatus=(e)=>{
-    const {pageSize,page,region}=this.state
-    this.setState({})
+    const {pageSize,region}=this.state
+    // this.setState({})
     this.handleAliCloundCerificateList(1,pageSize,region,e)
   }
   render(){
     const {
       cerificates,
       cerificateStatus,
+      page,
       pageSize,
       total,
       region,
@@ -122,7 +136,7 @@ class CMDBSystemSetting extends PureComponent {
       regionNames,
       searchValue
     } = this.state
-    const {loading}=this.props
+    const {loading,equipment}=this.props
     const columns = [
         {
         title: '证书/ID',
@@ -239,7 +253,7 @@ class CMDBSystemSetting extends PureComponent {
           }
         },
         render:(text,record)=>{
-          if(cerificateStatus.hasOwnProperty(record.Domain)){
+          if(cerificateStatus.hasOwnProperty(record.Domain.split(',')[0])){
             return "检测完成."
           }else{
             let diff_day=formatAliCloundTime(new Date(),record.AfterDate)
@@ -257,10 +271,11 @@ class CMDBSystemSetting extends PureComponent {
         dataIndex: 'callbackstatus',
         width:190,
         render:(text,record)=>{
-          if(cerificateStatus.hasOwnProperty(record.Domain)){
+          let domain=record.Domain.split(',')[0]
+          if(cerificateStatus.hasOwnProperty(domain)){
             return <div>
-              <div>{formatAliCloundTime(cerificateStatus[record.Domain]['invaliddate'])} 到期</div>
-              <div>还剩 <span style={{color:"red"}}>{cerificateStatus[record.Domain]['invalidday']}</span> 天</div>
+              <div>{formatAliCloundTime(cerificateStatus[domain]['invaliddate'])} 到期</div>
+              <div>还剩 <span style={{color:"red"}}>{cerificateStatus[domain]['invalidday']}</span> 天</div>
             </div>
           }else{
             return "-"
@@ -282,6 +297,7 @@ class CMDBSystemSetting extends PureComponent {
                 showSizeChanger:true,
                 showQuickJumper:true,
                 defaultPageSize:pageSize,
+                current:page,
                 total:total,
                 pageSize:pageSize,
                 pageSizeOptions:["15","30","45"],
@@ -309,6 +325,10 @@ class CMDBSystemSetting extends PureComponent {
                       <Option value='EXPIRED'>已经过期</Option>
                       <Option value='REVOKED'>已吊销</Option>
                   </Select>
+                  <strong>选择帐号:</strong>
+                    <CMDBSelectAccount aliAccount={equipment.aliAccount} 
+                      currAccount={equipment.currAccount}
+                      handleAliCloundAccountNameChange={this.handleAliCloundAccountNameChange} />
                   <strong>区域选择:</strong><CMDBSelectRegions 
                     loading={loading} 
                     region={region} 
@@ -322,7 +342,6 @@ class CMDBSystemSetting extends PureComponent {
               columns={columns} 
               dataSource={cerificates.filter(i=>{
                 if(searchValue!==""){
-                  console.log(i.BrandName)
                   return  i.Domain.indexOf(searchValue)>=0 ||
                           i.InstanceId.indexOf(searchValue)>=0||
                           i.Name.indexOf(searchValue)>=0

@@ -17,7 +17,7 @@ const columns = [{
   dataIndex: 'ExpirationDated',
   key: 'ExpirationDated',
   render:(text,record)=>{
-    return <div style={{fontSize:12}}>{formatAliCloundTime(false,record.RegistrationDate,"YYYY年MM月DD日")}~{formatAliCloundTime(false,text,"YYYY年MM月DD日")}</div>
+    return <div style={{fontSize:12}}>{formatAliCloundTime(false,record.RegistrationDate,"YYYY年MM月DD日")}~{formatAliCloundTime(false,record.ExpirationDate,"YYYY年MM月DD日")}</div>
   }
 }, {
   title: "剩余天数",
@@ -63,7 +63,7 @@ class CMDBBase extends PureComponent {
     }})
   }
   render(){
-    const {Issued,WillExpired,Checking}=this.state.cerificate
+    const {Issued,WillExpired,Payed,Checking}=this.state.cerificate
     const {ecs}=this.state
     const {domains}=this.state
     const {loading}=this.props
@@ -109,10 +109,10 @@ class CMDBBase extends PureComponent {
           </Col>
           <Col span={12}>
           <Card style={{boxShadow: "#dcd8d8 0px 0px 3px"}} headStyle={{minHeight:40}} bodyStyle={{padding:"8px 5px"}}  title="阿里云证书检测">
-              <Col span={8}>
+              <Col span={6}>
                 <Card>
                   <Statistic
-                    title="已签发的证书"
+                    title="已签发的"
                     value={Issued}
                     suffix="个"
                     valueStyle={{ color: '#3f8600' }}
@@ -120,10 +120,10 @@ class CMDBBase extends PureComponent {
                   />
                 </Card>
               </Col>
-              <Col span={8}>
+              <Col span={6}>
                 <Card>
                   <Statistic
-                    title="即将过期的证书"
+                    title="即将过期的"
                     value={WillExpired}
                     suffix="个"
                     valueStyle={{ color: '#cf1322' }}
@@ -131,10 +131,20 @@ class CMDBBase extends PureComponent {
                   />
                 </Card>
               </Col>
-              <Col span={8}>
+              <Col span={6}>
                 <Card>
                   <Statistic
-                    title="待申请的证书"
+                    title="等待申请"
+                    value={Payed}
+                    valueStyle={{ color: '#3f8600' }}
+                    suffix="个"
+                  />
+                </Card>
+              </Col>
+              <Col span={6}>
+                <Card>
+                  <Statistic
+                    title="申请中的..."
                     value={Checking}
                     valueStyle={{ color: '#3f8600' }}
                     suffix="个"

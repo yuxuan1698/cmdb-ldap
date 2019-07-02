@@ -56,7 +56,7 @@ export default {
       } 
     },
     effects: {
-      *loginAction({payload,callback},{call,put,select}){
+      *loginAction({payload,callback},{call,put}){
         const data = yield call(userlogin, payload)
         // const { historyPath } = yield select(_ => _.login)
         if(data && data.hasOwnProperty('token')){
@@ -72,9 +72,7 @@ export default {
           }
         }
       },
-      *logoutAction({payload},{call,put,select}){
-        // const data = yield call(userlogin, payload)
-        // if(data && data.hasOwnProperty('token')){
+      *logoutAction({},{put}){
         Store.delLocal('userinfo')
         yield put({
           type:'logout',

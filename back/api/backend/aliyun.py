@@ -23,10 +23,19 @@ from common.utils import (
 logger=CmdbLDAPLogger().get_logger('django.server')
 
 class AliClound():
+    Account='wbd'
     def __init__(self):
-        self.secreyKey=settings.ALI_CLOUND.get('ACCESSKEY') or ''
-        self.accesssecret=settings.ALI_CLOUND.get('ACCESSSECRET') or ''
-    # @staticmethod
+        self.secreyKey=settings.ALI_CLOUND_API_ACCOUNT.get('wbd').get('ACCESSKEY') or ''
+        self.accesssecret=settings.ALI_CLOUND_API_ACCOUNT.get('wbd').get('ACCESSSECRET') or ''
+
+    # @classmethod
+    def setAccount(self,Account='wbd'):
+        if Account in settings.ALI_CLOUND_API_ACCOUNT:
+            self.secreyKey=settings.ALI_CLOUND_API_ACCOUNT.get(Account).get('ACCESSKEY') 
+            self.accesssecret=settings.ALI_CLOUND_API_ACCOUNT.get(Account).get('ACCESSSECRET') 
+        return self
+           
+
     def getAliCloundRegionsList(self):
         client=AcsClient(self.secreyKey,self.accesssecret)
         req=DescribeRegionsRequest()
@@ -79,18 +88,24 @@ class AliClound():
             return False
 
     def getAliCloundCertificateStatusCount(self):
-        client=AcsClient(self.secreyKey,self.accesssecret)
-        req = DescribeCertificateStatusCountRequest()
-        req.set_accept_format('json')
-        try:
-            data=client.do_action_with_exception(req)
-            if data:
-                return data
-            else:
+        alldata={}
+        for k,v in settings.ALI_CLOUND_API_ACCOUNT.items():
+            client=AcsClient(v.get('ACCESSKEY'),v.get('ACCESSSECRET'))
+            req = DescribeCertificateStatusCountRequest()
+            req.set_accept_format('json')
+            try:
+                data=CmdbJson().decode(client.do_action_with_exception(req))
+                for s,m in data.items():
+                    # logger.info(s)
+                    if s in alldata:
+                        alldata[s]=alldata[s]+m
+                    else:
+                        alldata[s]=m
+            except Exception as e:
+                logger.error(e)
                 return False
-        except Exception as e:
-            logger.error(e)
-            return False
+        return alldata
+
     def getAliCloundCertificateLocationList(self):
         client=AcsClient(self.secreyKey,self.accesssecret)
         req = DescribeLocationListRequest()
@@ -155,38 +170,44 @@ class AliClound():
             ecsData={"count": 0,
                     "runCount":0,
                     "expireWill":0}
-            ecsList = self.getAliCloundEcsList(PageSize=100)
-            data=CmdbJson().decode(ecsList)
-            ecsData['count']=data.get('TotalCount')
-            ecslist=data.get('Instances').get('Instance')
-            for a in ecslist:
-                expiredtime=a.get('ExpiredTime')
-                invalidtime = datetime.strptime(expiredtime, '%Y-%m-%dT%H:%MZ')
-                diff_day = invalidtime - datetime.now()
-                if diff_day.days<=30:
-                     ecsData['expireWill']+=1
-                if a.get('Status')=='Running':
-                    ecsData['runCount']+=1
-            cache.set('ecsData',ecsData)
+            for user in settings.ALI_CLOUND_API_ACCOUNT:
+                ecsList = self.setAccount(user).getAliCloundEcsList(PageSize=100)
+
+                data=CmdbJson().decode(ecsList)
+                ecsData['count']+=data.get('TotalCount')
+                ecslist=data.get('Instances').get('Instance')
+                for a in ecslist:
+                    expiredtime=a.get('ExpiredTime')
+                    invalidtime = datetime.strptime(expiredtime, '%Y-%m-%dT%H:%MZ')
+                    diff_day = invalidtime - datetime.now()
+                    if diff_day.days<=30:
+                        ecsData['expireWill']+=1
+                    if a.get('Status')=='Running':
+                        ecsData['runCount']+=1
+                cache.set('ecsData',ecsData)
         return ecsData
 
     def getAliCloundDomainList(self):
         """
         获取域名列表
         """
-        client=AcsClient(self.secreyKey,self.accesssecret)
-        req = QueryDomainListRequest()
-        req.set_PageNum(1)
-        req.set_PageSize(50)
-        req.set_accept_format('json')
-        try:
-            data=client.do_action_with_exception(req)
-            if data:
-                return data
-            else:
+        alldata={}
+        for k,v in settings.ALI_CLOUND_API_ACCOUNT.items():
+            client=AcsClient(v.get('ACCESSKEY'),v.get('ACCESSSECRET'))
+            req = QueryDomainListRequest()
+            req.set_PageNum(1)
+            req.set_PageSize(100)
+            req.set_accept_format('json')
+            try:
+                data=CmdbJson().decode(client.do_action_with_exception(req))
+                if 'Data' in alldata:
+                    if type(alldata['Data']['Domain']) == list:
+                        alldata['Data']['Domain'].extend(data['Data']['Domain'])
+                        alldata['TotalItemNum']+=data['TotalItemNum']
+                else:
+                    alldata=data
+                logger.info(alldata)
+            except Exception as e:
+                logger.error(e)
                 return False
-        except Exception as e:
-            logger.error(e)
-            return False
-
-
+        return alldata

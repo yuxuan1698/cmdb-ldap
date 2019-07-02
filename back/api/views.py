@@ -9,6 +9,7 @@ from django.core.cache import cache
 from api.backend.aliyun import AliClound
 from .serializers import CerificateInvalidSerializer
 from common.utils import check_cerificate_invalidtime
+from django.conf import settings
 
 aliClound=AliClound()
 logger=CmdbLDAPLogger().get_logger('django.server')
@@ -47,11 +48,12 @@ class getAliCloundEcsListSet(APIView):
     RegionId=request.GET.get('region') or 'cn-shenzhen'
     tagkey=request.GET.get('tagkey') 
     tagvalue=request.GET.get('tagvalue')
+    currAccount=request.GET.get('currAccount') or 'wbd'
     Tags=[]
     if tagkey and tagvalue:
       Tags=[{'Key':tagkey,'Value':"" if tagkey==tagvalue else tagvalue}]
     response = {}
-    cacheEcs=aliClound.getAliCloundEcsList(RegionId,PageSize,Page,Tags)
+    cacheEcs=aliClound.setAccount(currAccount).getAliCloundEcsList(RegionId,PageSize,Page,Tags)
     if cacheEcs:
       data=CmdbJson().decode(cacheEcs)
       response['total']=data.get('TotalCount')
@@ -86,8 +88,7 @@ class getAliCloundCerificateCountSet(APIView):
   def get(self,request, *args, **kwargs):
     CertificateCount = aliClound.getAliCloundCertificateStatusCount()
     if CertificateCount:
-      data=CmdbJson().decode(CertificateCount)
-      return JsonResponse(data, safe=False)
+      return JsonResponse(CertificateCount, safe=False)
     else:
       return JsonResponse({'error':'获取Rigion信息出错，请检查！'},status=status.HTTP_400_BAD_REQUEST,safe=False)
 
@@ -99,9 +100,9 @@ class getAliCloundCerificateListSet(APIView):
     certicateStatus = request.GET.get('status') or ''
     PageSize=request.GET.get('pageSize') or 15
     Page=request.GET.get('page') or 1
-    RegionId=request.GET.get('region') or 'cn-shenzhen'
+    currAccount=request.GET.get('currAccount') or 'wbd'
 
-    CertificateList = aliClound.getAliCloundCertificateList(certicateStatus,PageSize,Page)
+    CertificateList = aliClound.setAccount(currAccount).getAliCloundCertificateList(certicateStatus,PageSize,Page)
     if CertificateList:
       data=CmdbJson().decode(CertificateList)
       return JsonResponse(data, safe=False)
@@ -127,7 +128,8 @@ class getAliCloundTagsListSet(APIView):
   """
   def get(self,request, *args, **kwargs):
     RegionId = request.GET.get('region') or ''
-    TagsList = aliClound.getAliCloundTagsList(RegionId)
+    currAccount = request.GET.get('currAccount') or 'wbd'
+    TagsList = aliClound.setAccount(currAccount).getAliCloundTagsList(RegionId)
     if TagsList:
       data=CmdbJson().decode(TagsList)
       return JsonResponse(data, safe=False)
@@ -139,7 +141,6 @@ class getAliCloundEcsAllStatusSet(APIView):
   列出阿里云ECS Tags列表
   """
   def get(self,request, *args, **kwargs):
-    # RegionId = request.GET.get('region') or ''
     TagsList = aliClound.getAliCloundEcsAllStatus()
     if TagsList:
       return JsonResponse(TagsList, safe=False)
@@ -177,8 +178,7 @@ class getAliCloundEcsDomainListSet(APIView):
   def get(self,request, *args, **kwargs):
     DomainList = aliClound.getAliCloundDomainList()
     if DomainList:
-      data=CmdbJson().decode(DomainList)
-      return JsonResponse(data, safe=False)
+      return JsonResponse(DomainList, safe=False)
     else:
       return JsonResponse({'error':'获取domain信息出错，请检查！'},status=status.HTTP_400_BAD_REQUEST,safe=False)
 
@@ -193,3 +193,15 @@ class getAliCloundDashboardStatusSet(APIView):
       return JsonResponse(data, safe=False)
     else:
       return JsonResponse({'error':'获取Dashboard信息出错，请检查！'},status=status.HTTP_400_BAD_REQUEST,safe=False)
+
+class getAliCloundAcountNameListSet(APIView):
+  """
+  列出面板数据
+  """
+  def get(self,request, *args, **kwargs):
+    aliaccount=[{'key':s,'name':v.get('Name')} for s,v in settings.ALI_CLOUND_API_ACCOUNT.items()]
+    aliaccount.reverse()
+    if aliaccount:
+      return JsonResponse(aliaccount, safe=False)
+    else:
+      return JsonResponse({'error':'获取多个阿里云帐号列表信息出错，请检查！'},status=status.HTTP_400_BAD_REQUEST,safe=False)

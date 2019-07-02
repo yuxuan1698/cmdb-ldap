@@ -14,14 +14,16 @@ from .views import (
     getAliCloundTagsListSet,
     getCheckCerificateInvalidViewSet,
     getAliCloundEcsDomainListSet,
-    getAliCloundDashboardStatusSet
+    getAliCloundDashboardStatusSet,
+    getAliCloundAcountNameListSet
     )
 urlpatterns = [
     path('system/cronlogs/', getCrontabLogsViewSet.as_view(),name='system-mailresults'),
-    path('aliclound/dashborad/status/', getAliCloundDashboardStatusSet.as_view(),name='aliclound-ecs'),
-    path('aliclound/domain/list/', getAliCloundEcsDomainListSet.as_view(),name='aliclound-ecs'),
-    path('aliclound/ecs/list/', getAliCloundEcsListSet.as_view(),name='aliclound-ecs'),
-    path('aliclound/ecs/allstatus/', getAliCloundEcsAllStatusSet.as_view(),name='aliclound-ecs'),
+    path('aliclound/account/namelist/', getAliCloundAcountNameListSet.as_view(),name='aliclound-account-list'),
+    path('aliclound/dashborad/status/', getAliCloundDashboardStatusSet.as_view(),name='aliclound-dashboard-status'),
+    path('aliclound/domain/list/', getAliCloundEcsDomainListSet.as_view(),name='aliclound-domain-list'),
+    path('aliclound/ecs/list/', getAliCloundEcsListSet.as_view(),name='aliclound-ecs-list'),
+    path('aliclound/ecs/allstatus/', getAliCloundEcsAllStatusSet.as_view(),name='aliclound-ecs-status'),
     path('aliclound/regions/list/', getAliCloundRegionListSet.as_view(),name='aliclound-regions'),
     path('aliclound/tags/list/',getAliCloundTagsListSet.as_view(), name='aliclound-cerificate-list'),
     path('aliclound/cerificate/list/',getAliCloundCerificateListSet.as_view(), name='aliclound-cerificate-list'),

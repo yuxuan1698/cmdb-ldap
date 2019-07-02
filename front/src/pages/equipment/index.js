@@ -5,10 +5,12 @@ import {PureComponent} from 'react'
 import CMDBBreadcrumb from "../components/Breadcrumb";
 import {Layout,Table,Tooltip,Tag,Input,Icon,Cascader, notification } from 'antd';
 import CMDBSelectRegions from "./components/SelectRegions"
+import CMDBSelectAccount from "./components/SelectAccount"
 import {formatMessage} from 'umi/locale';
 import { formatAliCloundTime } from 'utils'
 import css from './index.less'
 import linuxlogo from './linux.png'
+import windows from './windows.png'
 const {
   Content
 } = Layout;
@@ -18,7 +20,7 @@ const InstanceStatus={
   'Stopped':['已停止','red','pause-circle']
 }
 
-@connect(({ loading }) => ({ loading }))
+@connect(({ loading,equipment }) => ({ loading,equipment }))
 class CMDBSystemSetting extends PureComponent {
   constructor(props){
     super(props)
@@ -43,17 +45,32 @@ class CMDBSystemSetting extends PureComponent {
     const {page,pageSize}=this.state
     this.handleAliCloundEcsList(page,pageSize,region)
   }
+  handleAliCloundAccountNameChange=(e)=>{
+    const {pageSize}=this.state
+    const {dispatch}=this.props
+    this.setState({Tags:[],currTag:[]})
+    dispatch({type:'equipment/setAliCloundAlicurrAccountName',payload:e})
+    setTimeout(()=>this.handleAliCloundEcsList(1,pageSize),200)
+  }
   handleAliCloundEcsList=(page,pageSize,region)=>{
     const {dispatch}=this.props
     const {currTag}=this.state
     let payload={page,pageSize,region:region?region:this.state.region,searchValue:""}
+    const {currAccount}=this.props.equipment
+    let tagQuery={region:payload['region']}
+    if(currAccount!==""){
+      payload['currAccount']=currAccount
+      tagQuery['currAccount']=currAccount
+    }
     let query={}
     if(currTag.length>0){
       query['tagkey']=currTag[0]
       query['tagvalue']=currTag[1]
       query['page']=1
     }
-    dispatch({type:'equipment/getAliCloundTagsList',payload:{region:payload['region']},callback:(data)=>{
+   
+
+    dispatch({type:'equipment/getAliCloundTagsList',payload:tagQuery,callback:(data)=>{
       if(data.hasOwnProperty('Tags')){
         let tagobj={}
         data.Tags.Tag.map(i=>{
@@ -139,8 +156,7 @@ class CMDBSystemSetting extends PureComponent {
       currTag,
       searchValue
     } = this.state
-    const {loading}=this.props
-    console.log(ecslist)
+    const {loading,equipment}=this.props
     const columns = [
         {
         title: '实例名称/ID',
@@ -217,17 +233,29 @@ class CMDBSystemSetting extends PureComponent {
         key: 'NetworkInterfaces',
         dataIndex: 'NetworkInterfaces',
         sorter: (a,b)=> {
-          let aip=a.NetworkInterfaces.NetworkInterface.map(s=>s.PrimaryIpAddress).join()
-          let bip=b.NetworkInterfaces.NetworkInterface.map(s=>s.PrimaryIpAddress).join()
+          let aip,bip
+          if(a.hasOwnProperty('InnerIpAddress') && a.InnerIpAddress.IpAddress.length>0){
+            aip=a.InnerIpAddress.IpAddress.join()
+            bip=b.InnerIpAddress.IpAddress.join()
+          }else{
+            aip=a.NetworkInterfaces.NetworkInterface.map(s=>s.PrimaryIpAddress).join()
+            bip=b.NetworkInterfaces.NetworkInterface.map(s=>s.PrimaryIpAddress).join()
+          }
           return  aip < bip?-1:(aip > bip?1:0)
         },
         render: (text,record) => {
-          if (text) {
+          let privateip=record.hasOwnProperty('NetworkInterfaces') && record.NetworkInterfaces.NetworkInterface.length>0?
+              record.NetworkInterfaces.NetworkInterface.map(i=>i.PrimaryIpAddress).join('、'):(
+                record.hasOwnProperty('InnerIpAddress') &&
+                record.InnerIpAddress.IpAddress.length>0?record.InnerIpAddress.IpAddress.join('、'):false)
+          let publicip=record.hasOwnProperty('PublicIpAddress') && record.PublicIpAddress.IpAddress.length>0?
+              record.PublicIpAddress.IpAddress.join('、'):false
+          if (privateip || publicip) {
             return <Tooltip placement = "top"
-                    title={<div style={{fontSize:12}}>(私){record.NetworkInterfaces.NetworkInterface.map(i=>i.PrimaryIpAddress).join('、')}</div>}
+                    title={<div style={{fontSize:12}}>(私){privateip}</div>}
                     >
-                {record.PublicIpAddress.IpAddress.length>0?<div>(公){record.PublicIpAddress.IpAddress}</div>:""} 
-                <div>(私){record.NetworkInterfaces.NetworkInterface.map(i=>i.PrimaryIpAddress).join('、')}</div> 
+                {publicip?<div>(公){publicip}</div>:""} 
+                <div>(私){privateip}</div> 
             </Tooltip> 
           }
         }
@@ -270,7 +298,8 @@ class CMDBSystemSetting extends PureComponent {
           if (text) {
             return <div>
                 <div>{record.OSName}</div>
-                <div>{text==='linux'?<span>{text}<img src={linuxlogo} /></span>:text}(
+                <div>{text==='linux'?<span>{text}<img src={linuxlogo} /></span>:
+                text==='windows'?<span>{text}<img src={windows} /></span>:text}(
                   {record.InstanceChargeType==='PrePaid'?"预付费":record.InstanceChargeType})</div>
               </div>
             }
@@ -366,7 +395,12 @@ class CMDBSystemSetting extends PureComponent {
                     onChange={this.handleSearchChange.bind(this)}
                     placeholder={formatMessage({id:'userlist_table_search'})}
                     style={{ transition:"all .2s ease-out",width:300,float:"right" }}
-                  /><strong>区域选择:</strong><CMDBSelectRegions 
+                  />
+                  <strong>选择帐号:</strong>
+                  <CMDBSelectAccount aliAccount={equipment.aliAccount} 
+                    currAccount={equipment.currAccount}
+                    handleAliCloundAccountNameChange={this.handleAliCloundAccountNameChange} />
+                  <strong>区域选择:</strong><CMDBSelectRegions 
                     loading={loading} 
                     region={region} 
                     regions={regions}
