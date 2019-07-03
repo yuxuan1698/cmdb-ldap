@@ -206,7 +206,14 @@ class CMDBUserList extends PureComponent {
         const username=record[record['userdn'].split(',')[0].split('=')[0]]
         return <ResetButtonGroup 
           restpassworddata={{userdn:record['userdn'],username}} 
-          restsshkeyddata={{username,email:record['mail']}} 
+          restsshkeyddata = {
+            {
+              username,
+              email: record['mail'],
+              userdn: record['userdn'],
+              writetable:true
+            }
+          }
           dispatch={dispatch} />
         
         // <div>

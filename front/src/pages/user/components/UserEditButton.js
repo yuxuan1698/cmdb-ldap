@@ -21,13 +21,13 @@ export class UserEditButton extends PureComponent {
     return (
       <div>
         <ButtonGroup size="small">
-          <Tooltip placement="topLeft" title={formatMessage({id:'userlist_useredit_edit'})} getPopupContainer={trigger => trigger.parentNode} >
+          <Tooltip placement="topLeft" title={formatMessage({ id: 'userlist_useredit_edit' })} getPopupContainer={trigger => trigger.parentNode.parentNode} >
             <Button type="Default" icon="bars" onClick={()=>{
            this.props.showHideUserDrawer('update',delkey)
           }}/>
           </Tooltip>{
             pwdAccountLockedTime===""?(
-            <Tooltip placement="top" title={formatMessage({id:'userlist_useredit_lock'})} getPopupContainer={trigger => trigger.parentNode} >
+              <Tooltip placement="top" title={formatMessage({ id: 'userlist_useredit_lock' })} getPopupContainer={trigger => trigger.parentNode.parentNode} >
               <Button type="Default" icon="lock"onClick={()=>{
                 Modal.confirm({
                   title: formatMessage({id:'userlist_useredit_lock'}),
@@ -40,7 +40,7 @@ export class UserEditButton extends PureComponent {
                 })
               }} />
             </Tooltip>):(
-            <Tooltip placement="top" title={formatMessage({id:'userlist_useredit_unlock'})} getPopupContainer={trigger => trigger.parentNode} >
+                <Tooltip placement="top" title={formatMessage({ id: 'userlist_useredit_unlock' })} getPopupContainer={trigger => trigger.parentNode.parentNode} >
               <Button type="Default" icon="unlock"onClick={()=>{
                 Modal.confirm({
                   title: formatMessage({id:'userlist_useredit_unlock'}),
@@ -53,7 +53,7 @@ export class UserEditButton extends PureComponent {
               }} />
             </Tooltip>)
           }
-          <Tooltip placement="topRight" title={formatMessage({id:'userlist_useredit_del'})} getPopupContainer={trigger => trigger.parentNode} >
+          <Tooltip placement="topRight" title={formatMessage({ id: 'userlist_useredit_del' })} getPopupContainer={trigger => trigger.parentNode.parentNode} >
             <Button type="danger" icon="delete" onClick={this.onDeleteUser.bind(this,delkey)} />
           </Tooltip>
         </ButtonGroup>

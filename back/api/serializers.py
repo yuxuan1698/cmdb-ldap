@@ -1,9 +1,13 @@
 from django.contrib.auth.models import Group
 from rest_framework import serializers
-from rest_framework.serializers import CharField,IntegerField,ChoiceField,EmailField,Serializer
-# from django.contrib.auth import get_user_model
- 
-# Users = get_user_model()
+from rest_framework.serializers import (
+    CharField, BooleanField, IntegerField, ChoiceField, 
+    EmailField, Serializer, ModelSerializer
+    )
+from django.contrib.auth import get_user_model
+from rest_framework.exceptions import ValidationError
+import re 
+Users = get_user_model()
 
 class UserGroupSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -28,10 +32,16 @@ class CerificateInvalidSerializer(Serializer):
             'required': '请填写端口信息。',
             'blank':"端口信息不能为空。"
         })
-class GenerateSSHKeySerializer(Serializer):
+
+
+class GenerateSSHKeySerializer(ModelSerializer):
     """
-    效验DOMAIN
+    效验生成SSHKEY的参数是否合法
     """
+    class Meta:
+        model = Users
+        fields=('username','userdn','email','privatekey','publickey')
+
     email = EmailField(
         required=False,
         allow_blank=False,
@@ -46,6 +56,16 @@ class GenerateSSHKeySerializer(Serializer):
             'required': '请填写用户名username字段。',
             'blank':"用户名username不能为空。"
         })
+    userdn = CharField(
+      required=False,
+      min_length=4,
+      error_messages={
+          'min_length': '用户DN不能小于6个字符',
+      })
+    # 是否保存到数据库及LDAP
+    writetable = BooleanField(
+        required=False,
+        )
     keytype = ChoiceField(
         required=False,
         initial='rsa',
@@ -61,3 +81,8 @@ class GenerateSSHKeySerializer(Serializer):
         initial=384,
         choices=((256,256), (384,384),(521,521)),
         )
+
+    def validate(self, data):
+        if not re.match(r"^[^,]+(,.+)+,dc=.+$", data.get('userdn')):
+            raise ValidationError("userdn字段格式不正确!例:cn=xxxx,dc=xxxxxxx,dc=xxx")
+        return data

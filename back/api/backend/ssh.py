@@ -20,6 +20,7 @@ class GenerateSSHKey():
         self.keytype=obj.get('keytype') or 'rsa'
         self.rsabits=obj.get('rsabits') or 2048
         self.ecdsabits=obj.get('ecdsabits') or 384
+
     def generatekey(self):
         public_key=StringIO()
         private_key=StringIO()
@@ -41,6 +42,8 @@ class GenerateSSHKey():
             public_key_value=public_key.getvalue()
             private_key_value=private_key.getvalue()
             cache.set("user_%s_private_key"%self.username,private_key_value)
+            
+
 
         except Exception as e:
             logger.error(e.args)

@@ -37,6 +37,7 @@ class generateSSHKeyViewSet(APIView):
     else:
       returnData = serializer.errors
       returnStatus = status.HTTP_400_BAD_REQUEST
+      
     return JsonResponse(returnData, status=returnStatus, safe=False)
 class getCrontabLogsViewSet(APIView):
   """
