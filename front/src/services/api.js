@@ -199,6 +199,14 @@ export function GetAliCloundEcsStatusCountApi(data) {
 export function GetAliCloundAccountNameListApi () {
     return request({
         method: "get",
-        url: `/v1/aliclound/account/namelist/`
+        url: "/v1/aliclound/account/namelist/"
+    })
+}
+// 获取生成的sshkey 公钥 私钥
+export function GetSSHKeyPrivateAndPublicKeyApi(data) {
+    return request({
+        method: "post",
+        url: "/v1/system/generate/sshkey/",
+        data
     })
 }

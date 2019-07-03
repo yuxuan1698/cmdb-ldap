@@ -80,7 +80,7 @@ export default {
   'userlist_table_department':'职位名称',
   'userlist_table_ou':'所属部门',
   'userlist_table_email':'邮箱',
-  'userlist_table_action':'动作',
+  'userlist_table_action':'重置动作',
   'userlist_table_status':'状态',
   'userlist_table_operation':'操作',
   'userlist_table_status_value':'正常',
@@ -104,6 +104,8 @@ export default {
   'userlist_useredit_batch':'批量操作',
   'userlist_userreset_password':'重置用户[{username}]密码',
   'userlist_userreset_password_msg':'你确定要重置用户[{username}]的密码，重置后新密码通过邮件发送到用户，请注意查收！',
+  'userlist_userreset_sshkey':'重置用户[{username}]的SSHKey?',
+  'userlist_userreset_sshkey_msg':'你确定要重置用户[{username}]SSHKey?，重置后新的私钥将自动下载,并邮件发送给用户！',
   'userlist_userreset_success':'重置用户密码成功',
 
   // add user

@@ -15,10 +15,12 @@ from .views import (
     getCheckCerificateInvalidViewSet,
     getAliCloundEcsDomainListSet,
     getAliCloundDashboardStatusSet,
-    getAliCloundAcountNameListSet
+    getAliCloundAcountNameListSet,
+    generateSSHKeyViewSet
     )
 urlpatterns = [
     path('system/cronlogs/', getCrontabLogsViewSet.as_view(),name='system-mailresults'),
+    path('system/generate/sshkey/', generateSSHKeyViewSet.as_view(),name='system-mailresults'),
     path('aliclound/account/namelist/', getAliCloundAcountNameListSet.as_view(),name='aliclound-account-list'),
     path('aliclound/dashborad/status/', getAliCloundDashboardStatusSet.as_view(),name='aliclound-dashboard-status'),
     path('aliclound/domain/list/', getAliCloundEcsDomainListSet.as_view(),name='aliclound-domain-list'),

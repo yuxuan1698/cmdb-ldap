@@ -8,7 +8,8 @@ import {
   getLDAPUserAttribute,
   PostLDAPLockUnLockUser,
   getUserPermissionList,
-  getLDAPObjectClassList
+  getLDAPObjectClassList,
+  GetSSHKeyPrivateAndPublicKeyApi
 } from '../../../services/api';
 
 export default {
@@ -92,6 +93,28 @@ export default {
       *getLDAPUserPermissions({ payload,callback }, { call }) {
         const data = yield call(getUserPermissionList,payload)
         if (data) {
+          callback(data)
+        }
+      },
+      *generateSSHKeyAndDownLoad({ payload,callback }, { call }) {
+        const data = yield call(GetSSHKeyPrivateAndPublicKeyApi,payload)
+        if (data) {
+          // 下载私钥程序段
+          if(data.hasOwnProperty('privatekey')){
+            let privateObj = new Blob([data.privatekey],{type:'application/x-x509-ca-cert'})
+            let PrivateElement = document.createElement('a')
+            //创建下载的对象链接
+            let DownloadHref = window.URL.createObjectURL(privateObj); 
+            // PrivateElement.style.display="none"
+            PrivateElement.href = DownloadHref;
+            //下载的文件名以用户名命名
+            PrivateElement.download = `${payload.username}.pem`; 
+            document.body.appendChild(PrivateElement);
+            //点击下载
+            PrivateElement.click(); 
+            document.body.removeChild(PrivateElement); //下载完成移除元素
+            window.URL.revokeObjectURL(DownloadHref);
+          }
           callback(data)
         }
       },

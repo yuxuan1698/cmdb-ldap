@@ -242,7 +242,8 @@ class getLDAPOUListViewSet(APIView):
     else:
       queryOU=settings.AUTH_LDAP_BASE_DN
     ous,errorMsg=CmdbLDAP().get_base_ou(queryOU)
-    logger.info(errorMsg)
+    if errorMsg:
+      logger.error(errorMsg)
     if len(ous)>0:
       return JsonResponse(ous,encoder=LDAPJSONEncoder,safe=False)
     else:
@@ -254,7 +255,8 @@ class getLDAPPermissionGroupsListViewSet(APIView):
   def get(self,request,*args,**kwargs):
     queryOU=settings.AUTH_LDAP_GROUP_SEARCH_OU
     ous,errorMsg=CmdbLDAP().get_base_ou(queryOU)
-    logger.info(errorMsg)
+    if errorMsg:
+      logger.error(errorMsg)
     if len(ous)>0:
       return JsonResponse(ous,encoder=LDAPJSONEncoder,safe=False)
     else:
@@ -273,7 +275,6 @@ class UserChangerPasswordSet(APIView):
         returnData={"status":"密码修改成功！"}
         returnStatus=status.HTTP_200_OK
       else:
-        # logger.info(changeStatus)
         returnData={"error":errorMsg}
         returnStatus=status.HTTP_400_BAD_REQUEST
     else:
@@ -391,14 +392,13 @@ class LockUnLockUserViewSet(APIView):
   """
   锁定/解锁用户
   """
-  serializer_class = LockUnLockUserSerializer
+  # serializer_class = LockUnLockUserSerializer
   def post(self,request, *args, **kwargs):
     """
     锁定/解锁用户
     """
     serializer = LockUnLockUserSerializer(instance=request, data=request.data)
     if serializer.is_valid():
-      logger.info(request.data)
       changeStatus, errorMsg = CmdbLDAP().lock_unlock_ldap_user(request.data)
       if changeStatus:
         returnData = {"status": changeStatus}

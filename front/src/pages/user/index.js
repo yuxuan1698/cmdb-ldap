@@ -3,12 +3,15 @@
 import {connect} from 'dva';
 import {PureComponent} from 'react'
 import PropTypes from 'prop-types';
-import { Table, Icon, Button, Alert,Layout,Input,Tooltip, Modal,notification } from 'antd';
+import { 
+  Table, Icon, Button, Alert,Layout,Input,Tooltip
+} from 'antd';
 import usercss from "./user.less";
 import CMDBBreadcrumb from "../components/Breadcrumb";
 
 import dynamic from 'umi/dynamic';
 import {UserEditButton,UserBatchButton} from './components/UserEditButton'
+import {ResetButtonGroup} from './components/ResetButtonGroup'
 import {formatTimeAndZone} from 'utils'
 import {formatMessage} from 'umi/locale';
 
@@ -119,22 +122,8 @@ class CMDBUserList extends PureComponent {
         })
     }
   }
-  handleResetPassword=(userdn,username)=>{
-    Modal.confirm({
-      title: formatMessage({id:'userlist_userreset_password'},{username}),
-      content: formatMessage({id:'userlist_userreset_password_msg'},{username}),
-      onCancel: ()=>{Modal.destroyAll()},
-      onOk: ()=>{
-        const {dispatch}=this.props
-        dispatch({type:'users/resetPasswordAction',payload:{userdn},callback:(data)=>{
-          notification.success({
-            message: formatMessage({id:'userlist_userreset_success'}),
-            description: data.status
-          })
-        }})
-      }
-    })
-  }
+
+
   render(){
     const {selectedRowKeys,loadedDrawer,modifyDrawer,modifydata,classobjects}=this.state
     const {userlist,loading,dispatch}=this.props
@@ -211,18 +200,42 @@ class CMDBUserList extends PureComponent {
       title: formatMessage({id:'userlist_table_action'}),
       dataIndex: 'mail_notification',
       key: 'mail_notification',
-      width:80,
+      width:120,
       align:"center",
       render:(text,record)=>{
         const username=record[record['userdn'].split(',')[0].split('=')[0]]
-        return <Tooltip placement = "top" 
-                title={formatMessage({id:'userlist_table_resetpassword'},{username})} >
-                <Button size='small' 
-                  type="default" 
-                  style={{padding:"0 4px",borderRadius:30}}
-                  onClick={this.handleResetPassword.bind(this,record['userdn'],username)}
-                  icon='mail'/>
-              </Tooltip>
+        return <ResetButtonGroup 
+          restpassworddata={{userdn:record['userdn'],username}} 
+          restsshkeyddata={{username,email:record['mail']}} 
+          dispatch={dispatch} />
+        
+        // <div>
+        //   {/* <Tooltip placement = "top" 
+        //     title={formatMessage({id:'userlist_table_resetpassword'},{username})} >
+        //     <Button size='small' 
+        //       type="default" 
+        //       style={{padding:"0 4px",borderRadius:30}}
+        //       onClick={this.handleResetPassword.bind(this,record['userdn'],username)}
+        //       icon='mail'/>
+        //   </Tooltip> */}
+        //   {/* <Tooltip placement = "top" 
+        //     title={formatMessage({id:'userlist_userreset_sshkey'},{username})} >
+        //       <Dropdown.Button onClick={this.handleResetSSHkey.bind(this,)} overlay={(
+        //           <Menu >
+        //           <Menu.Item key="rsa">
+        //             <Icon type="user" />
+        //             rsa
+        //           </Menu.Item>
+        //           <Menu.Item key="ecdsa">
+        //             <Icon type="user" />
+        //             ecdsa
+        //           </Menu.Item>
+        //         </Menu>
+        //         )}>
+        //         重置SSHKEY
+        //       </Dropdown.Button>
+        //   </Tooltip> */}
+        // </div>
 
       }
     },{

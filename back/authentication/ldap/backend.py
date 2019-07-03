@@ -5,6 +5,8 @@ from common.utils import CmdbLDAPLogger
 from django.utils import timezone
 import django.dispatch
 import ldap 
+import pprint
+ldap_error = django.dispatch.Signal(providing_args=['context', 'user', 'exception'])
 
 logger=CmdbLDAPLogger.get_logger('cmdb_ldap')
 

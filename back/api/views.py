@@ -3,18 +3,41 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import JsonResponse
 from rest_framework import status
 from django_celery_results.models import TaskResult
-from django.core.serializers import serialize
+
 from common.utils import CmdbLDAPLogger,CmdbJson
 from django.core.cache import cache
 from api.backend.aliyun import AliClound
-from .serializers import CerificateInvalidSerializer
+from api.backend.ssh import GenerateSSHKey
+from .serializers import CerificateInvalidSerializer,GenerateSSHKeySerializer
 from common.utils import check_cerificate_invalidtime
 from django.conf import settings
 
 aliClound=AliClound()
 logger=CmdbLDAPLogger().get_logger('django.server')
-# Users = get_user_model()
 
+class generateSSHKeyViewSet(APIView):
+  """
+  允许用户查看或编辑的API路径test。
+  """
+  
+  def post(self,request, *args, **kwargs):
+    """
+    生成sshkey
+    """
+    serializer = GenerateSSHKeySerializer(instance=request, data=request.data)
+    if serializer.is_valid():
+      generatekey=GenerateSSHKey(serializer.validated_data)
+      publickey,errorMsg = generatekey.generatekey()
+      if publickey:
+        returnData = publickey
+        returnStatus = status.HTTP_200_OK
+      else:
+        returnData = {"error": errorMsg}
+        returnStatus = status.HTTP_400_BAD_REQUEST
+    else:
+      returnData = serializer.errors
+      returnStatus = status.HTTP_400_BAD_REQUEST
+    return JsonResponse(returnData, status=returnStatus, safe=False)
 class getCrontabLogsViewSet(APIView):
   """
   允许用户查看或编辑的API路径test。
@@ -34,7 +57,6 @@ class getCrontabLogsViewSet(APIView):
         mailTask = paginator.page(1)
     except EmptyPage:
         mailTask = paginator.page(paginator.num_pages)
-    logger.info(mailTask)
     response['list'] = CmdbJson().encode(serialize("json", mailTask))
     return JsonResponse(response, safe=False)
 

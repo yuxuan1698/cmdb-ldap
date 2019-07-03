@@ -131,7 +131,7 @@ class DrawerAddUser extends PureComponent {
             title={`${formatMessage({id:'userlist_useradd_new'})}(${addmodel==='temp'?
               formatMessage({id:'userlist_useradd_template'}):
               formatMessage({id:'userlist_useradd_pro'})})`}
-            width={680}
+            width={780}
             bodyStyle={{padding:"10px 24px",overflow:"auto",height:"calc(100% - 106px)"}}
             onClose={this.handleClose.bind(this)}
             visible={visible} >
@@ -188,8 +188,21 @@ class DrawerAddUser extends PureComponent {
                         placeholder={(LDAP_MAP_FIELDS[i] ? LDAP_MAP_FIELDS[i] : i) + `(${i})`}
                         className={css.add_user_field_width}  min={2100} max={65535} />
                     }
-                    if(i==='sshPublicKey' || i==='description'){
+                    if(i==='description'){
                       inputField = <Input.TextArea 
+                        placeholder={(LDAP_MAP_FIELDS[i] ? LDAP_MAP_FIELDS[i] : i) + `(${i})`} 
+                        autosize={{ minRows: 2, maxRows: 5 }} />
+                    }
+                    if(i==='sshPublicKey' ){
+                      inputField = <Input.TextArea 
+                      addonAfter={(
+                        <Select defaultValue=".com" style={{ width: 80 }}>
+                          <Option value=".com">.com</Option>
+                          <Option value=".jp">.jp</Option>
+                          <Option value=".cn">.cn</Option>
+                          <Option value=".org">.org</Option>
+                        </Select>)}
+                        defaultValue="test"
                         placeholder={(LDAP_MAP_FIELDS[i] ? LDAP_MAP_FIELDS[i] : i) + `(${i})`} 
                         autosize={{ minRows: 2, maxRows: 5 }} />
                     }
