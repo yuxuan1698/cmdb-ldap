@@ -38,7 +38,7 @@ class GenerateSSHKeySerializer(Serializer):
     """
     email = EmailField(
         required=False,
-        allow_blank=False,
+        allow_blank=True,
         error_messages={
             'required': '请传入email字段。',
             'blank':"email字段信息不能为空。"
