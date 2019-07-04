@@ -206,7 +206,6 @@ class AliClound():
                         alldata['TotalItemNum']+=data['TotalItemNum']
                 else:
                     alldata=data
-                logger.info(alldata)
             except Exception as e:
                 logger.error(e)
                 return False

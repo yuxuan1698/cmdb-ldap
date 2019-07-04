@@ -215,35 +215,6 @@ class CMDBUserList extends PureComponent {
             }
           }
           dispatch={dispatch} />
-        
-        // <div>
-        //   {/* <Tooltip placement = "top" 
-        //     title={formatMessage({id:'userlist_table_resetpassword'},{username})} >
-        //     <Button size='small' 
-        //       type="default" 
-        //       style={{padding:"0 4px",borderRadius:30}}
-        //       onClick={this.handleResetPassword.bind(this,record['userdn'],username)}
-        //       icon='mail'/>
-        //   </Tooltip> */}
-        //   {/* <Tooltip placement = "top" 
-        //     title={formatMessage({id:'userlist_userreset_sshkey'},{username})} >
-        //       <Dropdown.Button onClick={this.handleResetSSHkey.bind(this,)} overlay={(
-        //           <Menu >
-        //           <Menu.Item key="rsa">
-        //             <Icon type="user" />
-        //             rsa
-        //           </Menu.Item>
-        //           <Menu.Item key="ecdsa">
-        //             <Icon type="user" />
-        //             ecdsa
-        //           </Menu.Item>
-        //         </Menu>
-        //         )}>
-        //         重置SSHKEY
-        //       </Dropdown.Button>
-        //   </Tooltip> */}
-        // </div>
-
       }
     },{
       title: formatMessage({id:'userlist_table_status'}),

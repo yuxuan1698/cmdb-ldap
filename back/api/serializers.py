@@ -2,12 +2,10 @@ from django.contrib.auth.models import Group
 from rest_framework import serializers
 from rest_framework.serializers import (
     CharField, BooleanField, IntegerField, ChoiceField, 
-    EmailField, Serializer, ModelSerializer
+    EmailField, Serializer
     )
-from django.contrib.auth import get_user_model
 from rest_framework.exceptions import ValidationError
 import re 
-Users = get_user_model()
 
 class UserGroupSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -34,14 +32,10 @@ class CerificateInvalidSerializer(Serializer):
         })
 
 
-class GenerateSSHKeySerializer(ModelSerializer):
+class GenerateSSHKeySerializer(Serializer):
     """
     效验生成SSHKEY的参数是否合法
     """
-    class Meta:
-        model = Users
-        fields=('username','userdn','email','privatekey','publickey')
-
     email = EmailField(
         required=False,
         allow_blank=False,

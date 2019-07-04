@@ -9,8 +9,8 @@ from .celery import app
 from common.utils import CmdbLDAPLogger,Sign_Url_By_MD5,CmdbJson
 from api.backend.aliyun import AliClound
 from api.models.cerificate import Cerificate
+from django.core.cache import cache
 import os
-
 logger=CmdbLDAPLogger().get_logger('cmdb_ldap')
 Users = get_user_model()
 
@@ -82,15 +82,41 @@ def send_reset_password_email(username,resetPassword):
     logger.warn("未找到此用户[%s]的相关信息，未发送重置邮件。"%username)
   return False
 
+@shared_task
+def send_reset_sshkey_email(data):
+  """
+  发送重置SSHKey的邮件
+  """
+  logger.info(data)
+  if "username" in data and "email" in data :
+    mail=SendEMail()
+    username=data.get('username')
+    data={
+      'title':"Hi,{},您的SSHKEY已经重置成功,请下载您的私钥到你本地进行使用。".format(username),**data
+    }
+    privatekey=cache.get("user_%s_private_key"%username)
+    html_content = render_to_string('user_reset_sshkey.html',{**data,"privatekey":privatekey})
+    status=mail.mailto([data.get('email')])\
+      .title("Hi,{},您的SSHKEY已经重置成功。".format(username))\
+      .content(html_content)\
+      .attach("{}-private.pem".format(username),privatekey)\
+      .attach("{}-public.key".format(username),cache.get("user_%s_public_key"%username))\
+      .send()
 
-@app.task(bind=True)
-def getAliyunCerificateList(self):
-    aliClound=AliClound()
-    listdata=aliClound.getAliCloundCertificateList()
+    return status
+  else:
+    logger.warn("传入的DATA参数为空，跳过发送邮件。"%username)
+  return False
 
-    if listdata:
-      data=CmdbJson().decode(listdata)
-      Cerificate.objects.bulk_create(data['CertificateList'])
 
-    logger.info(listdata)
-    print('在此调用实现了定时任务功能的函数或方法')
+# @app.task(bind=True)
+# def getAliyunCerificateList(self):
+#     aliClound=AliClound()
+#     listdata=aliClound.getAliCloundCertificateList()
+
+#     if listdata:
+#       data=CmdbJson().decode(listdata)
+#       Cerificate.objects.bulk_create(data['CertificateList'])
+
+#     logger.info(listdata)
+#     print('在此调用实现了定时任务功能的函数或方法')

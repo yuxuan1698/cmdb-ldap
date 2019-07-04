@@ -43,6 +43,10 @@ class SendEMail(EmailMultiAlternatives):
     else:
         super().attach_file(os.path.realpath(files))
     return self
+  def attach(self,filename=None, content=None, mimetype=None):
+    super().attach(filename, content, mimetype)
+    return self
+    
   def send(self):
     try:
       status=super().send()

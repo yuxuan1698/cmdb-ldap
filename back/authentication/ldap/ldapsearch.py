@@ -275,7 +275,7 @@ class CmdbLDAP(object):
     modrdn=""
     if dndata:
       if rdn_field[0]!='':
-        if data[rdn_field[0]]!=rdn_field[1]:
+        if rdn_field[0] in data  and data[rdn_field[0]]!=rdn_field[1]:
           modrdn="{}={}".format(rdn_field[0],data[rdn_field[0]])
         del dndata[0][1][rdn_field[0]]
         del data[rdn_field[0]]
@@ -422,3 +422,29 @@ class CmdbLDAP(object):
       return "保存用户权限成功!", None
     else:
       return None,self.errorMsg
+  def update_sshpublickey(self,data,olddn):
+    """
+    更新用户属性用户
+    """
+    returnStatus=False,'字段没有发生变化，修改不成功。'
+    dndata,err=self.get_dn_attribute(olddn)
+    if dndata:
+      modlist=[]
+      classObj=set(dndata[0][1]['objectClass'])
+      if b"ldapPublicKey" not in classObj:
+        classObj.add(b"ldapPublicKey")
+        modlist.append((ldap.MOD_REPLACE,"objectClass",list(classObj)))
+      if "sshPublicKey" in dndata[0][1]:
+        modlist.append((ldap.MOD_REPLACE,"sshPublicKey",[data.get('sshPublicKey').encode('utf8')]))
+      else:
+        modlist.append((ldap.MOD_ADD,"sshPublicKey",[data.get('sshPublicKey').encode('utf8')]))
+        
+      if len(modlist)>0:
+        logger.info("modlist:%s"%modlist)
+        try:
+          self.conn.modify_s(olddn,modlist)
+          returnStatus="更新用户成功",None
+        except ldap.LDAPError as e:
+          logger.error(e)
+          return False,"更新字段失败，失败内容:%s"%(e.args[0]['info'] if e.args[0]['info'] else "")
+      return returnStatus

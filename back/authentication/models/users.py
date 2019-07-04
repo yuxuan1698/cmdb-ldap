@@ -28,6 +28,7 @@ class Users(AbstractUser):
                               max_length=16, verbose_name='用户手机')
     userdn = models.CharField(
         max_length=254, null=True, blank=True, verbose_name='用户DN')
+    updatetime = models.DateTimeField( auto_now=True, verbose_name='更新时间')
     groups = models.ManyToManyField(
         UserGroups,
         verbose_name=_('User groups'),

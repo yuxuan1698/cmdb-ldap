@@ -17,7 +17,7 @@ class GenerateSSHKey():
     def __init__(self,obj):
         self.username=obj.get('username')
         self.basename=obj.get('email') or "%s@%s"%(obj.get('username') or "cmdbuser",os.uname()[1])
-        self.keytype=obj.get('keytype') or 'rsa'
+        self.keytype=obj.get('keytype') or 'ecdsa'
         self.rsabits=obj.get('rsabits') or 2048
         self.ecdsabits=obj.get('ecdsabits') or 384
 
@@ -42,6 +42,7 @@ class GenerateSSHKey():
             public_key_value=public_key.getvalue()
             private_key_value=private_key.getvalue()
             cache.set("user_%s_private_key"%self.username,private_key_value)
+            cache.set("user_%s_public_key"%self.username,public_key_value)
             
 
 

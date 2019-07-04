@@ -11,9 +11,14 @@ from api.backend.ssh import GenerateSSHKey
 from .serializers import CerificateInvalidSerializer,GenerateSSHKeySerializer
 from common.utils import check_cerificate_invalidtime
 from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.core.serializers import serialize
+from authentication.ldap.ldapsearch import CmdbLDAP
+from crontasks.tasks import send_reset_sshkey_email
 
 aliClound=AliClound()
 logger=CmdbLDAPLogger().get_logger('django.server')
+Users=get_user_model()
 
 class generateSSHKeyViewSet(APIView):
   """
@@ -24,11 +29,28 @@ class generateSSHKeyViewSet(APIView):
     """
     生成sshkey
     """
-    serializer = GenerateSSHKeySerializer(instance=request, data=request.data)
+    serializer = GenerateSSHKeySerializer(data=request.data)
     if serializer.is_valid():
-      generatekey=GenerateSSHKey(serializer.validated_data)
+      valideddata=serializer.validated_data
+      generatekey=GenerateSSHKey(valideddata)
       publickey,errorMsg = generatekey.generatekey()
       if publickey:
+        if valideddata.get('writetable'):
+          writeUser={"username":valideddata.get("username")}
+          if valideddata.get("email"):
+            writeUser['email']=valideddata.get("email")
+            # 发送邮件提示
+            send_reset_sshkey_email.delay(writeUser)
+          if valideddata.get("userdn"):
+            writeUser['userdn']=valideddata.get("userdn")
+            # 保存到LDAP sshPublickey
+            ldap=CmdbLDAP()
+            ldap.update_sshpublickey({"sshPublicKey":publickey.get('publickey')},writeUser['userdn'])
+            del ldap
+          # 保存到数据库
+          Users.objects.update_or_create(defaults=dict(writeUser,**publickey),username=valideddata.get("username"))
+          
+
         returnData = publickey
         returnStatus = status.HTTP_200_OK
       else:
@@ -39,6 +61,7 @@ class generateSSHKeyViewSet(APIView):
       returnStatus = status.HTTP_400_BAD_REQUEST
       
     return JsonResponse(returnData, status=returnStatus, safe=False)
+
 class getCrontabLogsViewSet(APIView):
   """
   允许用户查看或编辑的API路径test。

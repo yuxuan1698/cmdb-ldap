@@ -13,17 +13,17 @@ app = Celery('crontasks')
 #   should have a `CELERY_` prefix.
 app.config_from_object('django.conf:settings', namespace='CELERY')
 
-app.conf.beat_schedule = {
-    # 设置定时任务的参数,key可以自定义,见名知义,value为定时任务的相关参数的字典
-    'getAliyunCerificateList-every-1-minute': {
-        # 指定要执行的任务函数
-        'task': 'crontasks.tasks.getAliyunCerificateList',
-        # 设置定时启动的频率,没分钟执行一次任务函数
-        'schedule': crontab(minute='*/1'),
-        # 传入任务函数的参数,可以是一个列表或元组,如果函数没参数则为空列表或空元组
-        'args': []
-    },
-}
+# app.conf.beat_schedule = {
+#     # 设置定时任务的参数,key可以自定义,见名知义,value为定时任务的相关参数的字典
+#     'getAliyunCerificateList-every-1-minute': {
+#         # 指定要执行的任务函数
+#         'task': 'crontasks.tasks.getAliyunCerificateList',
+#         # 设置定时启动的频率,没分钟执行一次任务函数
+#         'schedule': crontab(minute='*/1'),
+#         # 传入任务函数的参数,可以是一个列表或元组,如果函数没参数则为空列表或空元组
+#         'args': []
+#     },
+# }
 # Load task modules from all registered Django app configs.
 app.autodiscover_tasks()
 

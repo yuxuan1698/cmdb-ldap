@@ -108,11 +108,12 @@ export default {
             // PrivateElement.style.display="none"
             PrivateElement.href = DownloadHref;
             //下载的文件名以用户名命名
-            PrivateElement.download = `${payload.username}.pem`; 
+            PrivateElement.download = `${payload.username}-private.pem`; 
             document.body.appendChild(PrivateElement);
             //点击下载
             PrivateElement.click(); 
-            document.body.removeChild(PrivateElement); //下载完成移除元素
+            //下载完成移除元素
+            document.body.removeChild(PrivateElement); 
             window.URL.revokeObjectURL(DownloadHref);
           }
           callback(data)
