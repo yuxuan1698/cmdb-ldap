@@ -15,7 +15,6 @@ import { Resizable } from 'react-resizable';
 import css from './index.less'
 import Sider from 'antd/lib/layout/Sider';
 import {formatMessage} from 'umi/locale';
-
 const {TreeNode,DirectoryTree}=Tree
 const {Footer}=Layout
 class LDAPSelectPermission extends PureComponent {
