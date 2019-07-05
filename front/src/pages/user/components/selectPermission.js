@@ -310,7 +310,7 @@ class LDAPSelectPermission extends PureComponent {
                     style={{float:"right",top:-4}} 
                     type="danger" 
                     onClick={this.handleRemovePermissionItem.bind(this)}>{formatMessage({id:'ldap_permission_remove_choise'})}</Button>:""}
-                  <h3 style={{margin:0}}>{formatMessage({id:'ldap_permission_remove_content'},{currUser})}</h3>
+                  <h3 style={{margin:0}}><Icon type='user' />{formatMessage({id:'ldap_permission_remove_content'},{currUser})}</h3>
                 </div>
             }}
             className={css.permission_current_status}

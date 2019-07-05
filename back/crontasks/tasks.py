@@ -31,17 +31,26 @@ def send_register_email(to,data):
     sign_uri=Sign_Url_By_MD5(urldata)
     changepassword_url="{}/user/changepassword?{}".format(settings.CMDB_BASE_URL,sign_uri)
     mail=SendEMail()
+    ssh_public_key=cache.get("user_%s_public_key"%data['username'])
+    ssh_private_key=cache.get("user_%s_private_key"%data['username'])
     newdata=dict({
       'qrcode': generateQRCode(changepassword_url),
-      'changepassword_url': changepassword_url
+      'changepassword_url': changepassword_url,
+      'haveprivatekey': ssh_public_key!="" and ssh_private_key!=""
     },**data)
     html_content = render_to_string('add_user.html',newdata)
     try:
-      status=mail.mailto([to])\
+      sendmail=mail.mailto([to])\
         .title("Hi,{},您的用户信息添加成功。".format(data['sn']))\
         .content(html_content)\
-        .attach_file(['crontasks/public/iwubida.ovpn', 'crontasks/public/ca.crt'])\
-        .send()
+        .attach_file(['crontasks/public/iwubida.ovpn'])
+        #  'crontasks/public/ca.crt'
+      if ssh_private_key and ssh_public_key:
+        sendmail.attach("%s_ssh_private.pem"%data['username'],ssh_private_key)\
+          .attach("%s_ssh_public.key"%data['username'],ssh_public_key)
+      status=sendmail.send()
+      cache.delete("user_%s_public_key"%data['username'])
+      cache.delete("user_%s_private_key"%data['username'])
       return status
     except Exception as exc:
       logger.error(exc)
@@ -95,12 +104,13 @@ def send_reset_sshkey_email(data):
       'title':"Hi,{},您的SSHKEY已经重置成功,请下载您的私钥到你本地进行使用。".format(username),**data
     }
     privatekey=cache.get("user_%s_private_key"%username)
-    html_content = render_to_string('user_reset_sshkey.html',{**data,"privatekey":privatekey})
+    publickey=cache.get("user_%s_public_key"%username)
+    html_content = render_to_string('user_reset_sshkey.html',{**data,"publickey":publickey})
     status=mail.mailto([data.get('email')])\
       .title("Hi,{},您的SSHKEY已经重置成功。".format(username))\
       .content(html_content)\
       .attach("{}-private.pem".format(username),privatekey)\
-      .attach("{}-public.key".format(username),cache.get("user_%s_public_key"%username))\
+      .attach("{}-public.key".format(username),publickey)\
       .send()
 
     return status

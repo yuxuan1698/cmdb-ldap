@@ -107,6 +107,10 @@ export default {
   'userlist_userreset_sshkey':'重置用户[{username}]的SSHKey?',
   'userlist_userreset_sshkey_msg':'你确定要重置用户[{username}]SSHKey?，重置后新的私钥将自动下载,并邮件发送给用户！',
   'userlist_userreset_success':'重置用户密码成功',
+  'userlist_userreset_sshkey_success_title':'重置用户sshkey成功。',
+  'userlist_userreset_sshkey_success':'重置用户sshkey成功,请查看邮件或手动下载私钥。',
+  'userlist_usergenerate_sshkey_success':'生成sshkey成功',
+  'userlist_usergenerate_sshkey_content':'生成sshkey成功.',
 
   // add user
   'userlist_useradd_new':'添加新用户',
@@ -116,6 +120,7 @@ export default {
   'userlist_useradd_field_choise':'请选择属性归属类',
   'userlist_useradd_choise_commander':'请选择属性领导/上级({i})',
   'userlist_useradd_input_tips':'请输入{fieldname}({fieldval})',
+  'userlist_useradd_generate_sshkey':'生成sshKey公钥',
   'userlist_useradd_del_field':'删除字段',
   'userlist_useradd_cancel':'取消',
   'userlist_useradd_save':'保存',

@@ -77,6 +77,7 @@ class GenerateSSHKeySerializer(Serializer):
         )
 
     def validate(self, data):
-        if not re.match(r"^[^,]+(,.+)+,dc=.+$", data.get('userdn')):
-            raise ValidationError("userdn字段格式不正确!例:cn=xxxx,dc=xxxxxxx,dc=xxx")
+        if 'userdn' in data:
+            if not re.match(r"^[^,]+(,.+)+,dc=.+$", data.get('userdn')):
+                raise ValidationError("userdn字段格式不正确!例:cn=xxxx,dc=xxxxxxx,dc=xxx")
         return data

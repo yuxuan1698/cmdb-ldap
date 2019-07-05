@@ -1,7 +1,14 @@
 .delete_field_icon{
     position: absolute;
-    margin-top: 9px;
+    margin-top: 6px;
+    font-size:26px;
+    margin-left: 5px;
+}
+.sshkey_field_icon{
+    position: absolute;
+    margin-top: 37px;
     font-size:22px;
+    cursor: pointer;
     margin-left: 5px;
 }
 .add_user_field_width{
@@ -42,6 +49,10 @@
     padding: 3px 5px;
     background-color: rgb(242, 242, 242);
     box-shadow: rgb(220, 216, 216) 0px 0px 3px;
+    transition: background-color .3s ease-in-out;
+    &:hover{
+        background-color: rgb(226, 226, 226);
+    }
 }
 .field_search_class{
     padding: 5px;

@@ -11,7 +11,7 @@ import {
   getLDAPObjectClassList,
   GetSSHKeyPrivateAndPublicKeyApi
 } from '../../../services/api';
-
+import {downloadSSHKey} from 'utils'
 export default {
     names: 'users',
     state:{
@@ -100,36 +100,11 @@ export default {
         const data = yield call(GetSSHKeyPrivateAndPublicKeyApi,payload)
         if (data) {
           // 下载私钥程序段
-          console.log(payload)
           if(data.hasOwnProperty('privatekey') &&
             data.hasOwnProperty('publickey') &&
             (!payload.hasOwnProperty('email') || payload.email==="")
             ){
-            
-              let PrivateElement = document.createElement('a')
-              Object.keys(data).map(k=>{
-                let keyObj = new Blob([data[k]], {
-                  type: 'application/x-x509-ca-cert'
-                })
-                //创建下载的对象链接
-                let DownloadHref = window.URL.createObjectURL(keyObj);
-                // PrivateElement.style.display="none"
-                PrivateElement.href = DownloadHref;
-                //下载的文件名以用户名命名
-                if(k==='privatekey'){
-                  PrivateElement.download = `${payload.username}-private.pem`;
-                }
-                if(k==='publickey'){
-                  PrivateElement.download = `${payload.username}-public.key`;
-                }
-                document.body.appendChild(PrivateElement);
-                //点击下载
-                PrivateElement.click();
-                window.URL.revokeObjectURL(DownloadHref);
-              })
-              //下载完成移除元素
-              document.body.removeChild(PrivateElement);
-              
+              downloadSSHKey(data,payload.username)
           }
           callback(data)
         }

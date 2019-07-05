@@ -12,8 +12,8 @@
         <tr style="height: 40px">
             <td>VPN地址:</td>
             <td>
-                <div>生产环境: <a href="http://183.230.181.233:1194">183.230.181.233</a> 端口:1194 </div>
-                <div>测试环境1: <a href="http://openvpn.iwubida.com">openvpn.iwubida.com(47.107.216.221)</a> 端口:1194</div>
+                <div>测试环境1:<a href="http://183.230.181.233:1194">183.230.181.233</a> 端口:1194 </div>
+                <div>生产环境: <a href="http://openvpn.iwubida.com">openvpn.iwubida.com(47.107.216.221)</a> 端口:1194</div>
                 </td>
         </tr>
             <td>Jumpserver:</td>
@@ -32,18 +32,21 @@
     <h4>登陆说明： </h4>
     <ul style="list-style: decimal;font-size: 12px;padding: 0 0 0 30px">
         <li><span style="color:#f74420">本密码为初始密码，请修改密码后再进行登陆操作(点击修改密码，或扫描上面的二维码进行修改密码).</span></li>
-        <li>gitlab登陆请选择LDAP认证登陆.</li>
+       
         <li>openvpn请用openvpn客户端连接,协议为ＴＣＰ 参考使用说明: <a href="http://realcourse.hxu.edu.cn/openvpn.html">http://realcourse.hxu.edu.cn/openvpn.html</a>
             <ul style="list-style: disc;padding: 0 0 0 20px;">
                 <li>附件iwubida.ovpn为配置文件，放到OPENVPN的配置目录。用这个配置连接。即可。 </li>
                 <li>ca.crt为根证书。一般不需要用到，因为这个证书已经放到了iwubida.ovpn里。 </li>
                 <li>注：openvpn-gui 需要以管理员运行。</li>
             </ul>
-     
         </li>
         <li>连接ＯＰＥＮＶＰＮ需要根证书，根证书请参见附件！</li>
-        <li>用此帐号登陆禅道后，原帐号密码将失效！只能用这个密码登陆！ </li>
+        <li>gitlab登陆请选择LDAP认证登陆.</li>
         <li>禅道用此帐号登陆，之前的用户名密码就失效，不能使用，只能用这个密码登陆，并且不能在禅道里修改密码。</li>
         <li>连接上VPN后，数据库直接通过IP访问，不再需要跳板机了。请知悉！</li>
+        {% if haveprivatekey %}
+        <li> <span style="color:#f74420">SSH私钥，公钥，可以做为GITLAB,Jumpserver免密登陆,SSH密钥请从附件下载。</span></li>
+        <li><span style="color:#f74420">保存的私钥的权限需要设置为600，才可以使用</span></li>
+        {% endif %}
     </ul>
 </div>

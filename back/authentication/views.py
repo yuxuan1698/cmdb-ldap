@@ -82,6 +82,7 @@ class CreateUserViewSet(APIView):
       changeStatus,errorMsg,newUserDn,newUser = CmdbLDAP().create_ldap_user(request.data)
       if changeStatus:
         returnData = {"status": changeStatus}
+        logger.info(request.data)
         dbdata=user_payload_handler(request.data,newUserDn,newUser)
         dbUsers = Users(**dbdata)
         dbUsers.set_password(request.data['userPassword'])

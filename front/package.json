@@ -16,6 +16,7 @@
     "nprogress": "^0.2.0",
     "react": "^16.7.0",
     "react-contextmenu": "^2.11.0",
+    "react-copy-to-clipboard": "^5.0.1",
     "react-dom": "^16.7.0",
     "react-resizable": "^1.7.5",
     "react-transition-group": "^4.0.1"

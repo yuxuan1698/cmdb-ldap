@@ -27,7 +27,7 @@ const models={
         'mobile','mail','loginShell','departmentNumber','sshPublicKey','description']
     }
   }
-
+const sshkeysvg=props=><svg t="1562306719054" viewBox="0 0 1024 1024" version="1.1" p-id="31350" width="28" height="28"><path d="M512 512m-472.177778 0a472.177778 472.177778 0 1 0 944.355556 0 472.177778 472.177778 0 1 0-944.355556 0Z" fill="#31C5B3" p-id="31351"></path><path d="M91.022222 568.888889l62.577778-5.688889c0 17.066667 5.688889 34.133333 11.377778 39.822222 11.377778 11.377778 28.444444 17.066667 51.2 17.066667s34.133333-5.688889 45.511111-11.377778c11.377778-5.688889 11.377778-17.066667 11.377778-28.444444s-5.688889-17.066667-11.377778-22.755556c-5.688889-5.688889-17.066667-11.377778-45.511111-22.755555-22.755556-11.377778-39.822222-17.066667-51.2-28.444445-11.377778-5.688889-17.066667-11.377778-28.444445-22.755555-5.688889-11.377778-5.688889-28.444444-5.688889-39.822223 0-28.444444 11.377778-45.511111 28.444445-62.577777 17.066667-17.066667 45.511111-28.444444 79.644444-28.444445 34.133333 0 62.577778 5.688889 85.333334 22.755556 17.066667 17.066667 28.444444 39.822222 34.133333 68.266666H295.822222c0-17.066667-5.688889-28.444444-17.066666-34.133333-5.688889-5.688889-22.755556-5.688889-39.822223-5.688889-17.066667 0-28.444444 5.688889-39.822222 11.377778-5.688889 0-11.377778 11.377778-11.377778 17.066667 0 11.377778 5.688889 17.066667 11.377778 22.755555 5.688889 5.688889 22.755556 11.377778 45.511111 22.755556 39.822222 17.066667 62.577778 34.133333 68.266667 39.822222 17.066667 11.377778 22.755556 34.133333 22.755555 56.888889 0 28.444444-11.377778 51.2-34.133333 68.266666-22.755556 17.066667-51.2 28.444444-91.022222 28.444445-28.444444 0-51.2-5.688889-68.266667-11.377778s-28.444444-22.755556-39.822222-39.822222c-5.688889-17.066667-11.377778-34.133333-11.377778-51.2zM364.088889 568.888889l62.577778-5.688889c0 17.066667 5.688889 34.133333 11.377777 39.822222 11.377778 11.377778 28.444444 17.066667 51.2 17.066667s34.133333-5.688889 45.511112-11.377778c11.377778-5.688889 11.377778-17.066667 11.377777-28.444444s-5.688889-17.066667-11.377777-22.755556c-5.688889-5.688889-22.755556-11.377778-45.511112-22.755555s-39.822222-17.066667-51.2-28.444445c-11.377778-5.688889-22.755556-11.377778-28.444444-22.755555-5.688889-11.377778-5.688889-28.444444-5.688889-39.822223 0-28.444444 11.377778-45.511111 28.444445-62.577777 17.066667-22.755556 45.511111-28.444444 79.644444-28.444445 34.133333 0 62.577778 5.688889 85.333333 22.755556 17.066667 17.066667 28.444444 39.822222 28.444445 68.266666H563.2c0-17.066667-5.688889-28.444444-17.066667-34.133333-5.688889-5.688889-17.066667-5.688889-34.133333-5.688889s-28.444444 5.688889-39.822222 11.377778c-5.688889 0-11.377778 11.377778-11.377778 17.066667 0 11.377778 5.688889 17.066667 11.377778 22.755555 5.688889 5.688889 22.755556 11.377778 45.511111 22.755556 34.133333 17.066667 56.888889 28.444444 68.266667 39.822222 17.066667 11.377778 22.755556 34.133333 22.755555 56.888889 0 28.444444-11.377778 51.2-34.133333 68.266666-22.755556 17.066667-51.2 28.444444-91.022222 28.444445-28.444444 0-51.2-5.688889-68.266667-11.377778s-34.133333-22.755556-39.822222-39.822222c-5.688889-17.066667-11.377778-34.133333-11.377778-51.2zM830.577778 529.066667h-119.466667l-28.444444 136.533333h-62.577778L682.666667 358.4h62.577777l-22.755555 119.466667h119.466667l22.755555-119.466667h62.577778l-62.577778 307.2h-62.577778l28.444445-136.533333z" fill="#FFFFFF" p-id="31352"></path></svg>
 @Form.create()
 class DrawerAddUser extends PureComponent {
   constructor(props){
@@ -122,15 +122,31 @@ class DrawerAddUser extends PureComponent {
       this.setState({currField:currField.filter(i=>i!==key)})
     }
   }
+  handleGenerateSSHkey=()=>{
+    const {setFieldsValue,getFieldValue } = this.props.form;
+    let username=getFieldValue('uid') || getFieldValue('sn')
+    let email=getFieldValue('mail') 
+    let payload={username,email}
+    const {dispatch}=this.props
+    dispatch({type:'users/generateSSHKeyAndDownLoad',payload,callback:(data)=>{
+      if(data.hasOwnProperty('publickey')){
+        setFieldsValue({sshPublicKey:data.publickey})
+        notification.success({
+          message: formatMessage({id:'userlist_usergenerate_sshkey_success'}),
+          description: formatMessage({id:'userlist_usergenerate_sshkey_content'})
+        })
+      }
+    }})
+  }
   render() {
     const { getFieldDecorator,getFieldValue } = this.props.form;
     const { loading,userselect } = this.props;
     const { selectedItems,options,currField,mayField ,mustField,addmodel,visible} = this.state;
     return (<Drawer
             destroyOnClose={true}
-            title={`${formatMessage({id:'userlist_useradd_new'})}(${addmodel==='temp'?
-              formatMessage({id:'userlist_useradd_template'}):
-              formatMessage({id:'userlist_useradd_pro'})})`}
+            title={<span><Icon type="user-add" style={{fontSize:18,marginRight:4}} />{`${formatMessage({id:'userlist_useradd_new'})}(${addmodel==='temp'?
+            formatMessage({id:'userlist_useradd_template'}):
+            formatMessage({id:'userlist_useradd_pro'})})`}</span>}
             width={780}
             bodyStyle={{padding:"10px 24px",overflow:"auto",height:"calc(100% - 106px)"}}
             onClose={this.handleClose.bind(this)}
@@ -176,54 +192,54 @@ class DrawerAddUser extends PureComponent {
                   </Col>
                   <Divider dashed style={{margin:"10px 0px"}}/>
                   {currField.map((i)=>{
-                    let inputField=<Input className={css.add_user_field_width}
-                                    type="text"
-                                    placeholder={(LDAP_MAP_FIELDS[i]?LDAP_MAP_FIELDS[i]:i)+`(${i})`}/>
-                    if(i==='userPassword'){
-                      inputField = <Input.Password 
-                        placeholder={(LDAP_MAP_FIELDS[i] ? LDAP_MAP_FIELDS[i] : i) + `(${i})`} />
-                    }
-                    if(i==='gidNumber' || i==='uidNumber'){
-                      inputField = <InputNumber 
-                        placeholder={(LDAP_MAP_FIELDS[i] ? LDAP_MAP_FIELDS[i] : i) + `(${i})`}
-                        className={css.add_user_field_width}  min={2100} max={65535} />
-                    }
-                    if(i==='description'){
-                      inputField = <Input.TextArea 
-                        placeholder={(LDAP_MAP_FIELDS[i] ? LDAP_MAP_FIELDS[i] : i) + `(${i})`} 
-                        autosize={{ minRows: 2, maxRows: 5 }} />
-                    }
-                    if(i==='sshPublicKey' ){
-                      inputField = <Input.TextArea 
-                      addonAfter={(
-                        <Select defaultValue=".com" style={{ width: 80 }}>
-                          <Option value=".com">.com</Option>
-                          <Option value=".jp">.jp</Option>
-                          <Option value=".cn">.cn</Option>
-                          <Option value=".org">.org</Option>
-                        </Select>)}
-                        defaultValue="test"
-                        placeholder={(LDAP_MAP_FIELDS[i] ? LDAP_MAP_FIELDS[i] : i) + `(${i})`} 
-                        autosize={{ minRows: 2, maxRows: 5 }} />
-                    }
-                    if(['member','manager','uniqueMember','seeAlso'].includes(i)){
-                      inputField=<Select
+                    let inputField
+                    switch(i){
+                      case "userPassword":
+                        inputField = <Input.Password 
+                          placeholder={(LDAP_MAP_FIELDS[i] ? LDAP_MAP_FIELDS[i] : i) + `(${i})`} />
+                        break;
+                      case "gidNumber":
+                      case "uidNumber":
+                        inputField = <InputNumber 
+                          placeholder={(LDAP_MAP_FIELDS[i] ? LDAP_MAP_FIELDS[i] : i) + `(${i})`}
+                          className={css.add_user_field_width}  min={2100} max={65535} />
+                          break;
+                      case "description":
+                        inputField = <Input.TextArea 
+                          placeholder={(LDAP_MAP_FIELDS[i] ? LDAP_MAP_FIELDS[i] : i) + `(${i})`} 
+                          autosize={{ minRows: 2, maxRows: 5 }} />
+                        break;
+                      case "sshPublicKey":
+                        inputField =<Input.TextArea 
+                          placeholder={(LDAP_MAP_FIELDS[i] ? LDAP_MAP_FIELDS[i] : i) + `(${i})`} 
+                          autosize={{ minRows: 3, maxRows: 5 }} />
+                        break;
+                      case "member":
+                      case "manager":
+                      case "uniqueMember":
+                      case "seeAlso":
+                        inputField=<Select
                                 showArrow autoFocus allowClear showSearch
                                 placeholder={formatMessage({id:'userlist_useradd_choise_commander'},{i})} >
                                 {userselect.map(item => (
                                   <Option key={item['userdn']} value={item['userdn']}>
-                                    {item['sn']}({item['uid']})
+                                    <Icon type="user" style={{marginRight:5}} />{item['sn']}({item['uid']})
                                   </Option>
                                 ))}
                               </Select>
+                        break;
+                      default:
+                        inputField=<Input className={css.add_user_field_width}
+                          type="text"
+                          placeholder={(LDAP_MAP_FIELDS[i]?LDAP_MAP_FIELDS[i]:i)+`(${i})`}/>
                     }
                     return (
                       <Col span={24} key={i} >
                       <Form.Item  labelCol={{ span: 7 }} wrapperCol={{ span: 13 }} label={LDAP_MAP_FIELDS[i]?LDAP_MAP_FIELDS[i]:i} hasFeedback required>
                         {getFieldDecorator(i, {
-                            initialValue: i==='homeDirectory'?`/home/${getFieldValue('uid')}`:(
+                            initialValue: i==='homeDirectory'?`/home/${getFieldValue('uid')||getFieldValue('sn')}`:(
                               i==='gidNumber'?getFieldValue('uidNumber'):(
-                                i==='loginShell'?'/bin/bash':(i==='mail'?`${getFieldValue('uid')}@iwubida.com`:"")
+                                i==='loginShell'?'/bin/bash':(i==='mail'?`${getFieldValue('uid')||getFieldValue('sn')}@iwubida.com`:"")
                               )),
                             rules: [{ required: true, 
                                 message: formatMessage(
@@ -232,12 +248,21 @@ class DrawerAddUser extends PureComponent {
                                 )
                               }],
                         })(inputField)}
-                        {!mustField.includes(i)?<Tooltip placement="top" title={formatMessage({id:'userlist_useradd_del_field'})}>
-                              <Icon className={css.delete_field_icon}
-                                type="minus-circle-o"
-                                theme="twoTone"
-                                onClick={this.removeField.bind(this,i)} />
-                              </Tooltip>:""}
+                         {!mustField.includes(i)?<span className={css.field_control}>
+                                <Tooltip placement="top" title={formatMessage({id:'userlist_useradd_del_field'})}>
+                                  <Icon className={css.delete_field_icon}
+                                    type="minus-circle-o"
+                                    theme="twoTone"
+                                    onClick={this.removeField.bind(this,i)} />
+                                </Tooltip>
+                                {i==='sshPublicKey' && (getFieldValue('uid')!==""||getFieldValue('sn')!=="")?
+                                  <Tooltip placement="top" title={formatMessage({id:'userlist_useradd_generate_sshkey'})}>
+                                    <Icon disabled={Boolean(loading.effects['users/generateSSHKeyAndDownLoad'])}
+                                      onClick={this.handleGenerateSSHkey.bind(this)}
+                                      className={css.sshkey_field_icon} 
+                                      component={sshkeysvg} />
+                                  </Tooltip>:""}
+                              </span>:""}
                       </Form.Item>
                       </Col>
                     )

@@ -9,6 +9,7 @@ from django.conf import settings
 from common.utils import CmdbLDAPLogger
 from authentication.models import Users
 from django.contrib.auth import backends
+from django.core.cache import cache
 logger = CmdbLDAPLogger.get_logger('cmdb_ldap')
 
 
@@ -30,15 +31,16 @@ def reflush_secretkey(userModel):
 
 
 def user_payload_handler(data, newUserDn, newUser):
-    dbdata = {
+    return {
         "username": newUser,
         "nickname": data.get('sn') or '',
         "email": data.get('mail') or '',
         "department": data.get('ou') or '',
         "mobile": data.get('mobile') or '',
-        "userdn": newUserDn
+        "userdn": newUserDn,
+        'publickey':data.get('sshPublicKey') or '',
+        'privatekey':cache.get("user_%s_private_key"%newUser) or ''
     }
-    return dbdata
 
 
 def generate_ldap_password(password):

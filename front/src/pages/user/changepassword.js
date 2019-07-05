@@ -55,13 +55,15 @@ class CMDBChangePassword extends PureComponent {
       }
     });
   }
+  componentDidMount=()=>{
+    const {location,login }=this.props
+    if(Object.keys(login.userinfo).length>0 && Object.keys(location.query).length>0){
+      message.warn('你有登陆CMDB管理平台，只能修改登陆的用户名的密码。',20)
+    }
+  }
   render(){
     const { loading,location,login,form }=this.props
     const currUser=Object.keys(login.userinfo).length>0?login.userinfo:location.query
-    console.log()
-    if(Object.keys(login.userinfo).length>0 && Object.keys(location.query).length>0){
-      message.warn('你有登陆CMDB管理平台，只能修改登陆的用户名的密码。')
-    }
     const { getFieldDecorator } = form;
     const formItemLayout = {
         labelCol: {

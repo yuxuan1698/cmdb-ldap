@@ -3,12 +3,15 @@
     <table style="width: 100%">
             <tr style="height: 40px">
                 <td> 
-                    <h2>用户帐号: <span style="color:red;margin-right: 30px;">{{username}}</span></span></h2>
+                    <h2>用户帐号: <span style="color:red"> {{username}}</span></h2>
                 </td>
             </tr>
             <tr>
                 <td> 
-                    <h2>当前私钥: <span style="color:red">{{privatekey}}</span></h2>
+                    <h2>当前公钥: </h2>
+                    <div style="color: red; word-break: break-all;background-color: #dcdcdc; padding: 5px;border-radius: 5px;margin: 5px;" >
+                        {{publickey}}
+                    </div>
                 </td>
             </tr>
         </table>

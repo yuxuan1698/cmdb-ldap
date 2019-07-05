@@ -159,3 +159,33 @@ export function isNotAuthChangerPassword(location){
       }
   }
 }
+
+
+export function downloadSSHKey(data,username){
+  if(!data instanceof Object) return message.error('下载SSHKey参数不合法。');
+  let PrivateElement = document.createElement('a')
+  Object.keys(data).map(k=>{
+    let keyObj = new Blob([data[k]], {
+      type: 'application/x-x509-ca-cert'
+    })
+    //创建下载的对象链接
+    let DownloadHref = window.URL.createObjectURL(keyObj);
+    // PrivateElement.style.display="none"
+    PrivateElement.href = DownloadHref;
+    //下载的文件名以用户名命名
+    if(k==='privatekey'){
+      PrivateElement.download = `${username||'nouser'}-private.pem`;
+    }
+    if(k==='publickey'){
+      PrivateElement.download = `${username||'nouser'}-public.key`;
+    }
+    document.body.appendChild(PrivateElement);
+    //点击下载
+    PrivateElement.click();
+    window.URL.revokeObjectURL(DownloadHref);
+  })
+  //下载完成移除元素
+  document.body.removeChild(PrivateElement);
+  message.success("SSHKey下载成功！")
+  return true
+}
