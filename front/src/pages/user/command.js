@@ -8,18 +8,22 @@ import { connect } from 'dva';
 // 国际化
 import { formatMessage } from 'umi/locale'; 
 import 'codemirror/lib/codemirror.css';
+import 'codemirror/addon/hint/show-hint.css';
 import 'codemirror/theme/material.css';
 import {UnControlled as CodeMirror} from 'react-codemirror2'
 import 'codemirror/addon/display/autorefresh';
 import 'codemirror/addon/comment/comment';
 import 'codemirror/addon/edit/matchbrackets';
-import 'codemirror/mode/cmake/cmake';
+import 'codemirror/addon/hint/show-hint.js';
 import 'codemirror/mode/yaml/yaml';
-import 'codemirror/mode/javascript/javascript';
-import 'codemirror/mode/clike/clike';
 import 'codemirror/keymap/sublime';
-import 'codemirror/theme/neat.css';
-import 'codemirror/theme/xq-light.css';
+
+import 'codemirror/mode/sql/sql';
+import 'codemirror/addon/hint/show-hint.js';
+import 'codemirror/addon/hint/sql-hint.js';
+
+import 'codemirror/theme/mbo.css';
+import 'codemirror/theme/mbo.css';
 import CMDBBreadcrumb from "../components/Breadcrumb";
 import usercss from "./user.less";
 
@@ -46,6 +50,11 @@ class CMDBChangePassword extends PureComponent {
   };
 
   render(){
+    let source = {
+       app: ["name", "score", "birthDate"],
+       version: ["name", "score", "birthDate"],
+       dbos: ["name", "population", "size"]
+     };
     let {value,panes,activeKey} =this.state
     console.log(CodeMirror.modes)
     return (
@@ -54,15 +63,12 @@ class CMDBChangePassword extends PureComponent {
             title='menu.side.users.ldap.ldifscript' />
         <Layout style={{margin:"10px 0 0 0"}}>
           <Content className={usercss.ldap_command_content}>
-            <Tabs
-                // hideAdd
-                animated
+            <Tabs animated
                 tabBarGutter={2}
                 onChange={this.onChange}
                 activeKey={activeKey}
                 type="editable-card"
-                
-                // style={{height:"100%",display:"flex",flexDirection:"column"}}
+                style={{display:"flex",flexDirection:"column",flex:"auto"}}
                 size="small"
                 // onEdit={this.onEdit}
               >
@@ -73,9 +79,15 @@ class CMDBChangePassword extends PureComponent {
                     value={value}
                     options={{
                       mode: 'yaml',
+                      theme: "mbo",
                       keyMap: 'sublime',
-                      lineNumbers: true
+                      // styleActiveLine: true,
+                      lineNumbers: true,
+                      hintOptions: {
+                        tables: source
+                      }
                     }}
+                    
                     onChange={(editor, data, value) => {
                     }}
                   />
