@@ -3,6 +3,8 @@ import {connect} from 'dva';
 import {PureComponent} from 'react'
 import {Row,Col,Statistic,Card,Icon,Table} from 'antd'
 import { formatAliCloundTime } from 'utils'
+
+
 const columns = [{
   title: "域名",
   dataIndex: 'DomainName',

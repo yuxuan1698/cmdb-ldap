@@ -29,6 +29,7 @@ class generateSSHKeyViewSet(APIView):
     """
     生成sshkey
     """
+    logger.info(request.data)
     serializer = GenerateSSHKeySerializer(data=request.data)
     if serializer.is_valid():
       valideddata=serializer.validated_data

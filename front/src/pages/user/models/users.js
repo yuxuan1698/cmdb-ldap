@@ -102,7 +102,7 @@ export default {
           // 下载私钥程序段
           if(data.hasOwnProperty('privatekey') &&
             data.hasOwnProperty('publickey') &&
-            (!payload.hasOwnProperty('email') || payload.email==="")
+            (!payload.hasOwnProperty('email') || payload.email==="" || payload.email=== undefined)
             ){
               downloadSSHKey(data,payload.username)
           }

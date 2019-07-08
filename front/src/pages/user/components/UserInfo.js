@@ -8,7 +8,8 @@ import {CopyToClipboard} from 'react-copy-to-clipboard'
 import {formatTimeAndZone,downloadSSHKey} from 'utils'
 import css from './index.less'
 import {formatMessage} from 'umi/locale';
-
+import downloadsvg from 'svgicon/download.svg'
+import copytoclipsvg from 'svgicon/copytoclip.svg'
 const ButtonGroup=Button.Group
 const color=["blue","cyan","geekblue","magenta","red","volcano","green","orange","gold","lime","purple"];
 
@@ -48,8 +49,6 @@ const other_profile={
   'subschemaSubentry':{name:"subschemaSubentry",col:12},
   'entryCSN':{name:"entryCSN",col:24},
 }
-const downloadsvg=props=><svg t="1562295924938" viewBox="0 0 1279 1024" version="1.1" p-id="9531" width="20" height="20"><path d="M602.079848 807.392611a47.880904 47.880904 0 0 0 16.768711 10.255244 49.613209 49.613209 0 0 0 19.60969 4.088239c1.663013 0 3.118149-0.762214 4.850453-0.900798a49.266748 49.266748 0 0 0 34.646096-13.511978l389.837867-371.752605a44.27771 44.27771 0 0 0 0-64.857491 49.821085 49.821085 0 0 0-68.114224 0l-312.784951 297.956422V45.871431a48.504534 48.504534 0 0 0-96.316145 0v620.650155L280.009744 370.921099a49.890378 49.890378 0 0 0-68.114224 0 44.347002 44.347002 0 0 0 0 64.857491z m628.272297-116.341589a48.088781 48.088781 0 0 0-49.197456 46.841521v145.513601a48.088781 48.088781 0 0 1-49.197455 46.841521H147.800244a48.088781 48.088781 0 0 1-49.197456-46.841521v-145.513601a49.197456 49.197456 0 0 0-98.325619 0v145.513601c0 77.537962 66.174042 140.593856 147.523075 140.593856h983.949113c81.349032 0 147.523075-63.055894 147.523075-140.593856v-145.513601a48.088781 48.088781 0 0 0-48.920287-46.910813z" fill="#0091ff" p-id="9532"></path></svg>
-const copytoclipsvg=props=><svg t="1562297756616" viewBox="0 0 1024 1024" version="1.1" p-id="27970" width="20" height="20"><path d="M512 512m-512 0a512 512 0 1 0 1024 0 512 512 0 1 0-1024 0Z" fill="#B7EB81" p-id="27971"></path><path d="M245.76 286.72c0-16.96768 13.70112-30.72 30.73024-30.72H747.52A30.6688 30.6688 0 0 1 778.24 286.72v491.52c0 16.96768-13.70112 30.72-30.73024 30.72H276.48A30.6688 30.6688 0 0 1 245.76 778.24V286.72z m194.56 133.12c0 11.38688 9.18528 20.48 20.52096 20.48h214.95808A20.44928 20.44928 0 0 0 696.32 419.84c0-11.38688-9.18528-20.48-20.52096-20.48H460.84096A20.44928 20.44928 0 0 0 440.32 419.84z m0 122.88c0 11.38688 9.18528 20.48 20.52096 20.48h214.95808A20.44928 20.44928 0 0 0 696.32 542.72c0-11.38688-9.18528-20.48-20.52096-20.48H460.84096A20.44928 20.44928 0 0 0 440.32 542.72z m0 122.88c0 11.38688 9.18528 20.48 20.52096 20.48h214.95808A20.44928 20.44928 0 0 0 696.32 665.6c0-11.38688-9.18528-20.48-20.52096-20.48H460.84096A20.44928 20.44928 0 0 0 440.32 665.6z m-71.68-204.8a40.96 40.96 0 1 0 0-81.92 40.96 40.96 0 0 0 0 81.92z m0 122.88a40.96 40.96 0 1 0 0-81.92 40.96 40.96 0 0 0 0 81.92z m0 122.88a40.96 40.96 0 1 0 0-81.92 40.96 40.96 0 0 0 0 81.92z" fill="#FFFFFF" p-id="27972"></path><path d="M451.40992 194.56h-52.06016C376.69888 194.56 358.4 212.91008 358.4 235.54048v61.46048c0 5.64224 4.57728 10.19904 10.21952 10.19904h286.76096c5.632 0 10.21952-4.56704 10.21952-10.19904v-61.46048A40.96 40.96 0 0 0 624.64 194.56h-52.04992a61.46048 61.46048 0 0 0-121.18016 0z" fill="#00BB74" p-id="27973"></path></svg>
 class UserInfo extends PureComponent {
   constructor(props){
     super(props)
@@ -76,12 +75,12 @@ class UserInfo extends PureComponent {
       formatcontent=<Popover placement="top" content={
         <ButtonGroup size="small">
             <CopyToClipboard text={content} onCopy={()=>message.info("SSHKey公钥已经复制到剪贴板上了。")} >
-              <Button title="复制到剪贴板" ><Icon style={{cursor:"pointer"}} style={{margin:1}} component={copytoclipsvg} /></Button>
+              <Button title="复制到剪贴板" ><Icon style={{cursor:"pointer"}} style={{margin:1,fontSize:20}} component={copytoclipsvg} /></Button>
             </CopyToClipboard>
             <Button title="下载此公钥到本地" 
               loading={this.state.downloadkey} 
               onClick={this.handleDownLoadPubicKey.bind(this,content)}>
-                <Icon style={{cursor:"pointer"}} style={{margin:1}} component={downloadsvg} />
+                <Icon style={{cursor:"pointer"}} style={{margin:1,fontSize:20}} component={downloadsvg} />
             </Button>
         </ButtonGroup>
         } >

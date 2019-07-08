@@ -6,6 +6,28 @@ export default {
   hash:true,
   // history: 'hash',
   ignoreMomentLocale: true,
+  urlLoaderExcludes: [/\.svg$/],
+  chainWebpack(config, { webpack }) {
+    config.module
+      .rule('svg')
+      .test(/.svg(\?v=\d+.\d+.\d+)?$/)
+      .use([
+        {
+          loader: 'babel-loader'
+        },
+        {
+          loader: '@svgr/webpack',
+          options: {
+            babel: false,
+            icon: true
+          }
+        }
+      ])
+      .loader(require.resolve('@svgr/webpack'))
+      .options({
+        name: 'svg/[name]-[hash:8].[ext]'
+      });
+  },
   plugins: [
     // ref: https://umijs.org/plugin/umi-plugin-react.html
     ['umi-plugin-react', {
@@ -39,7 +61,8 @@ export default {
     utils: resolve(__dirname,'./src/utils/utils'),
     cmdbstore: resolve(__dirname,'./src/utils/store'),
     api: resolve(__dirname,'./src/services/api'),
-    requestapi: resolve(__dirname,'./src/utils/request') ,
+    requestapi: resolve(__dirname,'./src/utils/request'),
+    svgicon: resolve(__dirname,'./src/static/svgicon/'),
   },
   theme: {
     "primary-color": "#1DA57A",

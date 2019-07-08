@@ -4,6 +4,7 @@ import {
   Modal,Button,Tooltip,notification, Icon,Tag
 } from 'antd';
 import {formatMessage} from 'umi/locale';
+// import restsshkeysvg from 'svgicon/restsshkey.svg'
 const ButtonGroup = Button.Group;
 
 const restpasssvg=props=><svg width="21px" height="21px" viewBox="0 0 21 21" version="1.1" xmlns="http://www.w3.org/2000/svg" >

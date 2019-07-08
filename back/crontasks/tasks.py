@@ -112,7 +112,8 @@ def send_reset_sshkey_email(data):
       .attach("{}-private.pem".format(username),privatekey)\
       .attach("{}-public.key".format(username),publickey)\
       .send()
-
+    cache.delete("user_%s_public_key"%data['username'])
+    cache.delete("user_%s_private_key"%data['username'])
     return status
   else:
     logger.warn("传入的DATA参数为空，跳过发送邮件。"%username)

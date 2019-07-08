@@ -28,9 +28,8 @@ from django.core.cache import cache
 
 from common.utils import CmdbLDAPLogger,LDAPJSONEncoder,generat_random_password
 from authentication.utils import user_payload_handler
-from crontasks.tasks import send_register_email,send_reset_password_email
+from crontasks.tasks import send_register_email,send_reset_password_email,send_reset_sshkey_email
 from django.contrib.auth.decorators import permission_required
-
 logger=CmdbLDAPLogger().get_logger('cmdb_ldap')
 
 
@@ -82,7 +81,6 @@ class CreateUserViewSet(APIView):
       changeStatus,errorMsg,newUserDn,newUser = CmdbLDAP().create_ldap_user(request.data)
       if changeStatus:
         returnData = {"status": changeStatus}
-        logger.info(request.data)
         dbdata=user_payload_handler(request.data,newUserDn,newUser)
         dbUsers = Users(**dbdata)
         dbUsers.set_password(request.data['userPassword'])
@@ -117,8 +115,33 @@ class UpdateUserViewSet(APIView):
     if serializer.is_valid():
       olddn=request.data['userdn']
       request.data.pop('userdn')
+      userid=olddn.split(",")[0].split("=")[0]
+      username=olddn.split(",")[0].split("=")[1]
+      newUserid=request.data[userid]
       changeStatus, errorMsg = CmdbLDAP().update_ldap_user(request.data,olddn)
       if changeStatus:
+        if newUserid == username:
+          newdn=olddn
+        else:
+          Users.objects.get(username=username,userdn=olddn).delete()
+          username=newUserid
+          newdn=olddn.replace("=%s,"%username,"%s,"%newUserid)
+        if "sshPublicKey" in request.data and cache.get("user_%s_public_key"%username):
+          dbdata={
+            "username":username,
+            "userdn": newdn, 
+            "publickey":cache.get("user_%s_public_key"%username),
+            "privatekey":cache.get("user_%s_private_key"%username),
+            }
+          if "mail" in request.data:
+            dbdata['email']=request.data['mail']
+            sendmailuser={
+              "username":username,
+              "email":request.data.get("mail"),
+              }
+            send_reset_sshkey_email.delay(sendmailuser)
+          Users.objects.update_or_create(defaults=dbdata,username=username)
+          
         returnData = {"status": changeStatus}
         returnStatus = status.HTTP_200_OK
       else:

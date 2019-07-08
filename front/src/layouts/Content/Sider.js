@@ -6,7 +6,10 @@
   import css from '../index.less';
   import Link from 'umi/link';
   import {formatMessage} from 'umi/locale';
-
+  import ldapsvg from 'svgicon/ldap.svg'
+  import systemsetting from 'svgicon/systemsetting.svg'
+  import equipment from 'svgicon/equipment.svg'
+  
   const Sider =Layout.Sider;
   const SubMenu = Menu.SubMenu;
 
@@ -20,7 +23,7 @@
     {
       key:'user',
       name: formatMessage({id:'menu.side.users.ldap'}),
-      icon: 'user',
+      icon: ldapsvg,
       allow: true,
       submenu:[
         {
@@ -35,12 +38,16 @@
           key: '/user/ldap',
           name:formatMessage({id:'menu.side.users.ldap'})
         },
+        {
+          key: '/user/command',
+          name:formatMessage({id:'menu.side.users.ldap.ldif'})
+        },
       ]
     },
     {
       key:'equipment',
       name: formatMessage({id:'menu.side.resource'}),
-      icon: 'edit',
+      icon: equipment,
       allow: true,
       submenu:[
         {
@@ -61,7 +68,7 @@
     {
       key:'system',
       name: formatMessage({id:'menu.side.system'}),
-      icon: 'exception',
+      icon: systemsetting,
       allow: true,
       submenu:[
         {
@@ -103,7 +110,7 @@
           menuItem = (<SubMenu key={it.key} 
           title={
             <span>
-              {it.icon?<Icon type={it.icon} />:""}
+              {it.icon?(typeof(it.icon)==="function" ?<Icon component={it.icon} />:<Icon type={it.icon} />):""}
               <span>{it.name}</span>
             </span>}>
             {childMenu}

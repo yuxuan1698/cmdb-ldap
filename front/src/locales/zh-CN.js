@@ -54,6 +54,8 @@ export default {
   'menu.side.users.list':'用户列表',
   'menu.side.users.perm':'用户权限',
   'menu.side.users.ldap':'LDAP管理',
+  'menu.side.users.ldap.ldif':'LDIF模式',
+  'menu.side.users.ldap.ldifscript':'LDIF脚本模式',
   'menu.side.resource':'资源管理',
   'menu.side.resource.device':'设备列表',
   'menu.side.resource.cerification':'证书列表',

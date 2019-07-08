@@ -44,8 +44,6 @@ class GenerateSSHKey():
             cache.set("user_%s_private_key"%self.username,private_key_value)
             cache.set("user_%s_public_key"%self.username,public_key_value)
             
-
-
         except Exception as e:
             logger.error(e.args)
             return None,e.args
