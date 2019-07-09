@@ -7,8 +7,11 @@
   import Link from 'umi/link';
   import {formatMessage} from 'umi/locale';
   import ldapsvg from 'svgicon/ldap.svg'
+  import ldifsvg from 'svgicon/ldif.svg'
   import systemsetting from 'svgicon/systemsetting.svg'
   import equipment from 'svgicon/equipment.svg'
+  import userlistsvg from 'svgicon/userlist.svg'
+  import userpermissionsvg from 'svgicon/userpermission.svg'
   
   const Sider =Layout.Sider;
   const SubMenu = Menu.SubMenu;
@@ -28,18 +31,22 @@
       submenu:[
         {
           key: '/user',
+          icon: userlistsvg,
           name:formatMessage({id:'menu.side.users.list'}),
         },
         {
           key: '/user/permission',
+          icon: userpermissionsvg,
           name:formatMessage({id:'menu.side.users.perm'})
         },
         {
           key: '/user/ldap',
+          icon: ldapsvg,
           name:formatMessage({id:'menu.side.users.ldap'})
         },
         {
           key: '/user/command',
+          icon: ldifsvg,
           name:formatMessage({id:'menu.side.users.ldap.ldif'})
         },
       ]
@@ -118,7 +125,7 @@
         }else{
           menuItem = (<Menu.Item key={it.key}>
             <Link to={it.key}>
-              {it.icon?<Icon type={it.icon} />:""}
+            {it.icon?(typeof(it.icon)==="function" ?<Icon component={it.icon} />:<Icon type={it.icon} />):""}
               <span>
                 {it.name}
               </span>
