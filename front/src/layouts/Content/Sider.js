@@ -147,6 +147,10 @@
     }
     render(){
       let {collapsed,toggleSideMenu}=this.props
+      const openKeys=this.state.parentpath
+      const defaultProps = collapsed ? {} : {
+        openKeys
+      };
       return (
         <Sider className={css.sider}
                 collapsed={collapsed}
@@ -156,10 +160,10 @@
           <div className={classnames({[css.logo]:true,[css.logoToggle]:collapsed})} />
           <Menu 
             selectedKeys={this.state.subpath}
-            openKeys={this.state.parentpath}
             mode="inline"
             theme="light"
             inlineCollapsed={collapsed}
+            {...defaultProps}
             onOpenChange={openKeys=>{
               this.setState({parentpath:openKeys})
             }} >
