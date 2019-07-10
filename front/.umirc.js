@@ -59,6 +59,7 @@ export default {
   ],
   alias:{
     utils: resolve(__dirname,'./src/utils/utils'),
+    ldaplint: resolve(__dirname,'./src/utils/ldaplint'),
     cmdbstore: resolve(__dirname,'./src/utils/store'),
     api: resolve(__dirname,'./src/services/api'),
     requestapi: resolve(__dirname,'./src/utils/request'),
