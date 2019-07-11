@@ -4,7 +4,8 @@ import {
   PostLDAPDeleteDN,
   PostLDAPCreateDN,
   getPermissionGroupsListApi,
-  PostLDAPGroupPermissions
+  PostLDAPGroupPermissions,
+  getLDAPObjectClassList
 } from '../../../services/api';
 
 export default {
@@ -12,8 +13,9 @@ export default {
     state:{
       groups:{
         treedata:[],
-        treeobject:{},
-      }
+        treeobject:{}
+      },
+      classObjects:{}
     },
     subscriptions: {
       setup({ dispatch, history }) {
@@ -29,6 +31,16 @@ export default {
       },
     },
     effects: {
+      // 获取objectClass
+      *getLDAPObjectClassList({ callback  }, { call,put }) {
+        const data = yield call(getLDAPObjectClassList)
+        yield put({type:'ldapObjectClass',payload:{
+          classObjects:data
+        }})
+        if(data && callback){
+          callback(data)
+        }
+      },
       // 获取组列表
       *getLDAPGroupsList({ payload }, { call,put }) {
         const data = yield call(getGroupList, payload)
@@ -97,7 +109,6 @@ export default {
         }
         if(resp){
           const newtreedata =deldn(treedata,payload[0])
-          console.log(newtreedata)
           if(newtreedata){
             yield put({
               type: 'ldapdeletedn',
@@ -178,10 +189,9 @@ export default {
       ldapdeletedn(state, {payload} ) {
         return {...state,...payload}
       },
-      // // 更新dn
-      // ldapupdatedn(state, {payload} ) {
-      //   console.log(payload)
-      //   return {...state,...payload}
-      // },
+      // 更新objectClass
+      ldapObjectClass(state, {payload} ) {
+        return {...state,...payload}
+      },
     },
   }

@@ -176,7 +176,7 @@ class CmdbLDAP(object):
     """
     if self.connect():
       result_id = self.conn.search(
-          queryOU, ldapType, "(objectClass=*)", ["*", "hasSubordinates"])
+          queryOU,ldapType, "(objectClass=*)", ["*", "hasSubordinates"])
       result_set = []
       while 1:
         try:

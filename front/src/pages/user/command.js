@@ -2,13 +2,16 @@
 
 import {PureComponent} from 'react'
 import {
-  Layout,Tabs,Button
+  Layout,Tabs,Button,Select,Icon
   } from 'antd';
 import { connect } from 'dva';
 // 国际化
 import { formatMessage } from 'umi/locale'; 
 import jsyaml from 'js-yaml'
-import {UnControlled as CodeMirror} from 'react-codemirror2'
+import {UnControlled as CodeMirrorComponent} from 'react-codemirror2'
+import * as CodeMirror from 'codemirror';
+import ldaplint from 'ldaplint'
+import themesvg from 'svgicon/theme.svg'
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/addon/display/fullscreen.css';
 import 'codemirror/addon/hint/show-hint.css';
@@ -16,11 +19,9 @@ import 'codemirror/addon/dialog/dialog.css';
 import 'codemirror/addon/lint/lint.css';
 import 'codemirror/addon/fold/foldgutter.css';
 import 'codemirror/theme/eclipse.css';
-import 'codemirror/theme/material.css';
+import 'codemirror/theme/ambiance.css';
 import 'codemirror/theme/idea.css';
 
-// import 'codemirror/addon/display/autorefresh';
-// import 'codemirror/addon/edit/matchbrackets';
 import 'codemirror/addon/lint/lint';
 import 'codemirror/addon/lint/yaml-lint';
 // import 'codemirror/addon/lint/javascript-lint';
@@ -31,7 +32,6 @@ import 'codemirror/keymap/sublime';
 // 模式
 import 'codemirror/mode/yaml/yaml';
 import 'codemirror/addon/mode/overlay';
-// import 'codemirror/mode/javascript/javascript';
 // 允许注释
 import 'codemirror/addon/comment/comment';
 import 'codemirror/addon/comment/continuecomment';
@@ -48,7 +48,7 @@ import 'codemirror/addon/display/fullscreen';
 
 // 显示联想
 import 'codemirror/addon/hint/show-hint';
-import 'codemirror/addon/hint/anyword-hint.js';
+// import 'codemirror/addon/hint/anyword-hint.js';
 
 import 'codemirror/addon/fold/foldcode';
 import 'codemirror/addon/fold/foldgutter';
@@ -60,68 +60,116 @@ import 'codemirror/addon/fold/brace-fold';
 import CMDBBreadcrumb from "../components/Breadcrumb";
 import usercss from "./user.less";
 
-// require('ldaplint')
-
 const {
   Content
 } = Layout;
 const { 
   TabPane 
 } = Tabs;
+const { Option } = Select;
 
-@connect(({ login, loading }) => ({ login, loading }))
-// @experimentalDecorators
-
+@connect(({ ldap, loading }) => ({ classObjects:ldap.classObjects, loading }))
 class CMDBChangePassword extends PureComponent {
   constructor(props){
     super(props)
     this.state={
-      value:"# <h1>Ldap Ldif</h1>",
-      activeKey:"test1",
-      panes:[{title:"test1",key:"test1"},{title:"test2",key:"test2"}]
+      value:`# !DATE ${new Date().toLocaleString()}
+# !CMDB LDAP 脚本 ldif
+`,
+      activeKey:"ldif1",
+      panes:[{title:"ldif1",key:"ldif1"}],
+      hintField:[],
+      hintType:["add","delete","modify","moddn"],
+      hintObjects:[],
+      addPaneIndex: 1,
+      theme:"eclipse"
     }
+  }
+  initHintStatus=(data)=>{
+    let classObjects=data||this.props.classObjects
+    let hints={
+      hintObjects:Object.keys(classObjects)
+    }
+    let tmpField=["dn","ou","changetype","replace","newrdn","deleteoldrdn","newsuperior","add","delete","modify","moddn"]
+    Object.values(classObjects).map(i=>{
+      i.map(s=>Object.values(s).map(k=>tmpField=tmpField.concat(k)))
+    })
+    hints['hintField']=Array.from(new Set(tmpField))
+    this.setState(hints)
   }
   onChange = activeKey => {
     this.setState({ activeKey });
   };
+  handleOnAddOrDelTag=(targetKey, action)=>{
+    let {panes,addPaneIndex}=this.state
+    switch(action){
+      case "remove":
+        if(panes.length>1){
+          let newpanes=panes.filter(i=>i.key!==targetKey)
+          this.setState({panes: newpanes,activeKey:newpanes[0].key})
+        }
+        break;
+      case "add":
+        panes.push({key:`ldif_console_${addPaneIndex}`,title: `ldif${addPaneIndex}`})
+        this.setState({
+          panes,
+          addPaneIndex:addPaneIndex+1
+        })
+        break;
+    }
+  }
+  handleGetObjectClass=()=>{
+    let {dispatch,classObjects}=this.props
+    let {hintField,hintObjects}=this.state
+    if(Object.keys(classObjects).length=== 0){
+      dispatch({type:'ldap/getLDAPObjectClassList',callback:(data)=>{
+        return this.initHintStatus(data)
+      }})
+    }
+    if(hintField.length===0 || hintObjects.length===0){
+      return this.initHintStatus(classObjects)
+    }
+  }
   componentWillMount=()=>{
     window.jsyaml=jsyaml
+    this.handleGetObjectClass()
+    CodeMirror.registerHelper('hint', 'ldapHint', (editor)=> {
+      let cur = editor.getCursor();
+      let curLine = editor.getLine(cur.line);
+      let start = cur.ch;
+      let end = start;
+      let {hintField,hintObjects,hintType}=this.state
+      while (end < curLine.length && /[\w$]/.test(curLine.charAt(end))) ++end;
+      while (start && /[\w$]/.test(curLine.charAt(start - 1))) --start;
+      let curWord = curLine.slice(start, end).toLowerCase();
+      let list=hintField.filter(i=>i.toLowerCase().indexOf(curWord)>=0)
+      if(/^\s*objectClass/.test(curLine)){
+        list=hintObjects.filter(i=>i.toLowerCase().indexOf(curWord)>=0)
+      }else if(/^\s*changetype/.test(curLine)){
+        list=hintType.filter(i=>i.toLowerCase().indexOf(curWord)>=0)
+      }
+      return {
+        list,
+        from: CodeMirror.Pos(cur.line, start), 
+        to: CodeMirror.Pos(cur.line, end)
+      };
+    });
   }
-  // componentDidMount(){
-    
-  // }
-  codeMirrorOnChange=(editor, data, value)=>{
-    // if (data.origin == "+input"){
-    //   var text = data.text;
-    //   editor.showHint()
-    //   // if (data.origin !== 'complete' && /\w|\./g.test(data.text[0])) {
-    //   // }
-    // }
+  codeMirrorOnChange=(editor, data)=>{
+    if (data.origin == "+input"){
+      CodeMirror.showHint(editor, CodeMirror.hint.ldapHint); 
+    }
   }
-  autoComplete = cm => {
-    console.log(cm)
-    const hintOptions = {
-      tables: {
-        table_name: ['column1', 'column2', 'column3', 'etc'],
-        another_table: ['columnA', 'columnB']
-      }, 
-      disableKeywords: true,
-      completeSingle: false,
-      completeOnSingleClick: false
-    };
-    cm.showHint(cm, cm, hintOptions); 
+  handleChangeCodeTheme=(theme)=>{
+    this.setState({theme})
   }
   render(){
-    let source = {
-       app: ["name", "score", "birthDate"],
-       version: ["name", "score", "birthDate"],
-       dbos: ["name", "population", "size"]
-     };
-    let {value,panes,activeKey} =this.state
+    let {value,panes,activeKey,theme} =this.state
     let options={
       mode: 'ldap',
-      theme: "eclipse",
+      theme: theme,
       keyMap: 'sublime',
+      autofocus:true,
       lineWrapping:true,
       lineNumbers: true,
       autofocus:true,
@@ -140,10 +188,8 @@ class CMDBChangePassword extends PureComponent {
         "Esc": (cm)=> {
           if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
         },
-        "Tab": this.autoComplete
       },
     }
-    
     return (
       <Layout className={usercss.userbody}>
         <CMDBBreadcrumb route={{'menu.side.users.ldap':"","menu.side.users.ldap.ldif":'/user/command'}} 
@@ -152,128 +198,36 @@ class CMDBChangePassword extends PureComponent {
           <Content className={usercss.ldap_command_content}>
             <Tabs animated
                 tabBarGutter={2}
+                tabBarStyle={{height:30}}
+                tabBarExtraContent={
+                  <span style={{float:"left",marginTop:"-2px",marginRight:10}}>
+                    <span style={{marginRight:5}}><Icon component={themesvg} />切换主题</span>
+                    <Select size="small"
+                      style={{width:100}}
+                      onChange={this.handleChangeCodeTheme} 
+                      defaultValue={theme}>
+                      <Option value="eclipse">eclipse</Option>
+                      <Option value="ambiance">ambiance</Option>
+                      <Option value="idea">idea</Option>
+                    </Select>
+                  </span>
+                }
                 onChange={this.onChange}
                 activeKey={activeKey}
                 type="editable-card"
                 style={{display:"flex",flexDirection:"column",flex:"auto"}}
-                // onEdit={this.onEdit}
+                onEdit={this.handleOnAddOrDelTag}
               >
                 {panes.map(pane => (
                   <TabPane className={usercss.panepadding} tab={pane.title} key={pane.key}>
-                  <CodeMirror
-                    defineMode={{name: 'ldap',fn: (e,c)=>{
-                      var cons = ['true', 'false', 'on', 'off', 'yes', 'no'];
-                      var keywordRegex = new RegExp("\\b(("+cons.join(")|(")+"))$", 'i');
-                      console.log(e)
-                      console.log(c)
-                      return {
-                        token: function(stream, state) {
-                          var ch = stream.peek();
-                          var esc = state.escaped;
-                          state.escaped = false;
-                          /* comments */
-                          if (ch == "#" && (stream.pos == 0 || /\s/.test(stream.string.charAt(stream.pos - 1)))) {
-                            stream.skipToEnd();
-                            return "comment";
-                          }
-
-                          if (stream.match(/^('([^']|\\.)*'?|"([^"]|\\.)*"?)/))
-                            return "string";
-
-                          if (state.literal && stream.indentation() > state.keyCol) {
-                            stream.skipToEnd(); return "string";
-                          } else if (state.literal) { state.literal = false; }
-                          if (stream.sol()) {
-                            state.keyCol = 0;
-                            state.pair = false;
-                            state.pairStart = false;
-                            /* document start */
-                            if(stream.match(/---/)) { return "def"; }
-                            /* document end */
-                            if (stream.match(/\.\.\./)) { return "def"; }
-                            /* array list item */
-                            if (stream.match(/\s*-\s+/)) { return 'meta'; }
-                          }
-                          /* inline pairs/lists */
-                          if (stream.match(/^(\{|\}|\[|\])/)) {
-                            if (ch == '{')
-                              state.inlinePairs++;
-                            else if (ch == '}')
-                              state.inlinePairs--;
-                            else if (ch == '[')
-                              state.inlineList++;
-                            else
-                              state.inlineList--;
-                            return 'meta';
-                          }
-
-                          /* list seperator */
-                          if (state.inlineList > 0 && !esc && ch == ',') {
-                            stream.next();
-                            return 'meta';
-                          }
-                          /* pairs seperator */
-                          if (state.inlinePairs > 0 && !esc && ch == ',') {
-                            state.keyCol = 0;
-                            state.pair = false;
-                            state.pairStart = false;
-                            stream.next();
-                            return 'meta';
-                          }
-
-                          /* start of value of a pair */
-                          if (state.pairStart) {
-                            /* block literals */
-                            if (stream.match(/^\s*(\||\>)\s*/)) { state.literal = true; return 'meta'; };
-                            /* references */
-                            if (stream.match(/^\s*(\&|\*)[a-z0-9\._-]+\b/i)) { return 'variable-2'; }
-                            /* numbers */
-                            if (state.inlinePairs == 0 && stream.match(/^\s*-?[0-9\.\,]+\s?$/)) { return 'number'; }
-                            if (state.inlinePairs > 0 && stream.match(/^\s*-?[0-9\.\,]+\s?(?=(,|}))/)) { return 'number'; }
-                            /* keywords */
-                            if (stream.match(keywordRegex)) { return 'keyword'; }
-                          }
-
-                          /* pairs (associative arrays) -> key */
-                          if (!state.pair && stream.match(/^\s*(?:[,\[\]{}&*!|>'"%@`][^\s'":]|[^,\[\]{}#&*!|>'"%@`])[^#]*?(?=\s*:($|\s))/)) {
-                            state.pair = true;
-                            state.keyCol = stream.indentation();
-                            return "atom";
-                          }
-                          if (state.pair && stream.match(/::/)) { 
-                            console.log(stream)
-                            state.pairStart = true; return 'meta'; 
-                          }
-
-                          /* nothing found, continue */
-                          state.pairStart = false;
-                          state.escaped = (ch == '\\');
-                          stream.next();
-                          return null;
-                        },
-                        startState: function() {
-                          return {
-                            pair: false,
-                            pairStart: false,
-                            keyCol: 0,
-                            inlinePairs: 0,
-                            inlineList: 0,
-                            literal: false,
-                            escaped: false
-                          };
-                        },
-                        lineComment: "#",
-                        fold: "indent"
-                      };
-                    }}}
+                  <CodeMirrorComponent
+                    defineMode={{name: 'ldap',fn: ldaplint }}
                     className={usercss.codemirror2}
                     value={value}
-                    // options={{overlayMode:true}}
                     options={options}
                     onChange={this.codeMirrorOnChange}
                   />
                   <div style={{padding:10}}>
-                    {/* <div style={{flex:"auto"}}>1</div> */}
                     <div style={{float:"right"}}>
                       <Button block > 执行脚本文件 </Button>
                     </div>
