@@ -19,8 +19,7 @@ import 'codemirror/addon/dialog/dialog.css';
 import 'codemirror/addon/lint/lint.css';
 import 'codemirror/addon/fold/foldgutter.css';
 import 'codemirror/theme/eclipse.css';
-import 'codemirror/theme/ambiance.css';
-import 'codemirror/theme/idea.css';
+
 
 import 'codemirror/addon/lint/lint';
 import 'codemirror/addon/lint/yaml-lint';
@@ -161,6 +160,7 @@ class CMDBChangePassword extends PureComponent {
     }
   }
   handleChangeCodeTheme=(theme)=>{
+    require(`codemirror/theme/${theme}.css`)
     this.setState({theme})
   }
   render(){
@@ -203,11 +203,24 @@ class CMDBChangePassword extends PureComponent {
                   <span style={{float:"left",marginTop:"-2px",marginRight:10}}>
                     <span style={{marginRight:5}}><Icon component={themesvg} />切换主题</span>
                     <Select size="small"
-                      style={{width:100}}
+                      style={{width:120}}
                       onChange={this.handleChangeCodeTheme} 
                       defaultValue={theme}>
                       <Option value="eclipse">eclipse</Option>
-                      <Option value="ambiance">ambiance</Option>
+                      <Option value = "ambiance" > ambiance </Option>
+                      <Option value = "blackboard" > blackboard </Option>
+                      <Option value = "cobalt" > cobalt </Option>
+                      <Option value = "eclipse" > eclipse </Option>
+                      <Option value = "elegant" > elegant </Option>
+                      <Option value = "erlang-dark" > erlang - dark </Option>
+                      <Option value = "lesser-dark" > lesser - dark </Option>
+                      <Option value = "monokai" > monokai </Option>
+                      <Option value = "neat" > neat </Option>
+                      <Option value = "night" > night </Option>
+                      <Option value = "rubyblue" > rubyblue </Option>
+                      <Option value = "twilight" > twilight </Option>
+                      <Option value = "vibrant-ink" > vibrant - ink </Option>
+                      <Option value = "xq-dark" > xq - dark </Option>
                       <Option value="idea">idea</Option>
                     </Select>
                   </span>
