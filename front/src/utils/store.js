@@ -20,8 +20,12 @@ export class Store {
   static base64Decode(val){
     try {
       const base64DecodeStr = new Buffer.from(val,'base64').toString();
-      const value = JSON.parse(base64DecodeStr);
-      return value
+      try{
+        const value = JSON.parse(base64DecodeStr);
+        return value
+      }catch(error){
+        return base64DecodeStr
+      }
     } catch (error) {
      return false
     }
@@ -60,11 +64,11 @@ export class Store {
   // 获取LOCAL键值
   static getLocal(key){
     const base64DecodeVal = this.base64Decode(localStorage.getItem(key));
-      if(base64DecodeVal){
-        return base64DecodeVal
-      }else{
-        return false  
-      }
+    if(base64DecodeVal){
+      return base64DecodeVal
+    }else{
+      return false  
+    }
   }
   // 设置LOCAL存储
   static setLocal(key,value){

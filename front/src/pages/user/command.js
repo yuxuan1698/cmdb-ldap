@@ -5,6 +5,8 @@ import {
   Layout,Tabs,Button,Select,Icon
   } from 'antd';
 import { connect } from 'dva';
+import { Store } from "cmdbstore";
+import { ContextMenuTrigger, ContextMenu,MenuItem } from 'react-contextmenu';
 // 国际化
 import { formatMessage } from 'umi/locale'; 
 import jsyaml from 'js-yaml'
@@ -18,7 +20,6 @@ import 'codemirror/addon/hint/show-hint.css';
 import 'codemirror/addon/dialog/dialog.css';
 import 'codemirror/addon/lint/lint.css';
 import 'codemirror/addon/fold/foldgutter.css';
-import 'codemirror/theme/eclipse.css';
 
 
 import 'codemirror/addon/lint/lint';
@@ -49,7 +50,7 @@ import 'codemirror/addon/display/fullscreen';
 import 'codemirror/addon/hint/show-hint';
 // import 'codemirror/addon/hint/anyword-hint.js';
 
-import 'codemirror/addon/fold/foldcode';
+// import 'codemirror/addon/fold/foldcode';
 import 'codemirror/addon/fold/foldgutter';
 import 'codemirror/addon/fold/comment-fold';
 import 'codemirror/addon/fold/indent-fold';
@@ -66,23 +67,31 @@ const {
   TabPane 
 } = Tabs;
 const { Option } = Select;
-
-@connect(({ ldap, loading }) => ({ classObjects:ldap.classObjects, loading }))
+const themeAll=["ambiance","blackboard",
+        "cobalt","eclipse","elegant","erlang-dark",
+        "lesser-dark","monokai","neat","night" ,
+        "rubyblue","twilight","vibrant-ink",
+        "xq-dark","idea"
+      ]
+const defaultValue=`# !DATE ${new Date().toLocaleString()}
+# !CMDB LDAP 脚本 ldif
+`
+@connect(({ ldap,users, loading }) => ({ userlist:users.userlist,classObjects:ldap.classObjects, loading }))
 class CMDBChangePassword extends PureComponent {
   constructor(props){
     super(props)
+    const initTheme= Store.getLocal('ldap_theme') ||"eclipse"
     this.state={
-      value:`# !DATE ${new Date().toLocaleString()}
-# !CMDB LDAP 脚本 ldif
-`,
-      activeKey:"ldif1",
-      panes:[{title:"ldif1",key:"ldif1"}],
+      values:{ldif0:defaultValue},
+      activeKey:"ldif0",
+      panes:[{title:"ldif0",key:"ldif0"}],
       hintField:[],
       hintType:["add","delete","modify","moddn"],
       hintObjects:[],
       addPaneIndex: 1,
-      theme:"eclipse"
+      theme:initTheme
     }
+    require(`codemirror/theme/${initTheme}.css`)
   }
   initHintStatus=(data)=>{
     let classObjects=data||this.props.classObjects
@@ -100,19 +109,24 @@ class CMDBChangePassword extends PureComponent {
     this.setState({ activeKey });
   };
   handleOnAddOrDelTag=(targetKey, action)=>{
-    let {panes,addPaneIndex}=this.state
+    let {panes,addPaneIndex,values}=this.state
     switch(action){
       case "remove":
         if(panes.length>1){
           let newpanes=panes.filter(i=>i.key!==targetKey)
-          this.setState({panes: newpanes,activeKey:newpanes[0].key})
+          delete values[targetKey]
+          this.setState({
+            panes: newpanes,
+            activeKey:newpanes[0].key
+          })
         }
         break;
       case "add":
         panes.push({key:`ldif_console_${addPaneIndex}`,title: `ldif${addPaneIndex}`})
         this.setState({
           panes,
-          addPaneIndex:addPaneIndex+1
+          addPaneIndex:addPaneIndex+1,
+          values: Object.assign(values,{[`ldif_console_${addPaneIndex}`]: defaultValue})
         })
         break;
     }
@@ -132,6 +146,10 @@ class CMDBChangePassword extends PureComponent {
   componentWillMount=()=>{
     window.jsyaml=jsyaml
     this.handleGetObjectClass()
+    let {userlist,dispatch}=this.props
+    if(Object.keys(userlist).length==0){
+      dispatch({type:"users/getUserList"})
+    }
     CodeMirror.registerHelper('hint', 'ldapHint', (editor)=> {
       let cur = editor.getCursor();
       let curLine = editor.getLine(cur.line);
@@ -142,10 +160,15 @@ class CMDBChangePassword extends PureComponent {
       while (start && /[\w$]/.test(curLine.charAt(start - 1))) --start;
       let curWord = curLine.slice(start, end).toLowerCase();
       let list=hintField.filter(i=>i.toLowerCase().indexOf(curWord)>=0)
-      if(/^\s*objectClass/.test(curLine)){
+      if(/^\s*objectClass:/.test(curLine)){
         list=hintObjects.filter(i=>i.toLowerCase().indexOf(curWord)>=0)
-      }else if(/^\s*changetype/.test(curLine)){
+      }else if(/^\s*changetype:/.test(curLine)){
         list=hintType.filter(i=>i.toLowerCase().indexOf(curWord)>=0)
+      }else if(/^\s*manager:|^\s*uniqueMember:|^\s*member:|^\s*seeAlso:/.test(curLine)){
+        let userdnlist=[]
+        let {userlist}=this.props
+        Object.values(userlist).map(i=>userdnlist.push(i[0]))
+        list=userdnlist.concat(list).filter(i=>i.toLowerCase().indexOf(curWord)>=0)
       }
       return {
         list,
@@ -154,17 +177,20 @@ class CMDBChangePassword extends PureComponent {
       };
     });
   }
-  codeMirrorOnChange=(editor, data)=>{
-    if (data.origin == "+input"){
-      CodeMirror.showHint(editor, CodeMirror.hint.ldapHint); 
+  codeMirrorOnChange=(cm, data)=>{
+    let {values,activeKey} =this.state
+    if (data.origin === "+input"){
+      CodeMirror.showHint(cm, CodeMirror.hint.ldapHint,{completeSingle:false}); 
+      this.setState({values: Object.assign(values,{[activeKey]:cm.getValue()})})
     }
   }
   handleChangeCodeTheme=(theme)=>{
     require(`codemirror/theme/${theme}.css`)
     this.setState({theme})
+    Store.setLocal('ldap_theme',theme)
   }
   render(){
-    let {value,panes,activeKey,theme} =this.state
+    let {values,panes,activeKey,theme} =this.state
     let options={
       mode: 'ldap',
       theme: theme,
@@ -201,27 +227,17 @@ class CMDBChangePassword extends PureComponent {
                 tabBarStyle={{height:30}}
                 tabBarExtraContent={
                   <span style={{float:"left",marginTop:"-2px",marginRight:10}}>
-                    <span style={{marginRight:5}}><Icon component={themesvg} />切换主题</span>
+                    <span style={{marginRight:5}}><Icon component={themesvg} style={{
+                          color: "#31b914",
+                          fontSize: 22,
+                          float: "left",
+                          margin: "5px 2px 0 0"
+                    }}/>切换主题</span>
                     <Select size="small"
-                      style={{width:120}}
+                      style={{width:140}}
                       onChange={this.handleChangeCodeTheme} 
                       defaultValue={theme}>
-                      <Option value="eclipse">eclipse</Option>
-                      <Option value = "ambiance" > ambiance </Option>
-                      <Option value = "blackboard" > blackboard </Option>
-                      <Option value = "cobalt" > cobalt </Option>
-                      <Option value = "eclipse" > eclipse </Option>
-                      <Option value = "elegant" > elegant </Option>
-                      <Option value = "erlang-dark" > erlang - dark </Option>
-                      <Option value = "lesser-dark" > lesser - dark </Option>
-                      <Option value = "monokai" > monokai </Option>
-                      <Option value = "neat" > neat </Option>
-                      <Option value = "night" > night </Option>
-                      <Option value = "rubyblue" > rubyblue </Option>
-                      <Option value = "twilight" > twilight </Option>
-                      <Option value = "vibrant-ink" > vibrant - ink </Option>
-                      <Option value = "xq-dark" > xq - dark </Option>
-                      <Option value="idea">idea</Option>
+                      {themeAll.map(i=><Option key={i} value={i}>{i}</Option>)}
                     </Select>
                   </span>
                 }
@@ -233,16 +249,23 @@ class CMDBChangePassword extends PureComponent {
               >
                 {panes.map(pane => (
                   <TabPane className={usercss.panepadding} tab={pane.title} key={pane.key}>
-                  <CodeMirrorComponent
-                    defineMode={{name: 'ldap',fn: ldaplint }}
-                    className={usercss.codemirror2}
-                    value={value}
-                    options={options}
-                    onChange={this.codeMirrorOnChange}
-                  />
-                  <div style={{padding:10}}>
+                    {/* <ContextMenuTrigger id='ldap_control_menu'  > */}
+                      <CodeMirrorComponent
+                        defineMode={{name: 'ldap',fn: ldaplint }}
+                        className={usercss.codemirror2}
+                        value={values[activeKey]}
+                        options={options}
+                        onChange={this.codeMirrorOnChange}
+                        onContextMenu={(cm,event)=>{
+                          console.log(cm)
+                          let line=cm.getCursor()
+                          console.log(line)
+                          event.preventDefault()
+                        }}
+                      />
+                  <div className={usercss.run_ldif_script_button}>
                     <div style={{float:"right"}}>
-                      <Button block > 执行脚本文件 </Button>
+                      <Button size="large" block ><Icon type="right-square" theme="filled" /> 执行脚本文件 </Button>
                     </div>
                   </div>
                   </TabPane>

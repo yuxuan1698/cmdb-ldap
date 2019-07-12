@@ -147,7 +147,6 @@ export default {
     ldap_departmentNumber:'ジョブ名',
     ldap_homeDirectory:'ユーザーディレクトリ',
     ldap_userPassword:'ユーザーパスワード',
-    ldap_sshPublicKey:'ユーザ公開鍵',
     ldap_manager:'リーダー/スーペリア',
     ldap_description:'備考/説明',
     ldap_ou:'所属部署',

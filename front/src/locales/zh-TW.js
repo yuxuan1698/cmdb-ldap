@@ -147,7 +147,6 @@ export default {
   ldap_departmentNumber:'職位名稱',
   ldap_homeDirectory:'用戶目錄',
   ldap_userPassword:'用戶密碼',
-  ldap_sshPublicKey:'用戶公鑰',
   ldap_manager:'領導/上級',
   ldap_description:'備註/描述',
   ldap_ou:'所屬部門',

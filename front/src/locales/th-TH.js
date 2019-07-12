@@ -147,7 +147,6 @@ export default {
   ldap_departmentNumber: 'ชื่องาน',
   ldap_homeDirectory: 'ไดเรกทอรีผู้ใช้',
   ldap_userPassword: 'รหัสผ่านผู้ใช้',
-  ldap_sshPublicKey: 'รหัสสาธารณะของผู้ใช้',
   ldap_manager: 'Leader / Superior',
   ldap_description: 'หมายเหตุ / คำอธิบาย',
   ldap_ou: 'แผนกสังกัด',
