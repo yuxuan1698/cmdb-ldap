@@ -213,6 +213,12 @@ export default {
   'ldap_permission_backup':'返回',
   'ldap_permission_save':'保存权限',
   'ldap_permission_choise':'请先选择需要用户......',
+  // ldap_ldif
+  'ldap_ldif_menu_copy':'复制',
+  'ldap_ldif_menu_cut':'剪切',
+  'ldap_ldif_menu_paste':'粘贴',
+  'ldap_ldif_menu_encode_base64':'转base64码',
+  'ldap_ldif_menu_decode_base64':'解base64码',
   // System 设置
   'breadcrumb_system_crontablogs':'后台任务日志',
   'breadcrumb_system_crontab':'后台任务',

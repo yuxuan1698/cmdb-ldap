@@ -89,7 +89,13 @@ class CMDBChangePassword extends PureComponent {
       hintType:["add","delete","modify","moddn"],
       hintObjects:[],
       addPaneIndex: 1,
-      theme:initTheme
+      theme:initTheme,
+      menuBase64: {
+        encode: false,
+        decode: false
+      },
+      curCm: null,
+      curLinePos:""
     }
     require(`codemirror/theme/${initTheme}.css`)
   }
@@ -98,7 +104,7 @@ class CMDBChangePassword extends PureComponent {
     let hints={
       hintObjects:Object.keys(classObjects)
     }
-    let tmpField=["dn","ou","changetype","replace","newrdn","deleteoldrdn","newsuperior","add","delete","modify","moddn"]
+    let tmpField=["dn","ou","changetype","replace","newrdn","deleteoldrdn","newsuperior","add","delete","modify","moddn","version"]
     Object.values(classObjects).map(i=>{
       i.map(s=>Object.values(s).map(k=>tmpField=tmpField.concat(k)))
     })
@@ -189,6 +195,34 @@ class CMDBChangePassword extends PureComponent {
     this.setState({theme})
     Store.setLocal('ldap_theme',theme)
   }
+  handleRightMenu=()=>{
+    return <ContextMenu id="ldap_ldif_control_menu" >
+      < MenuItem >
+         <Icon style={{margin:"0 7px 0 -8px"}}  type = "file-add"
+         theme = "twoTone" / > {formatMessage({id:'ldap_ldif_menu_copy'})}
+        </MenuItem>
+        < MenuItem >
+          < Icon style={{margin:"0 7px 0 -8px"}} type = "delete"
+          theme = "twoTone" / > {formatMessage({id:'ldap_ldif_menu_cut'})}
+        </MenuItem>
+        <MenuItem divider />
+        < MenuItem >
+           < Icon style={{margin:"0 7px 0 -8px",color:"#1590ff"}} 
+            type = "reload" / > {formatMessage({id:'ldap_ldif_menu_paste'})}
+        </MenuItem>
+        <MenuItem divider />
+        <MenuItem disabled={!Boolean(this.state.menuBase64.encode)} ><Icon style={{margin:"0 7px 0 -8px"}} type = "edit" theme = "twoTone" / > 
+           {formatMessage({id:'ldap_ldif_menu_encode_base64'})}
+        </MenuItem>
+        <MenuItem disabled={!Boolean(this.state.menuBase64.decode)} onClick={()=>{
+          let {curCm,curLinePos}=this.state
+          console.log(curCm)
+          console.log(curLinePos)
+        }} ><Icon style={{margin:"0 7px 0 -8px"}} type = "edit" theme = "twoTone" / > 
+           {formatMessage({id:'ldap_ldif_menu_decode_base64'})}
+        </MenuItem>
+    </ContextMenu>
+  }
   render(){
     let {values,panes,activeKey,theme} =this.state
     let options={
@@ -249,7 +283,7 @@ class CMDBChangePassword extends PureComponent {
               >
                 {panes.map(pane => (
                   <TabPane className={usercss.panepadding} tab={pane.title} key={pane.key}>
-                    {/* <ContextMenuTrigger id='ldap_control_menu'  > */}
+                    <ContextMenuTrigger id='ldap_ldif_control_menu' >
                       <CodeMirrorComponent
                         defineMode={{name: 'ldap',fn: ldaplint }}
                         className={usercss.codemirror2}
@@ -257,12 +291,50 @@ class CMDBChangePassword extends PureComponent {
                         options={options}
                         onChange={this.codeMirrorOnChange}
                         onContextMenu={(cm,event)=>{
-                          console.log(cm)
-                          let line=cm.getCursor()
-                          console.log(line)
+                          let cur = cm.getCursor();
+                          let curLine = cm.getLine(cur.line);
+                          let start = cur.ch;
+                          let end = start;
+                          if(cur.outside){
+                            event.stopPropagation()
+                          }
+                          let curState={
+                            curCm: cm,
+                            curLinePos: cur
+                          }
+                          if(!/^\s*\w+::?\s*[\w\u4e00-\u9fa5]+/.test(curLine)){
+                            curState['menuBase64']={decode:false,encode:false}
+                          }else{
+                            if(/^\s*\w+::/.test(curLine)){
+                              curState['menuBase64']={decode:true,encode:false}
+                            }else{
+                              curState['menuBase64']={decode:false,encode:true}
+                            }
+                          }
+                          setTimeout(()=>{
+                            this.setState(curState)
+                          },100)
+                          while (end < curLine.length && /[\w$]/.test(curLine.charAt(end))) ++end;
+                          while (start && /[\u4e00-\u9fa5$]/.test(curLine.charAt(start - 1))) --start;
+                          let curWord = curLine.slice(start, end).toLowerCase();
+                          console.log(start)
+                          console.log(end)
+                          console.log(curLine)
+                          console.log(curWord)
+                          // cm.replaceRange('test',CodeMirror.Pos(cur.line,start),CodeMirror.Pos(cur.line,start))
+                          // console.log(doc)
+                          // let lineword1=doc.setLine(line.line,'test')
+                          // let c=cm.s
+                          // console.log(lineword)
+                          // if(line.outside){
+                          //   event.stopPropagation()
+                          // }
                           event.preventDefault()
+                          
                         }}
                       />
+                    </ContextMenuTrigger>
+                    {this.handleRightMenu()}
                   <div className={usercss.run_ldif_script_button}>
                     <div style={{float:"right"}}>
                       <Button size="large" block ><Icon type="right-square" theme="filled" /> 执行脚本文件 </Button>

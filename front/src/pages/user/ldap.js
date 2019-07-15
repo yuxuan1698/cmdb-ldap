@@ -73,7 +73,7 @@ class CMDBLdapGroups extends PureComponent {
     );
   })
   handleRightMenu=()=>{
-    let menu = (<ContextMenu id="ldap_control_menu" >
+    return <ContextMenu id="ldap_control_menu" >
       < MenuItem onClick = {
         this.handleNewDNItem.bind(this)
       } >
@@ -99,8 +99,7 @@ class CMDBLdapGroups extends PureComponent {
    	      theme = "twoTone" / > 
            {formatMessage({id:'ldapmanager_rename_dn'})}
         </MenuItem>
-    </ContextMenu>)
-    return menu
+    </ContextMenu>
   }
   onLoadData = treeNode => {
     const {dispatch} =this.props
