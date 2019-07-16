@@ -62,8 +62,13 @@ export class Store {
     }
   }
   // 获取LOCAL键值
-  static getLocal(key){
-    const base64DecodeVal = this.base64Decode(localStorage.getItem(key));
+  static getLocal(key,decode=true){
+    let base64DecodeVal=""
+    if(decode){
+      base64DecodeVal = this.base64Decode(localStorage.getItem(key));
+    }else{
+      base64DecodeVal = localStorage.getItem(key);
+    }
     if(base64DecodeVal){
       return base64DecodeVal
     }else{

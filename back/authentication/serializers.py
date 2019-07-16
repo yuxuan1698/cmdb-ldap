@@ -80,6 +80,19 @@ class LockUnLockUserSerializer(Serializer):
       })
   lock = NullBooleanField(required=True)
 
+class LDIFScriptsSerializer(Serializer):
+  """
+  效验ldif脚本字段
+  """
+  ldif = CharField(
+      required=True,
+      min_length=4,
+      allow_blank=False,
+      error_messages={
+          'min_length': 'ldif字段不能小于4个字符',
+          'blank': "字段(ldif)不能为空。"
+      })
+
 
 class CreateUserSerializer(Serializer):
   """

@@ -22,7 +22,8 @@ from .views import (
     UserPermissionListByViewSet,
     SavePermissionListByViewSet,
     getLDAPPermissionGroupsListViewSet,
-    LockUnLockUserViewSet
+    LockUnLockUserViewSet,
+    LdifScriptViewSet
 )
 from rest_framework_jwt.views import obtain_jwt_token
 
@@ -48,6 +49,6 @@ urlpatterns = [
     path(r'ldap/dn/update/', UpdateDNViewSet.as_view(),name='ldap-dnupdate'),
     path(r'ldap/dn/create/', CreateDNViewSet.as_view(),name='ldap-dncreate'),
     path(r'ldap/dn/delete/', DeleteDNViewSet.as_view(), name='ldap-dndelete'),
-    path(r'ldap/ldif/', DeleteDNViewSet.as_view(), name='ldap-dndelete'),
+    path(r'ldap/ldif/', LdifScriptViewSet.as_view(), name='ldap-dndelete'),
     path('logout/', obtain_jwt_token,name='auth-logout'),
     ]

@@ -12,7 +12,8 @@ from authentication.serializers import (
   CreateDNSerializer,
   DeleteDNSerializer,
   UpdateUserSerializer,
-  LockUnLockUserSerializer
+  LockUnLockUserSerializer,
+  LDIFScriptsSerializer
 )
 from authentication.ldap.ldapsearch import CmdbLDAP
 
@@ -436,9 +437,10 @@ class LdifScriptViewSet(APIView):
     """
     锁定/解锁用户
     """
-    serializer = LockUnLockUserSerializer(instance=request, data=request.data)
+    serializer = LDIFScriptsSerializer(instance=request, data=request.data)
     if serializer.is_valid():
-      changeStatus, errorMsg = CmdbLDAP().ldif_script(request.data)
+      ldif=request.data.get('ldif')
+      changeStatus, errorMsg = CmdbLDAP().ldif_script(ldif)
       if changeStatus:
         returnData = {"status": changeStatus}
         returnStatus = status.HTTP_200_OK

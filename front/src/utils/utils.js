@@ -33,7 +33,9 @@ export function LDAP_MAP_FIELDS_FORMAT(){
 // 生成认证请求头
 export function GenerateRequestAuthParams() {
   const header_info=Store.getLocal('userinfo');
-  let header={}
+  const language=Store.getLocal('umi_locale',false) || navigator.language||navigator.userLanguage;
+  console.log(language)
+  let header={"CMDB-Language":language}
   if (header_info.hasOwnProperty('token_prefix') &&
       header_info.hasOwnProperty('token') && 
       header_info.token!==""){

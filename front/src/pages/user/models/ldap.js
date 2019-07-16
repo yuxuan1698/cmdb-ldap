@@ -5,7 +5,8 @@ import {
   PostLDAPCreateDN,
   getPermissionGroupsListApi,
   PostLDAPGroupPermissions,
-  getLDAPObjectClassList
+  getLDAPObjectClassList,
+  PostLDAPLdifScripts
 } from '../../../services/api';
 
 export default {
@@ -31,6 +32,13 @@ export default {
       },
     },
     effects: {
+      // 获取objectClass
+      *postLDAPLDIFScripts({ payload,callback }, { call }) {
+        const data = yield call(PostLDAPLdifScripts,payload)
+        if(data && callback){
+          callback(data)
+        }
+      },
       // 获取objectClass
       *getLDAPObjectClassList({ callback  }, { call,put }) {
         const data = yield call(getLDAPObjectClassList)

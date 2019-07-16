@@ -1,5 +1,8 @@
 import uuid
 import ldap
+import io
+import ldif
+from ldap.modlist import addModlist
 from ldap.ldapobject import ReconnectLDAPObject
 from ldap.schema.subentry import SCHEMA_ATTRS
 from django.conf import settings
@@ -427,9 +430,19 @@ class CmdbLDAP(object):
     """
     运行ldif脚本文件！
     """
+    if 
+    ldifio=io.StringIO(data,None)
+    parser = ldif.LDIFRecordList(ldifio)
+    parser.parse()  
+    logger.info(parser.all_records)
+    for dn, entry in parser.all_records:
+      add_modlist = addModlist(entry)
+      logger.info(add_modlist.get('changetype'))
+      logger.info(add_modlist)
+      logger.info(dn)
     # if self.connect():
     #   try:
     #     self.conn.modify_s(dn, lockUnlockModList)
     #   except ldap.LDAPError as e:
     #     return False, e.args[0]
-    return msg, None
+    return "msg", None

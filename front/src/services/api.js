@@ -122,6 +122,14 @@ export function PostLDAPGroupPermissions (data) {
         data: data,
     })
 }
+// 提交ldif脚本文件
+export function PostLDAPLdifScripts (data) {
+    return request({
+        method: "post",
+        url: '/v1/ldap/ldif/',
+        data: data,
+    })
+}
 // 获取权限组列表
 export function GetSystemCrontabLogsApi(data) {
 
