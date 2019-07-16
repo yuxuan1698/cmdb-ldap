@@ -53,16 +53,12 @@ class CmdbLDAP(object):
     """ 返回所有LDAP用户列表 """
     if self.connect():
       searchFilter="(&(%s))"%username
-      result_id=self.conn.search(self.userDN, self.searchScope, searchFilter, retrieveAttributes)
-      result_set = []
-      while 1:
-        result_type, result_data = self.conn.result(result_id, 0)
-        if(result_data == []):
-          break
-        else:
-          if result_type == ldap.RES_SEARCH_ENTRY:
-            result_set.append(result_data[0])
-      return result_set,None
+      try:
+        result_data=self.conn.search_s(self.userDN, self.searchScope, searchFilter, retrieveAttributes)
+        return result_data, None
+      except ldap.LDAPError as e:
+        logger.info(e)
+        return None, '获取用户列表失败！'
     else:
       return None,self.errorMsg
 
@@ -70,16 +66,12 @@ class CmdbLDAP(object):
     """ 返回所有LDAP DN属性 """
     if self.connect():
       searchFilter="(objectClass=*)"
-      result_id=self.conn.search(dn, ldap.SCOPE_BASE, searchFilter, None)
-      result_set = []
-      while 1:
-        result_type, result_data = self.conn.result(result_id, 0)
-        if(result_data == []):
-          break
-        else:
-          if result_type == ldap.RES_SEARCH_ENTRY:
-            result_set.append(result_data[0])
-      return result_set,None
+      try:
+        result_data=self.conn.search_s(dn, ldap.SCOPE_BASE, searchFilter, None)
+        return result_data,None
+      except ldap.LDAPError as e:
+        logger.info(e)
+        return None,'获取属性失败！'
     else:
       return None,self.errorMsg
   def change_self_password(self,data):
@@ -146,10 +138,9 @@ class CmdbLDAP(object):
     """ 获取 schema 列表 """
     if self.connect():
       self.conn.set_option(ldap.OPT_DEBUG_LEVEL,0)
+      s_temp = {}
       subschemasubentry_dn = self.conn.search_subschemasubentry_s(self.bindDN)
-      if subschemasubentry_dn is None:
-        s_temp = {}
-      else:
+      if subschemasubentry_dn:
         s_temp = self.conn.read_subschemasubentry_s(
           subschemasubentry_dn,attrs=SCHEMA_ATTRS
         )
@@ -175,30 +166,17 @@ class CmdbLDAP(object):
     获取Base OU信息
     """
     if self.connect():
-      result_id = self.conn.search(
+      try:
+        result_id = self.conn.search_s(
           queryOU,ldapType, "(objectClass=*)", ["*", "hasSubordinates"])
+      except ldap.NO_SUCH_OBJECT as e:
+        logger.info(e.args[0])
+        self.errorMsg="没有找到对象: No such object"
+        return None,self.errorMsg
       result_set = []
-      while 1:
-        try:
-          result_type, result_data = self.conn.result(result_id, 0)
-        except ldap.NO_SUCH_OBJECT as e:
-          logger.info(e.args[0])
-          self.errorMsg="没有找到对象: No such object"
-          return None,self.errorMsg
-        if(result_data == []):
-          break
-        else:
-          if result_type == ldap.RES_SEARCH_ENTRY:
-            result_set.append((result_data[0][1],result_data[0][0]))
-
-      if len(result_set)==0 and ldapType==ldap.SCOPE_ONELEVEL:
-        newresult,msg=self.get_base_ou(queryOU,ldapType=ldap.SCOPE_BASE)
-        if len(newresult)>0:
-          return {"notsubdir":True,"data":newresult},None
-        else:
-          return False,"没有找到DN记录或者属性！"
-
-      return result_set,None
+      for val in result_id:
+        result_set.append((val[1], val[0]))
+      return result_set, None
 
   def create_ldap_user(self,data):
     """
@@ -395,16 +373,12 @@ class CmdbLDAP(object):
     """ 返回所有LDAP DN属性 """
     if self.connect() and userdn:
       searchFilter="(|(member={})(uniqueMember={})(memberUid={}))".format(userdn,userdn,userdn.split(',')[0].split('=')[1])
-      result_id=self.conn.search(settings.AUTH_LDAP_GROUP_SEARCH_OU, ldap.SCOPE_SUBTREE, searchFilter, None)
-      result_set = []
-      while 1:
-        result_type, result_data = self.conn.result(result_id, 0)
-        if(result_data == []):
-          break
-        else:
-          if result_type == ldap.RES_SEARCH_ENTRY:
-            result_set.append(result_data[0])
-      return result_set,None
+      try:
+        result_data=self.conn.search_s(settings.AUTH_LDAP_GROUP_SEARCH_OU, ldap.SCOPE_SUBTREE, searchFilter, None)
+        return result_data, None
+      except ldap.LDAPError as e:
+        logger.error(e)
+        return None,"查询用户权限失败！"
     else:
       return None,self.errorMsg
   def save_permissions_group(self,permissData={}):
@@ -448,3 +422,14 @@ class CmdbLDAP(object):
           logger.error(e)
           return False,"更新字段失败，失败内容:%s"%(e.args[0]['info'] if e.args[0]['info'] else "")
       return returnStatus
+
+  def ldif_script(self, data):
+    """
+    运行ldif脚本文件！
+    """
+    # if self.connect():
+    #   try:
+    #     self.conn.modify_s(dn, lockUnlockModList)
+    #   except ldap.LDAPError as e:
+    #     return False, e.args[0]
+    return msg, None

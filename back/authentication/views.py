@@ -35,15 +35,7 @@ logger=CmdbLDAPLogger().get_logger('cmdb_ldap')
 
 Users = get_user_model()
 
-# cmdbldap={
-#   "getClasses":CmdbLDAP(),
-#   "getUsers":CmdbLDAP(),
-#   "getOUDN":CmdbLDAP(),
-#   "updateDN":CmdbLDAP(),
-#   "createDN":CmdbLDAP(),
-#   "deleteDN":CmdbLDAP(),
-#   "all":CmdbLDAP()
-# }
+# cmdbldap = CmdbLDAP()
 # threadlock=False
 class LoginViewSet(ObtainJSONWebToken):
   """用户登陆接口"""
@@ -58,7 +50,7 @@ class UserListViewSet(APIView):
     """ 
     获取所有用户的列表信息
     """
-    user_list,errorMsg=CmdbLDAP().get_user_list()
+    user_list, errorMsg = CmdbLDAP().get_user_list()
     if user_list:
       page=PageNumberPagination()
       page_roles=page.paginate_queryset(queryset=user_list,request=request,view=self)
@@ -424,6 +416,29 @@ class LockUnLockUserViewSet(APIView):
     serializer = LockUnLockUserSerializer(instance=request, data=request.data)
     if serializer.is_valid():
       changeStatus, errorMsg = CmdbLDAP().lock_unlock_ldap_user(request.data)
+      if changeStatus:
+        returnData = {"status": changeStatus}
+        returnStatus = status.HTTP_200_OK
+      else:
+        returnData = {"error": errorMsg}
+        returnStatus = status.HTTP_400_BAD_REQUEST
+    else:
+      returnData = serializer.errors
+      returnStatus = status.HTTP_400_BAD_REQUEST
+    return JsonResponse(returnData, status=returnStatus, safe=False)
+
+class LdifScriptViewSet(APIView):
+  """
+  锁定/解锁用户
+  """
+  # serializer_class = LockUnLockUserSerializer
+  def post(self,request, *args, **kwargs):
+    """
+    锁定/解锁用户
+    """
+    serializer = LockUnLockUserSerializer(instance=request, data=request.data)
+    if serializer.is_valid():
+      changeStatus, errorMsg = CmdbLDAP().ldif_script(request.data)
       if changeStatus:
         returnData = {"status": changeStatus}
         returnStatus = status.HTTP_200_OK
