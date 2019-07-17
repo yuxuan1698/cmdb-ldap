@@ -12,6 +12,9 @@
   import equipment from 'svgicon/equipment.svg'
   import userlistsvg from 'svgicon/userlist.svg'
   import userpermissionsvg from 'svgicon/userpermission.svg'
+  import devicelistsvg from 'svgicon/devicelist.svg'
+  import certsvg from 'svgicon/certsvg.svg'
+  import monitorsvg from 'svgicon/monitor.svg'
   
   const Sider =Layout.Sider;
   const SubMenu = Menu.SubMenu;
@@ -59,15 +62,18 @@
       submenu:[
         {
           key: '/equipment/',
+          icon: devicelistsvg,
           name:formatMessage({id:'menu.side.resource.device'}),
           // allow: false,
         },
         {
           key: '/equipment/cerificate/',
+          icon: certsvg,
           name:formatMessage({id:'menu.side.resource.cerification'}),
         },
         {
           key: '/equipment/groups',
+          icon: monitorsvg,
           name:formatMessage({id:'menu.side.resource.monitor'}),
         },
       ]

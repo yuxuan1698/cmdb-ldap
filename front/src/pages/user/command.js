@@ -177,6 +177,8 @@ class CMDBChangePassword extends PureComponent {
         list=hintObjects.filter(i=>i.toLowerCase().indexOf(curWord)>=0)
       }else if(/^\s*changetype:/.test(curLine)){
         list=hintType.filter(i=>i.toLowerCase().indexOf(curWord)>=0)
+      }else if(/^\s*deleteoldrdn:/.test(curLine)){
+        list=["1"].filter(i=>i.toLowerCase().indexOf(curWord)>=0)
       }else if(/^\s*manager:|^\s*uniqueMember:|^\s*member:|^\s*seeAlso:/.test(curLine)){
         let userdnlist=[]
         let {userlist}=this.props
@@ -190,13 +192,13 @@ class CMDBChangePassword extends PureComponent {
       };
     });
   }
-  codeMirrorOnChange=(cm, data)=>{
+  codeMirrorOnChange=(cm, data,value)=>{
     let {values,activeKey} =this.state
     console.log(data)
-    if (data.origin === "+input"){
-      CodeMirror.showHint(cm, CodeMirror.hint.ldapHint,{completeSingle:false}); 
-      this.setState({values: Object.assign(values,{[activeKey]:cm.getValue()})})
-    }
+    // if (data.origin === "+input" || data.origin=== "paste"){
+    if(![undefined,'paste','complete'].includes(data.origin)) CodeMirror.showHint(cm, CodeMirror.hint.ldapHint,{completeSingle:false}); 
+    this.setState({values: Object.assign(values,{[activeKey]:cm.getValue()})})
+    // }
   }
   handleChangeCodeTheme=(theme)=>{
     require(`codemirror/theme/${theme}.css`)
@@ -219,7 +221,7 @@ class CMDBChangePassword extends PureComponent {
       menuState['copy']=true
       menuState['cut']=true
     }
-    if(/^\s*\w+::?\s*[\w\u4e00-\u9fa5]+/.test(curLine)){
+    if(/^\s*\w+::?\s*[\{\w\u4e00-\u9fa5]+/.test(curLine)){
       if(/^\s*\w+::/.test(curLine)){
         menuState['decode']=true
         menuState['encode']=false
@@ -270,8 +272,6 @@ class CMDBChangePassword extends PureComponent {
           </MenuItem>
         < MenuItem disabled={!Boolean(this.state.rightMenuControl.cut)} onClick={()=>{
           let {curCm}=this.state
-          // console.log(CodeMirror.paste())
-          // console.log(curCm.getEditor())
         }}>
           <Icon style={{margin:"0 6px 0 -8px"}} type="scissor" /> 
           {formatMessage({id:'ldap_ldif_menu_cut'})}
@@ -293,16 +293,22 @@ class CMDBChangePassword extends PureComponent {
     </ContextMenu>
   }
   handleSubmitCodeMirror=()=>{
-    let {values,activeKey}=this.state
+    let {values,activeKey,curCm}=this.state
     let {dispatch}=this.props
-    let ldif=values[activeKey]
+    let selectWord=curCm.getSelection()
+    let ldif=""
+    if(selectWord!==""){
+      ldif=selectWord
+    }else{
+      ldif=values[activeKey].split('\n').filter(i=>!/^\s*[#-]/.test(i)).join('\n')
+    }
     dispatch({type:'ldap/postLDAPLDIFScripts',payload: {ldif},callback:(data)=>{
-      console.log(data)
       message.info("脚本执行成功！")
     }})
   }
   render(){
     let {values,panes,activeKey,theme} =this.state
+    let ismac = CodeMirror.keyMap.default == CodeMirror.keyMap.macDefault;
     let options={
       mode: 'ldap',
       theme: theme,
@@ -325,6 +331,9 @@ class CMDBChangePassword extends PureComponent {
         },
         "Esc": (cm)=> {
           if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
+        },
+        [(ismac ? "Cmd" : "Ctrl") + "-R"]: (cm)=> {
+          this.handleSubmitCodeMirror()
         },
       },
     }
@@ -353,18 +362,17 @@ class CMDBChangePassword extends PureComponent {
                 activeKey={activeKey}
                 type="editable-card"
                 style={{display:"flex",flexDirection:"column",flex:"auto"}}
-                onEdit={this.handleOnAddOrDelTag}
-              >
+                onEdit={this.handleOnAddOrDelTag} >
                 {panes.map(pane => (
                   <TabPane className={usercss.panepadding} tab={pane.title} key={pane.key}>
                     <ContextMenuTrigger id='ldap_ldif_control_menu' >
                       <CodeMirrorComponent
                         defineMode={{name: 'ldap',fn: ldaplint }}
                         className={usercss.codemirror2}
+                        editorDidMount={(cm)=>this.setState({curCm: cm})}
                         value={values[activeKey]}
                         options={options}
                         onChange={this.codeMirrorOnChange}
-                        onPaste={(cm,evnet)=>console.log(cm)}
                         onContextMenu={this.handleContextMenu}
                       />
                     </ContextMenuTrigger>

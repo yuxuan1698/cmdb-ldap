@@ -13,7 +13,7 @@ https                                     : //docs.djangoproject.com/en/2.1/ref/
 import os
 import ldap,datetime
 from django_auth_ldap.config import LDAPSearch,GroupOfUniqueNamesType
-import logging
+# import logging
 
 BASE_DIR                                  = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -29,7 +29,7 @@ SECRET_KEY                                = 'u_rom*ua&x304mcqwqgv-x5i@*fwnj&ip)a
 # SECURITY WARNING                        : don't run with debug turned on in production!
 DEBUG                                     = True
 
-ALLOWED_HOSTS                             = ['127.0.0.1']
+ALLOWED_HOSTS                             = ['127.0.0.1','192.168.1.252']
 
 CMDB_BASE_URL                             = "http://127.0.0.1:8081"
 # Application definition

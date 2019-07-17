@@ -2,9 +2,12 @@ import {resolve} from "path";
 // ref: https://umijs.org/config/
 export default {
   treeShaking: true,
-  outputPath: "output",
+  base: "/cmdb", 
+  outputPath: "output/cmdb",
+  publicPath: "/cmdb/",
+  runtimePublicPath: true,
   hash:true,
-  // history: 'hash',
+  ignoreMomentLocale: true,
   ignoreMomentLocale: true,
   urlLoaderExcludes: [/\.svg$/],
   chainWebpack(config, { webpack }) {
@@ -35,8 +38,7 @@ export default {
       dva: {
         immer: true,
       },
-      // chunks: ['umi'],
-      // chunks: ['vendors', 'default.cmdb',  'cmdb'],
+      chunks: ['vendors', 'umi'],
       dynamicImport: { webpackChunkName: true },
       title: 'CMDB-LDAP Manager',
       dll: true,

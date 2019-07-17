@@ -1,8 +1,8 @@
 import uuid
 import ldap
-import io
+import io,re
 import ldif
-from ldap.modlist import addModlist
+from ldap.modlist import addModlist,modifyModlist
 from ldap.ldapobject import ReconnectLDAPObject
 from ldap.schema.subentry import SCHEMA_ATTRS
 from django.conf import settings
@@ -430,19 +430,48 @@ class CmdbLDAP(object):
     """
     运行ldif脚本文件！
     """
-    if 
+    # if 
     ldifio=io.StringIO(data,None)
-    parser = ldif.LDIFRecordList(ldifio)
-    parser.parse()  
-    logger.info(parser.all_records)
-    for dn, entry in parser.all_records:
-      add_modlist = addModlist(entry)
-      logger.info(add_modlist.get('changetype'))
-      logger.info(add_modlist)
-      logger.info(dn)
-    # if self.connect():
-    #   try:
-    #     self.conn.modify_s(dn, lockUnlockModList)
-    #   except ldap.LDAPError as e:
-    #     return False, e.args[0]
+    try:
+      parser = ldif.LDIFRecordList(ldifio)
+      parser.parse()  
+    except Exception as e:
+      logger.error(e)
+      return None,"ldif脚本格式错误，请检查。%s"%e.args[0]
+    # errordnldif=[]
+    if self.connect():
+      for dn, entry in parser.all_records:
+        haveChangetype=entry.get('changetype')
+        changetype= haveChangetype[0].decode('utf-8') if haveChangetype else "add"
+        try:
+          if changetype =="add":
+            add_modlist = addModlist(entry,ignore_attr_types=['changetype','add'])
+            self.conn.add_s(dn, add_modlist)
+          elif changetype == "modify":
+            oldlist={}
+            if entry.get('replace'):
+              replacefields=entry.get('replace')[0].decode('utf-8')
+              for f in re.split(r'[,;]',replacefields):
+                if entry.get(f):
+                  oldlist[f]="old"
+            if entry.get('delete'):
+              replacefields=entry.get('delete')[0].decode('utf-8')
+              for f in re.split(r'[,;]',replacefields):
+                oldlist[f]=""
+            if entry.get('add'):
+              oldlist[entry.get('add')[0].decode('utf-8')]=""
+            add_modlist = modifyModlist(oldlist,entry,ignore_attr_types=['changetype','add','replace','delete','deleteoldrdn'])
+            self.conn.modify_s(dn, add_modlist)
+          elif changetype == "delete":
+            self.conn.delete_s(dn)
+          elif changetype == "moddn":
+            modrdn=entry.get('newrdn')[0].decode('utf-8') if entry.get('newrdn') else None
+            delOldDN=int(entry.get('deleteoldrdn')[0].decode('utf-8')) if entry.get('deleteoldrdn') else 1
+            self.conn.modrdn_s(dn,modrdn,delOldDN)
+          else:
+            return False, "changetype字段类型不匹配。"
+        except ldap.LDAPError as e:
+          logger.error(e)
+          return False, "执行ldif脚本出错，出错内容：%s"%e.args[0]
+    # logger.info(errordnldif)
     return "msg", None

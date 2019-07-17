@@ -11,6 +11,7 @@ import { formatAliCloundTime } from 'utils'
 import css from './index.less'
 import linuxlogo from './linux.png'
 import windows from './windows.png'
+import monitorsvg from 'svgicon/monitor.svg'
 const {
   Content
 } = Layout;
@@ -358,8 +359,8 @@ class CMDBSystemSetting extends PureComponent {
             return <div style={{textAlign:"center"}}>
               <Tooltip placement="top"
                 title={<div style={{fontSize:12}}>查看监控数据</div>} >
-                  <Icon type='line-chart' style={{fontSize:16,cursor:"pointer",color:"green"}} />
-                  <Icon type='line-chart' style={{fontSize:16,cursor:"pointer",color:"green"}} />
+                  <Icon component={monitorsvg} style={{fontSize:16,cursor:"pointer",color:"green"}} />
+                  {/* <Icon type='line-chart' style={{fontSize:16,cursor:"pointer",color:"green"}} /> */}
                 </Tooltip>
               
             </div>
