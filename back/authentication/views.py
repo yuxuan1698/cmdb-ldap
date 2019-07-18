@@ -116,7 +116,10 @@ class UpdateUserViewSet(APIView):
         if newUserid == username:
           newdn=olddn
         else:
-          Users.objects.get(username=username,userdn=olddn).delete()
+          try:
+            Users.objects.get(username=username,userdn=olddn).delete()
+          except Exception as e:
+            logger.warn(e)
           username=newUserid
           newdn=olddn.replace("=%s,"%username,"%s,"%newUserid)
         if "sshPublicKey" in request.data and cache.get("user_%s_public_key"%username):

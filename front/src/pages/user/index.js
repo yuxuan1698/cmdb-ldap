@@ -81,9 +81,7 @@ class CMDBUserList extends PureComponent {
         });
       }})
     }else{
-      this.setState({
-        ...dispDrager
-      })
+      this.setState(dispDrager)
     }
   }
   onSelectChange=(selectedRowKeys)=>{
@@ -237,7 +235,7 @@ class CMDBUserList extends PureComponent {
               </Tooltip>
       }
     },{
-      title: formatMessage({id:'userlist_table_operation'}),
+      title:()=><span><Icon type="box-plot" theme="twoTone" /> {formatMessage({id:'userlist_table_operation'})}</span>,
       key: 'action',
       align: 'center',
       width:115,

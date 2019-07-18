@@ -62,6 +62,7 @@ class UserInfo extends PureComponent {
   }
   DescriptionItemFun= ({ title, content,keyval }) => {
     let index=0
+    console.log(content)
     let formatcontent=(<div className={css.userinfo_value}>{
       content instanceof Array?content.map(i=>{
           if(index>color.length) index=0
@@ -69,12 +70,17 @@ class UserInfo extends PureComponent {
           if(keyval==='memberOf') return <Tag key={i} color={color[index-1]}>{i}</Tag>
           let datavalue=formatTimeAndZone(i)
           return content.length>1?<Tag key={i} color={color[index-1]}>{datavalue}</Tag>:
-          <Tag key={i} style={{ background: '#fff', borderStyle: 'dashed' }} >{datavalue}</Tag>
-          }):<Tag style={{ background: '#fff', borderStyle: 'dashed' }} >{content}</Tag>}</div>)
+            <CopyToClipboard text={datavalue} onCopy={()=>message.success(`${datavalue}已经复制到剪贴板上`)} >
+              <Tag key={i} style={{ background: '#fff', borderStyle: 'dashed' }} >{datavalue}</Tag>
+            </CopyToClipboard>
+          }):<CopyToClipboard text={content} onCopy={()=>message.success(`${content}已经复制到剪贴板上`)} >
+              <Tag style={{ background: '#fff', borderStyle: 'dashed' }} >{content}</Tag>
+            </CopyToClipboard>}
+      </div>)
     if(keyval==='sshPublicKey'){
       formatcontent=<Popover placement="top" content={
         <ButtonGroup size="small">
-            <CopyToClipboard text={content} onCopy={()=>message.info("SSHKey公钥已经复制到剪贴板上了。")} >
+            <CopyToClipboard text={content} onCopy={()=>message.success("SSHKey公钥已经复制到剪贴板上了。")} >
               <Button title="复制到剪贴板" ><Icon style={{cursor:"pointer"}} style={{margin:1,fontSize:20}} component={copytoclipsvg} /></Button>
             </CopyToClipboard>
             <Button title="下载此公钥到本地" 

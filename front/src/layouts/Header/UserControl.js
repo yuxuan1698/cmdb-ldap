@@ -33,7 +33,7 @@ class CMDBUserControl extends PureComponent{
         router.push('/system/setting')
         break;
       case 'user':
-        router.push('/user/center')
+        router.push('/center')
         break;
     }
   }

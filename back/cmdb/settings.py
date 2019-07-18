@@ -35,50 +35,50 @@ CMDB_BASE_URL                             = "http://127.0.0.1:8081"
 # Application definition
 
 INSTALLED_APPS                            = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'rest_framework',
-    # 'rest_framework.authtoken',
-    'corsheaders',
-    'api.apps.ApiConfig',
-    'authentication.apps.AuthenticationConfig',
-    'common.apps.CommonConfig',
-    'crontasks.apps.CrontasksConfig',
-    'rest_framework_swagger',
-    'django_celery_results',
+	'django.contrib.admin',
+	'django.contrib.auth',
+	'django.contrib.contenttypes',
+	'django.contrib.sessions',
+	'django.contrib.messages',
+	'django.contrib.staticfiles',
+	'rest_framework',
+	# 'rest_framework.authtoken',
+	'corsheaders',
+	'api.apps.ApiConfig',
+	'authentication.apps.AuthenticationConfig',
+	'common.apps.CommonConfig',
+	'crontasks.apps.CrontasksConfig',
+	'rest_framework_swagger',
+	'django_celery_results',
 ]
 
 MIDDLEWARE                                = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    # 'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+	'django.middleware.security.SecurityMiddleware',
+	'django.contrib.sessions.middleware.SessionMiddleware',
+	'corsheaders.middleware.CorsMiddleware',
+	'django.middleware.common.CommonMiddleware',
+	# 'django.middleware.csrf.CsrfViewMiddleware',
+	'django.contrib.auth.middleware.AuthenticationMiddleware',
+	'django.contrib.messages.middleware.MessageMiddleware',
+	'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 ROOT_URLCONF                              = 'cmdb.urls'
 
 TEMPLATES                                 = [
-    {
-        'BACKEND'                         : 'django.template.backends.django.DjangoTemplates',
-        'DIRS'                            : [],
-        'APP_DIRS'                        : True,
-        'OPTIONS'                         : {
-            'context_processors'          : [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
-    },
+	{
+		'BACKEND'                               : 'django.template.backends.django.DjangoTemplates',
+		'DIRS'                                  : [],
+		'APP_DIRS'                              : True,
+		'OPTIONS'                               : {
+			'context_processors'                   : [
+				'django.template.context_processors.debug',
+				'django.template.context_processors.request',
+				'django.contrib.auth.context_processors.auth',
+				'django.contrib.messages.context_processors.messages',
+			],
+		},
+	},
 ]
 
 WSGI_APPLICATION                          = 'cmdb.wsgi.application'
@@ -88,17 +88,17 @@ WSGI_APPLICATION                          = 'cmdb.wsgi.application'
 # https                                   : //docs.djangoproject.com/en/2.1/ref/settings/#databases
 
 DATABASES                                 = {
-    'default'                             : {
-        'ENGINE'                          : 'django.db.backends.sqlite3',
-        'NAME'                            : os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+	'default'                                : {
+		'ENGINE'                                : 'django.db.backends.sqlite3',
+		'NAME'                                  : os.path.join(BASE_DIR, 'db.sqlite3'),
+	}
 }
 # CELERY 设置段
 CELERY_BROKER_URL                         = 'redis://:%(password)s@%(host)s:%(port)s/%(db)s' % {
-    'password'                            : 'jbg@123',
-    'host'                                : '192.168.1.250',
-    'port'                                : 6379,
-    'db'                                  : 8,
+	'password'                               : 'jbg@123',
+	'host'                                   : '192.168.1.250',
+	'port'                                   : 6379,
+	'db'                                     : 8,
 }
 CELERY_RESULT_BACKEND                     = 'django_celery_results.backends.database:DatabaseBackend' #ji结果存储，我配置的是存储到数据库
 CELERY_CACHE_BACKEND                      = CELERY_RESULT_BACKEND
@@ -116,18 +116,18 @@ CELERY_TIMEZONE                           = 'Asia/Shanghai'
 # https                                   : //docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS                  = [
-    {
-        'NAME'                            : 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME'                            : 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME'                            : 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME'                            : 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+	{
+		'NAME'                                  : 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+	},
+	{
+		'NAME'                                  : 'django.contrib.auth.password_validation.MinimumLengthValidator',
+	},
+	{
+		'NAME'                                  : 'django.contrib.auth.password_validation.CommonPasswordValidator',
+	},
+	{
+		'NAME'                                  : 'django.contrib.auth.password_validation.NumericPasswordValidator',
+	},
 ]
 
 
@@ -152,37 +152,37 @@ APPEND_SLASH                              = True
 STATIC_URL                                = '/static/'
 
 REST_FRAMEWORK                            = {
-    'DEFAULT_RENDERER_CLASSES'            : (
-        'rest_framework.renderers.JSONRenderer',
-        'rest_framework.renderers.TemplateHTMLRenderer',
-        'rest_framework.renderers.BrowsableAPIRenderer',
-    ),
-    'DEFAULT_PARSER_CLASSES'              : (
-        'rest_framework.parsers.JSONParser',
-        'rest_framework.parsers.FormParser',
-        'rest_framework.parsers.MultiPartParser',
-    ),
-    'DEFAULT_PERMISSION_CLASSES'          : (
-        # 'rest_framework.permissions.AllowAny',
-        'rest_framework.permissions.IsAuthenticated',
-    ),
-    'DEFAULT_AUTHENTICATION_CLASSES'      : (
-        # 'rest_framework.authentication.TokenAuthentication',
-        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
-    ),
-    'DEFAULT_PAGINATION_CLASS'            : 'rest_framework.pagination.PageNumberPagination',
-    'PAGINATE_BY'                         : 5,
-    'PAGE_SIZE'                           : 10,
-    'NON_FIELD_ERRORS_KEY'                : 'error'
+	'DEFAULT_RENDERER_CLASSES'               : (
+		'rest_framework.renderers.JSONRenderer',
+		'rest_framework.renderers.TemplateHTMLRenderer',
+		'rest_framework.renderers.BrowsableAPIRenderer',
+	),
+	'DEFAULT_PARSER_CLASSES'                 : (
+		'rest_framework.parsers.JSONParser',
+		'rest_framework.parsers.FormParser',
+		'rest_framework.parsers.MultiPartParser',
+	),
+	'DEFAULT_PERMISSION_CLASSES'             : (
+		# 'rest_framework.permissions.AllowAny',
+		'rest_framework.permissions.IsAuthenticated',
+	),
+	'DEFAULT_AUTHENTICATION_CLASSES'         : (
+		# 'rest_framework.authentication.TokenAuthentication',
+		'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+		'rest_framework.authentication.SessionAuthentication',
+		'rest_framework.authentication.BasicAuthentication',
+	),
+	'DEFAULT_PAGINATION_CLASS'               : 'rest_framework.pagination.PageNumberPagination',
+	'PAGINATE_BY'                            : 5,
+	'PAGE_SIZE'                              : 10,
+	'NON_FIELD_ERRORS_KEY'                   : 'error'
 }
 JWT_AUTH                                  = {
-    'JWT_AUTH_HEADER_PREFIX'              : 'Token',
-    'JWT_EXPIRATION_DELTA'                : datetime.timedelta(seconds = 1800),  # 生成的token有效期
-    'JWT_RESPONSE_PAYLOAD_HANDLER'        : 'authentication.utils.jwt_response_payload_handler', 
-    'JWT_GET_USER_SECRET_KEY'             : 'authentication.utils.reflush_secretkey',
-    'JWT_AUTH_COOKIE'                     : None,
+	'JWT_AUTH_HEADER_PREFIX'                 : 'Token',
+	'JWT_EXPIRATION_DELTA'                   : datetime.timedelta(seconds = 1800),  # 生成的token有效期
+	'JWT_RESPONSE_PAYLOAD_HANDLER'           : 'authentication.utils.jwt_response_payload_handler', 
+	'JWT_GET_USER_SECRET_KEY'                : 'authentication.utils.reflush_secretkey',
+	'JWT_AUTH_COOKIE'                        : None,
 }
 # 
 EMAIL_BACKEND                             = 'django.core.mail.backends.smtp.EmailBackend'
@@ -196,13 +196,13 @@ EMAIL_HOST_PASSWORD                       = 'Wubida@123'
 DEFAULT_FROM_EMAIL                        = 'dev@iwubida.com'
 
 CACHES                                    = {
-    'default'                             : {
-        # 'BACKEND'                       : 'django.core.cache.backends.filebased.FileBasedCache',
-        'BACKEND'                         : 'django.core.cache.backends.db.DatabaseCache',
-        # 'LOCATION'                      : '/tmp/django_cache',
-        'LOCATION'                        : 'ldap_cache_table',
-        'TIMEOUT'                         : 3600,
-    }
+	'default'                                : {
+		# 'BACKEND'                             : 'django.core.cache.backends.filebased.FileBasedCache',
+		'BACKEND'                               : 'django.core.cache.backends.db.DatabaseCache',
+		# 'LOCATION'                            : '/tmp/django_cache',
+		'LOCATION'                              : 'ldap_cache_table',
+		'TIMEOUT'                               : 3600,
+	}
 }
 
 
@@ -231,7 +231,7 @@ AUTH_LDAP_USER_FLAGS_BY_GROUP             = {'is_superuser': "cn=admin,%s" % AUT
 # AUTH_LDAP_GROUP_SEARCH_FILTER           = ""
 AUTH_LDAP_USER_SEARCH                     = LDAPSearch(AUTH_LDAP_SEARCH_OU, ldap.SCOPE_SUBTREE, AUTH_LDAP_SEARCH_FILTER)
 AUTH_LDAP_CONNECTION_OPTIONS              = {
-    ldap.OPT_TIMEOUT                      : 20
+	ldap.OPT_TIMEOUT                         : 20
 }
 
 # AUTH_LDAP_MIRROR_GROUPS                 = True
@@ -250,109 +250,107 @@ AUTH_LDAP_ALWAYS_UPDATE_USER              = True
 AUTH_LDAP_BACKEND                         = 'authentication.ldap.backend.LDAPBackendAuthentication' #配置为先使用LDAP认证，如通过认证则不再使用后面的认证方式
 
 if AUTH_LDAP                              : 
-    AUTHENTICATION_BACKENDS.insert(0, AUTH_LDAP_BACKEND)
+	AUTHENTICATION_BACKENDS.insert(0, AUTH_LDAP_BACKEND)
 AUTH_USER_MODEL                           = "authentication.Users"
 # AUTH_GROUP_MODEL                        = "authentication.UserGroups"
 
 # Ali Cloud Config配置
-# ALI_CLOUND                              = {
-#     'ACCESSKEY'                         : 'LTAIUWuSChF0IY7L',
-#     'ACCESSSECRET'                      : '9e1QiG9cRDTIGJnUcOQMK27C1ohu8v',
-# }
 ALI_CLOUND_API_ACCOUNT                    = {
-    # 物必达帐号
-    'wbd'                                 : {
-        'ACCESSKEY'                       : 'LTAIUWuSChF0IY7L',
-        'ACCESSSECRET'                    : '9e1QiG9cRDTIGJnUcOQMK27C1ohu8v',
-        'Name'                            : "物必达(iwubida)"
-    },
-    # 94赖账号
-    'lazy'                                : {
-        'ACCESSKEY'                       : 'LTAIBsNvE3dgppCx',
-        'ACCESSSECRET'                    : 'IBeSKdl1DdxbcqjoahXL1zB8m1196n',
-        'Name'                            : "就是赖(94lazy)"
-    }
+	# 物必达帐号
+	'wbd'                                    : {
+		'ACCESSKEY'                             : 'LTAIUWuSChF0IY7L',
+		'ACCESSSECRET'                          : '9e1QiG9cRDTIGJnUcOQMK27C1ohu8v',
+		'Name'                                  : "物必达(iwubida)"
+	},
+	# 94赖账号
+	'lazy'                                   : {
+		'ACCESSKEY'                             : 'LTAIBsNvE3dgppCx',
+		'ACCESSSECRET'                          : 'IBeSKdl1DdxbcqjoahXL1zB8m1196n',
+		'Name'                                  : "就是赖(94lazy)"
+	}
 }
 
 # 日志部分
 # Django的日志配置项
 
 LOGGING                                   = {
-    'version'                             : 1,
-    'disable_existing_loggers'            : False,
-    'formatters'                          : {
-        'verbose'                         : {
-            'format'                      : '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
-        },
-        'main'                            : {
-            'datefmt'                     : '%Y-%m-%d %H:%M:%S',
-            'format'                      : '%(asctime)s [%(module)s %(levelname)s] %(message)s',
-        },
-        'simple'                          : {
-            'format'                      : '%(levelname)s %(message)s'
-        },
-    },
-    'handlers'                            : {
-        'null'                            : {
-            'level'                       : 'DEBUG',
-            'class'                       : 'logging.NullHandler',
-        },
-        'console'                         : {
-            'level'                       : 'DEBUG',
-            'class'                       : 'logging.StreamHandler',
-            'formatter'                   : 'main'
-        },
-    },
-    'loggers'                             : {
-        'django'                          : {
-            'handlers'                    : ['null'],
-            'propagate'                   : False,
-            'level'                       : 'DEBUG',
-        },
-        'django.request'                  : {
-            'handlers'                    : ['console'],
-            'level'                       : 'DEBUG',
-            'propagate'                   : False,
-        },
-        'django.server'                   : {
-            'handlers'                    : ['console'],
-            'level'                       : 'DEBUG',
-            'propagate'                   : False,
-        },
-        'django_auth_ldap'                : {
-            'handlers'                    : ['console'],
-            'level'                       : "INFO",
-        },
-        'cmdb_ldap'                       : {
-            'handlers'                    : ['console'],
-            'level'                       : "INFO",
-        },
-    }
+	'version'                                : 1,
+	'disable_existing_loggers'               : False,
+	'formatters'                             : {
+		'verbose'                               : {
+			'format'                               : '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+		},
+		'main'                                  : {
+			'datefmt'                              : '%Y-%m-%d %H:%M:%S',
+			'format'                               : '%(asctime)s [%(module)s %(levelname)s] %(message)s',
+		},
+		'simple'                                : {
+			'format'                               : '%(levelname)s %(message)s'
+		},
+	},
+	'handlers'                               : {
+		'null'                                  : {
+			'level'                                : 'DEBUG',
+			'class'                                : 'logging.NullHandler',
+		},
+		'console'                               : {
+			'level'                                : 'DEBUG',
+			'class'                                : 'logging.StreamHandler',
+			'formatter'                            : 'main'
+		},
+	},
+	'loggers'                                : {
+		'django'                                : {
+			'handlers'                             : ['null'],
+			'propagate'                            : False,
+			'level'                                : 'DEBUG',
+		},
+		'django.request'                        : {
+			'handlers'                             : ['console'],
+			'level'                                : 'DEBUG',
+			'propagate'                            : False,
+		},
+		'django.server'                         : {
+			'handlers'                             : ['console'],
+			'level'                                : 'DEBUG',
+			'propagate'                            : False,
+		},
+		'django_auth_ldap'                      : {
+			'handlers'                             : ['console'],
+			'level'                                : "INFO",
+		},
+		'cmdb_ldap'                             : {
+			'handlers'                             : ['console'],
+			'level'                                : "INFO",
+		},
+	}
 }
 
 # swagger 配置项
 SWAGGER_SETTINGS                          = {
-    # 基础样式
-    'SECURITY_DEFINITIONS'                : {
-        'api_key'                         : {
-            'type'                        : 'apiKey',
-            'description'                 : 'Personal API Key authorization',
-            'in'                          : 'header',
-            'name'                        : 'Authorization'
-        }
-    },
-    'USE_SESSION_AUTH'                    : False,
-    # 如果需要登录才能够查看接口文档, 登录的链接使用restframework自带的.
-    # 'LOGIN_URL'                         : 'authentication:auth-login',
-    # 'LOGOUT_URL'                        : 'authentication:logout',
-    # 'DOC_EXPANSION'                     : None,
-    'SHOW_REQUEST_HEADERS'                : True,
-    'DOC_EXPANSION'                       : 'list',
-    # 接口文档中方法列表以首字母升序排列
-    'APIS_SORTER'                         : 'alpha',
-    # 如果支持json提交, 则接口文档中包含json输入框
-    'JSON_EDITOR'                         : True,
-    # 方法列表字母排序
-    'OPERATIONS_SORTER'                   : 'alpha',
-    # 'VALIDATOR_URL'                     : None,
+	# 'LOGIN_URL'                              : 'rest_framework:login',
+	# 'LOGOUT_URL'                             : 'rest_framework:logout',
+	# 基础样式
+	'SECURITY_DEFINITIONS'                   : {
+		'api_key'                               : {
+			'type'                                 : 'apiKey',
+			'description'                          : 'JWT authorization',
+			'in'                                   : 'header',
+			'name'                                 : 'Authorization'
+		}
+	},
+	'USE_SESSION_AUTH'                       : False,
+	# 如果需要登录才能够查看接口文档, 登录的链接使用restframework自带的.
+	# 'LOGIN_URL'                            : 'authentication:auth-login',
+	# 'LOGOUT_URL'                           : 'authentication:logout',
+	# 'DOC_EXPANSION'                        : None,
+	'SHOW_REQUEST_HEADERS'                   : True,
+	'DOC_EXPANSION'                          : 'list',
+	# 接口文档中方法列表以首字母升序排列
+	'APIS_SORTER'                            : 'alpha',
+	# 如果支持json提交, 则接口文档中包含json输入框
+	'JSON_EDITOR'                            : True,
+	# 方法列表字母排序
+	'OPERATIONS_SORTER'                      : 'alpha',
+	# 'VALIDATOR_URL'                        : None,
 }

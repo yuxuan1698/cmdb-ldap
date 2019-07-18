@@ -219,6 +219,8 @@ export default {
   'ldap_ldif_menu_paste':'粘贴',
   'ldap_ldif_menu_encode_base64':'转base64码',
   'ldap_ldif_menu_decode_base64':'解base64码',
+  'ldap_ldif_menu_full_screen':'全屏模式',
+  'ldap_ldif_menu_exitfull_screen':'退出全屏模式',
   // System 设置
   'breadcrumb_system_crontablogs':'后台任务日志',
   'breadcrumb_system_crontab':'后台任务',

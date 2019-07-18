@@ -1,7 +1,7 @@
 'use strict'
 import {connect} from 'dva';
 import {PureComponent} from 'react'
-import {Row,Col,Statistic,Card,Icon,Table} from 'antd'
+import {Row,Col,Statistic,Card,Icon,Table,Spin} from 'antd'
 import { formatAliCloundTime } from 'utils'
 
 
@@ -49,33 +49,58 @@ class CMDBBase extends PureComponent {
         runCount:0,
         expireWill:0,
       },
+      rds:{
+        count:0,
+        runCount:0,
+        expireWill:0
+      },
       domains:[]
     }
   }
-  componentWillMount=()=>{
-    const {dispatch}= this.props
-    dispatch({type:'global/loadAllStatus',callback:(cerificate)=>{
-      this.setState({cerificate})
-    }})
-    dispatch({type:'global/getAliyunDomainList',callback:(data)=>{
-      this.setState({domains:data.Data.Domain})
-    }})
-    dispatch({type:'global/getAliyunEcsStatusCount',callback:(data)=>{
-      this.setState({ecs:data})
-    }})
+  handleGetAllStatusReq=(api,callback)=>{
+    let {dispatch} =this.props
+    return new Promise(resolve=>{
+      dispatch({type: api,callback:(data)=>callback(data,resolve)})
+    })
+  }
+  componentWillMount=async ()=>{
+    let reqApi={
+      "global/getAliyunEcsStatusCount":(data,resolve)=>{
+        this.setState({ecs:data})
+        resolve()
+      },
+      "global/loadAllStatus":(cerificate,resolve)=>{
+        this.setState({cerificate})
+        resolve()
+      },
+      "global/getAliyunRdsStatusCount":(data,resolve)=>{
+        this.setState({rds:data})
+        resolve()
+      },
+      "global/getAliyunDomainList":(data,resolve)=>{
+        this.setState({domains:data.Data.Domain})
+        resolve()
+      },
+    }
+    for(let i of Object.keys(reqApi)){
+      await this.handleGetAllStatusReq(i,reqApi[i])
+    }
   }
   render(){
     const {Issued,WillExpired,Payed,Checking}=this.state.cerificate
-    const {ecs}=this.state
+    const {ecs,rds}=this.state
     const {domains}=this.state
     const {loading}=this.props
-    console.log(ecs)
     return <div style={{width:"100%"}}>
       <div style={{ background: '#FFF', padding: '10px',boxShadow: "#dcd8d8 0px 0px 3px" }}>
       <Row gutter={8}>
           <Col span={12}>
-          <Card headStyle={{minHeight:40}} bodyStyle={{padding:"8px 5px"}} style={{boxShadow: "#dcd8d8 0px 0px 3px"}} title="阿里云ECS主机检测">
-          <Col span={8}>
+          <Card headStyle={{minHeight:40}} 
+            bodyStyle={{padding:"8px 5px"}} 
+            // loading={Boolean(loading.effects['global/getAliyunEcsStatusCount'])}
+            style={{boxShadow: "#dcd8d8 0px 0px 3px"}} 
+            title="阿里云ECS主机检测">
+            <Col span={8}>
                 <Card>
                   <Statistic
                     title="ECS主机数"
@@ -110,7 +135,10 @@ class CMDBBase extends PureComponent {
             </Card>
           </Col>
           <Col span={12}>
-          <Card style={{boxShadow: "#dcd8d8 0px 0px 3px"}} headStyle={{minHeight:40}} bodyStyle={{padding:"8px 5px"}}  title="阿里云证书检测">
+          <Card style={{boxShadow: "#dcd8d8 0px 0px 3px"}} 
+              headStyle={{minHeight:40}} 
+              bodyStyle={{padding:"8px 5px"}} 
+              title="阿里云证书检测">
               <Col span={6}>
                 <Card>
                   <Statistic
@@ -158,6 +186,82 @@ class CMDBBase extends PureComponent {
         </Row>
         <Row gutter={8} style={{marginTop:10}}>
           <Col span={12}>
+          <Card headStyle={{minHeight:40}} 
+              bodyStyle={{padding:"8px 5px"}} 
+              style={{boxShadow: "#dcd8d8 0px 0px 3px"}} 
+              title="阿里云RDS检测">
+            <Col span={8}>
+                <Card>
+                  <Statistic
+                    title="RDS主机数"
+                    value={rds.count}
+                    suffix="个"
+                    valueStyle={{ color: '#3f8600' }}
+                    // prefix={<Icon type="arrow-up" />}
+                  />
+                </Card>
+              </Col>
+              <Col span={8}>
+                <Card>
+                  <Statistic
+                    title="运行RDS的主机"
+                    value={rds.runCount}
+                    suffix="个"
+                    valueStyle={{ color: '#03A9F4' }}
+                    // prefix={<Icon type="arrow-up" />}
+                  />
+                </Card>
+              </Col>
+              <Col span={8}>
+                <Card>
+                  <Statistic
+                    title="即将过期的RDS"
+                    value={rds.expireWill}
+                    valueStyle={{ color: 'red' }}
+                    suffix="个"
+                  />
+                </Card>
+              </Col>
+            </Card>
+            <Card headStyle={{minHeight:40}} 
+              bodyStyle={{padding:"8px 5px"}} 
+              style={{boxShadow: "#dcd8d8 0px 0px 3px",marginTop:10}} 
+              title="阿里云OSS检测">
+            <Col span={8}>
+                <Card>
+                  <Statistic
+                    title="RDS主机数"
+                    value={rds.count}
+                    suffix="个"
+                    valueStyle={{ color: '#3f8600' }}
+                    // prefix={<Icon type="arrow-up" />}
+                  />
+                </Card>
+              </Col>
+              <Col span={8}>
+                <Card>
+                  <Statistic
+                    title="运行RDS的主机"
+                    value={rds.runCount}
+                    suffix="个"
+                    valueStyle={{ color: '#03A9F4' }}
+                    // prefix={<Icon type="arrow-up" />}
+                  />
+                </Card>
+              </Col>
+              <Col span={8}>
+                <Card>
+                  <Statistic
+                    title="即将过期的RDS"
+                    value={rds.expireWill}
+                    valueStyle={{ color: 'red' }}
+                    suffix="个"
+                  />
+                </Card>
+              </Col>
+            </Card>
+          </Col>
+          <Col span={12}>
             <Card headStyle={{minHeight:40}} bodyStyle={{padding:"8px 8px"}} style={{boxShadow: "#dcd8d8 0px 0px 3px"}} title="阿里云域名过期检测">
                 <Table columns={columns} 
                   showHeader={false} 
@@ -170,18 +274,6 @@ class CMDBBase extends PureComponent {
                   dataSource={domains}/>
 
               </Card>
-          </Col>
-          <Col span={12}>
-            <Card>
-              <Statistic
-                title="Idle"
-                value={9.3}
-                precision={2}
-                valueStyle={{ color: '#cf1322' }}
-                prefix={<Icon type="arrow-down" />}
-                suffix="%"
-              />
-            </Card>
           </Col>
         </Row>
       </div>

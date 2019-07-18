@@ -466,7 +466,11 @@ class CmdbLDAP(object):
             self.conn.delete_s(dn)
           elif changetype == "moddn":
             modrdn=entry.get('newrdn')[0].decode('utf-8') if entry.get('newrdn') else None
+            if not modrdn:
+              return False, "newrdn字段未知，无法执行脚本。"
             delOldDN=int(entry.get('deleteoldrdn')[0].decode('utf-8')) if entry.get('deleteoldrdn') else 1
+            logger.info(modrdn)
+            logger.info(delOldDN)
             self.conn.modrdn_s(dn,modrdn,delOldDN)
           else:
             return False, "changetype字段类型不匹配。"

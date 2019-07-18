@@ -91,6 +91,7 @@ class CMDBChangePassword extends PureComponent {
       hintObjects:[],
       addPaneIndex: 1,
       theme:initTheme,
+      fullScreen: false,
       rightMenuControl: {
         copy: false,
         cut: false,
@@ -98,7 +99,7 @@ class CMDBChangePassword extends PureComponent {
         encode: false,
         decode: false
       },
-      curCm: null,
+      curCm: new Object(),
       curLinePos:"",
       selectWord:""
     }
@@ -261,6 +262,7 @@ class CMDBChangePassword extends PureComponent {
     }
   }
   handleRightMenu=()=>{
+    let {curCm,fullScreen}=this.state
     return <ContextMenu id="ldap_ldif_control_menu" >
           <MenuItem disabled={!Boolean(this.state.rightMenuControl.copy)} onClick={()=>{
             let {selectWord}=this.state
@@ -271,7 +273,6 @@ class CMDBChangePassword extends PureComponent {
               {formatMessage({id:'ldap_ldif_menu_copy'})}
           </MenuItem>
         < MenuItem disabled={!Boolean(this.state.rightMenuControl.cut)} onClick={()=>{
-          let {curCm}=this.state
         }}>
           <Icon style={{margin:"0 6px 0 -8px"}} type="scissor" /> 
           {formatMessage({id:'ldap_ldif_menu_cut'})}
@@ -290,6 +291,14 @@ class CMDBChangePassword extends PureComponent {
           <Icon style={{margin:"0 6px 0 -8px"}} type="swap-left" /> 
            {formatMessage({id:'ldap_ldif_menu_decode_base64'})}
         </MenuItem>
+        <MenuItem divider />
+        <MenuItem onClick={()=>{
+          // curCm.setOption("fullScreen", !fullScreen);
+          this.setState({fullScreen: !fullScreen})
+        }} >
+          <Icon style={{margin:"0 6px 0 -8px"}} type={fullScreen?"fullscreen-exit":"fullscreen"} /> 
+           {formatMessage({id: fullScreen?'ldap_ldif_menu_exitfull_screen':'ldap_ldif_menu_full_screen'})}
+        </MenuItem>
     </ContextMenu>
   }
   handleSubmitCodeMirror=()=>{
@@ -307,7 +316,7 @@ class CMDBChangePassword extends PureComponent {
     }})
   }
   render(){
-    let {values,panes,activeKey,theme} =this.state
+    let {values,panes,activeKey,theme,fullScreen} =this.state
     let ismac = CodeMirror.keyMap.default == CodeMirror.keyMap.macDefault;
     let options={
       mode: 'ldap',
@@ -323,14 +332,15 @@ class CMDBChangePassword extends PureComponent {
       continueComments: true,
       highlightSelectionMatches: {showToken: /\w/, annotateScrollbar: true},
       lint: true,
+      fullScreen,
       matchBrackets:true,
       gutters:["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
       extraKeys:{
         "F12": (cm)=> {
-          cm.setOption("fullScreen", !cm.getOption("fullScreen"));
+          this.setState({fullScreen: !fullScreen})
         },
         "Esc": (cm)=> {
-          if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
+          if (fullScreen) this.setState({fullScreen: !fullScreen})
         },
         [(ismac ? "Cmd" : "Ctrl") + "-R"]: (cm)=> {
           this.handleSubmitCodeMirror()

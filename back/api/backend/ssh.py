@@ -7,8 +7,9 @@ from common.utils import (
 from io import StringIO
 from paramiko.rsakey import RSAKey
 from paramiko.ecdsakey import ECDSAKey
-# from paramiko.dsskey import DSSKey
-from paramiko.ed25519key import Ed25519Key
+
+from paramiko.dsskey import DSSKey
+# from paramiko.ed25519key import Ed25519Key
 import os
 
 logger=CmdbLDAPLogger().get_logger('django.server')
@@ -20,6 +21,7 @@ class GenerateSSHKey():
         self.keytype=obj.get('keytype') or 'ecdsa'
         self.rsabits=obj.get('rsabits') or 2048
         self.ecdsabits=obj.get('ecdsabits') or 384
+        self.dssbits=obj.get('dssbits') or 2048
 
     def generatekey(self):
         public_key=StringIO()
@@ -31,6 +33,8 @@ class GenerateSSHKey():
                 key=RSAKey.generate(self.rsabits)
             elif self.keytype == 'ecdsa':
                 key=ECDSAKey.generate(bits=self.ecdsabits)
+            elif self.keytype == 'dss':
+                key=DSSKey.generate(bits=self.dssbits)
             else:
                 return None,"sshkey暂时不支持其它类型 %s"%self.keytype
             key.write_private_key(private_key)

@@ -16,74 +16,78 @@ from django.core.serializers import serialize
 from authentication.ldap.ldapsearch import CmdbLDAP
 from crontasks.tasks import send_reset_sshkey_email
 
+from rest_framework.decorators import api_view
+from rest_framework import authentication, permissions
 aliClound=AliClound()
 logger=CmdbLDAPLogger().get_logger('django.server')
 Users=get_user_model()
 
-class generateSSHKeyViewSet(APIView):
-  """
-  允许用户查看或编辑的API路径test。
-  """
+# class generateSSHKeyViewSet(APIView):
+#   """
+#   允许用户查看或编辑的API路径test。
+#   """
   
-  def post(self,request, *args, **kwargs):
-    """
-    生成sshkey
-    """
-    logger.info(request.data)
-    serializer = GenerateSSHKeySerializer(data=request.data)
-    if serializer.is_valid():
-      valideddata=serializer.validated_data
-      generatekey=GenerateSSHKey(valideddata)
-      publickey,errorMsg = generatekey.generatekey()
-      if publickey:
-        if valideddata.get('writetable'):
-          writeUser={"username":valideddata.get("username")}
-          if valideddata.get("email"):
-            writeUser['email']=valideddata.get("email")
-            # 发送邮件提示
-            send_reset_sshkey_email.delay(writeUser)
-          if valideddata.get("userdn"):
-            writeUser['userdn']=valideddata.get("userdn")
-            # 保存到LDAP sshPublickey
-            ldap=CmdbLDAP()
-            ldap.update_sshpublickey({"sshPublicKey":publickey.get('publickey')},writeUser['userdn'])
-            del ldap
-          # 保存到数据库
-          Users.objects.update_or_create(defaults=dict(writeUser,**publickey),username=valideddata.get("username"))
-          
+@api_view(['POST'])
+def generateSSHKeyViewSet(request, *args, **kwargs):
+  """
+  生成sshkey
+  """
+  logger.info(request.data)
+  serializer = GenerateSSHKeySerializer(data=request.data)
+  if serializer.is_valid():
+    valideddata=serializer.validated_data
+    generatekey=GenerateSSHKey(valideddata)
+    publickey,errorMsg = generatekey.generatekey()
+    if publickey:
+      if valideddata.get('writetable'):
+        writeUser={"username":valideddata.get("username")}
+        if valideddata.get("email"):
+          writeUser['email']=valideddata.get("email")
+          # 发送邮件提示
+          send_reset_sshkey_email.delay(writeUser)
+        if valideddata.get("userdn"):
+          writeUser['userdn']=valideddata.get("userdn")
+          # 保存到LDAP sshPublickey
+          ldap=CmdbLDAP()
+          ldap.update_sshpublickey({"sshPublicKey":publickey.get('publickey')},writeUser['userdn'])
+          del ldap
+        # 保存到数据库
+        Users.objects.update_or_create(defaults=dict(writeUser,**publickey),username=valideddata.get("username"))
+        
 
-        returnData = publickey
-        returnStatus = status.HTTP_200_OK
-      else:
-        returnData = {"error": errorMsg}
-        returnStatus = status.HTTP_400_BAD_REQUEST
+      returnData = publickey
+      returnStatus = status.HTTP_200_OK
     else:
-      returnData = serializer.errors
+      returnData = {"error": errorMsg}
       returnStatus = status.HTTP_400_BAD_REQUEST
-      
-    return JsonResponse(returnData, status=returnStatus, safe=False)
+  else:
+    returnData = serializer.errors
+    returnStatus = status.HTTP_400_BAD_REQUEST
+    
+  return JsonResponse(returnData, status=returnStatus, safe=False)
 
-class getCrontabLogsViewSet(APIView):
-  """
-  允许用户查看或编辑的API路径test。
-  """
-  # serializer_class=UserGroupSerializer
+# class getCrontabLogsViewSet(APIView):
+#   """
+#   允许用户查看或编辑的API路径test。
+#   """
+#   # serializer_class=UserGroupSerializer
   
-  def get(self,request, *args, **kwargs):
-    pageSize=request.GET.get('pageSize') or 15
-    page=request.GET.get('page') or 1
-    response = {}
-    results = TaskResult.objects.all().order_by('pk')
-    paginator = Paginator(results, pageSize)
-    response['total'] = paginator.count
-    try:
-        mailTask = paginator.page(page)
-    except PageNotAnInteger:
-        mailTask = paginator.page(1)
-    except EmptyPage:
-        mailTask = paginator.page(paginator.num_pages)
-    response['list'] = CmdbJson().encode(serialize("json", mailTask))
-    return JsonResponse(response, safe=False)
+@api_view(['GET'])
+def getCrontabLogsViewSet(request, *args, **kwargs):
+  pageSize=request.GET.get('pageSize') or 15
+  page=request.GET.get('page') or 1
+  response = {}
+  results = TaskResult.objects.all().order_by('pk')
+  paginator = Paginator(results, pageSize)
+  response['total'] = paginator.count
+  try:
+      mailTask = paginator.page(page)
+  except PageNotAnInteger:
+      mailTask = paginator.page(1)
+  except EmptyPage:
+      mailTask = paginator.page(paginator.num_pages)
+  response['list'] = CmdbJson().encode(serialize("json", mailTask))
+  return JsonResponse(response, safe=False)
 
 class getAliCloundEcsListSet(APIView):
   """
@@ -185,12 +189,23 @@ class getAliCloundTagsListSet(APIView):
 
 class getAliCloundEcsAllStatusSet(APIView):
   """
-  列出阿里云ECS Tags列表
+  列出阿里云ECS 统计列表
   """
   def get(self,request, *args, **kwargs):
     TagsList = aliClound.getAliCloundEcsAllStatus()
     if TagsList:
       return JsonResponse(TagsList, safe=False)
+    else:
+      return JsonResponse({'error':'获取Tags信息出错，请检查！'},status=status.HTTP_400_BAD_REQUEST,safe=False)
+
+class getAliCloundRdsAllStatusSet(APIView):
+  """
+  列出阿里云Rds 统计信息
+  """
+  def get(self,request, *args, **kwargs):
+    RdsCount = aliClound.getAliCloundRdsAllStatus()
+    if RdsCount:
+      return JsonResponse(RdsCount, safe=False)
     else:
       return JsonResponse({'error':'获取Tags信息出错，请检查！'},status=status.HTTP_400_BAD_REQUEST,safe=False)
 

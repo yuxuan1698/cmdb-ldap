@@ -16,14 +16,16 @@ from .views import (
     getAliCloundEcsDomainListSet,
     getAliCloundDashboardStatusSet,
     getAliCloundAcountNameListSet,
+    getAliCloundRdsAllStatusSet,
     generateSSHKeyViewSet
     )
 urlpatterns = [
-    path('system/cronlogs/', getCrontabLogsViewSet.as_view(),name='system-mailresults'),
-    path('system/generate/sshkey/', generateSSHKeyViewSet.as_view(),name='system-mailresults'),
+    path('system/cronlogs/', getCrontabLogsViewSet,name='system-mailresults'),
+    path('system/generate/sshkey/', generateSSHKeyViewSet,name='system-mailresults'),
     path('aliclound/account/namelist/', getAliCloundAcountNameListSet.as_view(),name='aliclound-account-list'),
     path('aliclound/dashborad/status/', getAliCloundDashboardStatusSet.as_view(),name='aliclound-dashboard-status'),
     path('aliclound/domain/list/', getAliCloundEcsDomainListSet.as_view(),name='aliclound-domain-list'),
+    path('aliclound/rds/allstatus/', getAliCloundRdsAllStatusSet.as_view(),name='aliclound-rds-status'),
     path('aliclound/ecs/list/', getAliCloundEcsListSet.as_view(),name='aliclound-ecs-list'),
     path('aliclound/ecs/allstatus/', getAliCloundEcsAllStatusSet.as_view(),name='aliclound-ecs-status'),
     path('aliclound/regions/list/', getAliCloundRegionListSet.as_view(),name='aliclound-regions'),

@@ -353,7 +353,7 @@ class CMDBSystemSetting extends PureComponent {
       {
         title: '监控',
         key: 'qq',
-        width:60,
+        width:50,
         dataIndex: 'qq',
         render: (text) => {
             return <div style={{textAlign:"center"}}>

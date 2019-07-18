@@ -12,7 +12,9 @@ from aliyunsdkcas.request.v20180813.DescribeCertificateListRequest import Descri
 from aliyunsdkcas.request.v20180813.DescribeOrderListRequest import DescribeOrderListRequest
 from aliyunsdkcas.request.v20180813.DescribeLocationListRequest import DescribeLocationListRequest
 from aliyunsdkdomain.request.v20180129.QueryDomainListRequest import QueryDomainListRequest
-
+# rds
+from aliyunsdkrds.request.v20140815.DescribeDBInstancesRequest import DescribeDBInstancesRequest
+# from rest_framework_jwt.authentication import dT
 from datetime import datetime
 from django.core.cache import cache
 from django.conf import settings
@@ -54,6 +56,24 @@ class AliClound():
     def getAliCloundEcsList(self,RegionId='cn-shenzhen',PageSize=15,Page=1,Tags=[]):
         client=AcsClient(self.secreyKey,self.accesssecret,RegionId)
         req=DescribeInstancesRequest()
+        req.set_PageSize(PageSize)
+        req.set_PageNumber(Page)
+        if len(Tags)>0:
+            req.set_Tags(Tags)
+        req.set_accept_format('json')
+        try:
+            data=client.do_action_with_exception(req)
+            if data:
+                return data
+            else:
+                return False
+        except Exception as e:
+            logger.error(e)
+            return False
+
+    def getAliCloundRdsList(self,RegionId='cn-shenzhen',PageSize=15,Page=1,Tags=[]):
+        client=AcsClient(self.secreyKey,self.accesssecret,RegionId)
+        req=DescribeDBInstancesRequest()
         req.set_PageSize(PageSize)
         req.set_PageNumber(Page)
         if len(Tags)>0:
@@ -163,7 +183,7 @@ class AliClound():
 
     def getAliCloundEcsAllStatus(self,RegionIds='cn-shenzhen'):
         """
-        获取标签列表
+        获取ECS统计列表
         """
         ecsData=cache.get('ecsData')
         if not ecsData:
@@ -186,6 +206,31 @@ class AliClound():
                         ecsData['runCount']+=1
                 cache.set('ecsData',ecsData)
         return ecsData
+
+    def getAliCloundRdsAllStatus(self,RegionIds='cn-shenzhen'):
+        """
+        获取ECS统计列表
+        """
+        rdsData=cache.get('rdsData')
+        if not rdsData:
+            rdsData={"count": 0,
+                    "runCount":0,
+                    "expireWill":0}
+            for user in settings.ALI_CLOUND_API_ACCOUNT:
+                rdsList = self.setAccount(user).getAliCloundRdsList(PageSize=100)
+                data=CmdbJson().decode(rdsList)
+                rdsData['count']+=data.get('PageRecordCount')
+                rdsinstance=data.get('Items').get('DBInstance')
+                for a in rdsinstance:
+                    expiredtime=a.get('ExpireTime')
+                    invalidtime = datetime.strptime(expiredtime, '%Y-%m-%dT%H:%M:%SZ')
+                    diff_day = invalidtime - datetime.now()
+                    if diff_day.days<=30:
+                        rdsData['expireWill']+=1
+                    if a.get('DBInstanceStatus')=='Running':
+                        rdsData['runCount']+=1
+                cache.set('rdsData',rdsData)
+        return rdsData
 
     def getAliCloundDomainList(self):
         """
