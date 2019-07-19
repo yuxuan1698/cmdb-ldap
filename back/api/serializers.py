@@ -1,5 +1,6 @@
 from django.contrib.auth.models import Group
 from rest_framework import serializers
+from django.conf import settings
 from rest_framework.serializers import (
     CharField, BooleanField, IntegerField, ChoiceField, 
     EmailField, Serializer
@@ -81,3 +82,24 @@ class GenerateSSHKeySerializer(Serializer):
             if not re.match(r"^[^,]+(,.+)+,dc=.+$", data.get('userdn')):
                 raise ValidationError("userdn字段格式不正确!例:cn=xxxx,dc=xxxxxxx,dc=xxx")
         return data
+
+class GetCerificateListSerializer(Serializer):
+  """
+  效验重置用户密码字段
+  """
+  page = IntegerField(required=False)
+  pageSize = IntegerField(required=False)
+  region = CharField(required=False)
+  status = ChoiceField(
+    required=False,
+    choices=(
+      ("ALL","ALL"),
+      ("ISSUED","ISSUED"),
+      ("WILL_EXPIRED","WILL_EXPIRED"),
+      ("EXPIRED","EXPIRED"),
+      ("REVOKED","REVOKED"),
+    )
+  )
+  currAccount = ChoiceField(required=False,
+    choices=tuple((k,k) for k,v in settings.ALI_CLOUND_API_ACCOUNT.items())
+  )

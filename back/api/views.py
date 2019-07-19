@@ -8,7 +8,11 @@ from common.utils import CmdbLDAPLogger,CmdbJson
 from django.core.cache import cache
 from api.backend.aliyun import AliClound
 from api.backend.ssh import GenerateSSHKey
-from .serializers import CerificateInvalidSerializer,GenerateSSHKeySerializer
+from .serializers import (
+  CerificateInvalidSerializer,
+  GenerateSSHKeySerializer,
+  GetCerificateListSerializer
+)
 from common.utils import check_cerificate_invalidtime
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -148,17 +152,22 @@ class getAliCloundCerificateListSet(APIView):
   列出阿里云证书列表
   """
   def get(self,request, *args, **kwargs):
-    certicateStatus = request.GET.get('status') or ''
-    PageSize=request.GET.get('pageSize') or 15
-    Page=request.GET.get('page') or 1
-    currAccount=request.GET.get('currAccount') or 'wbd'
-
-    CertificateList = aliClound.setAccount(currAccount).getAliCloundCertificateList(certicateStatus,PageSize,Page)
-    if CertificateList:
-      data=CmdbJson().decode(CertificateList)
-      return JsonResponse(data, safe=False)
-    else:
-      return JsonResponse({'error':'获取Rigion信息出错，请检查！'},status=status.HTTP_400_BAD_REQUEST,safe=False)
+    serializer=GetCerificateListSerializer(data=request.GET)
+    if serializer.is_valid():
+      certicateStatus = request.GET.get('status') or ''
+      PageSize=request.GET.get('pageSize') or 15
+      Page=request.GET.get('page') or 1
+      currAccount=request.GET.get('currAccount') or 'wbd'
+      CertificateList = aliClound.setAccount(currAccount).getAliCloundCertificateList(certicateStatus,PageSize,Page)
+      if CertificateList:
+        data=CmdbJson().decode(CertificateList)
+        return JsonResponse(data, safe=False)
+      else:
+        return JsonResponse({'error':'获取Rigion信息出错，请检查！'},status=status.HTTP_400_BAD_REQUEST,safe=False)
+    else: 
+      logger.error(serializer.errors)
+      return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST, safe=False)
+   
 
 class getAliCloundCerificateLocationsSet(APIView):
   """
