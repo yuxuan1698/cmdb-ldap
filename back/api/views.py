@@ -270,7 +270,7 @@ class getAliCloundAcountNameListSet(APIView):
   列出面板数据
   """
   def get(self,request, *args, **kwargs):
-    aliaccount=[{'key':s,'name':v.get('Name')} for s,v in settings.ALI_CLOUND_API_ACCOUNT.items()]
+    aliaccount=[{'key':s,'name':v.get('name')} for s,v in settings.ALI_CLOUND_API_ACCOUNT.items()]
     aliaccount.reverse()
     if aliaccount:
       return JsonResponse(aliaccount, safe=False)

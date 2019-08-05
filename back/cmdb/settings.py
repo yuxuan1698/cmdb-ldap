@@ -11,12 +11,13 @@ https                                     : //docs.djangoproject.com/en/2.1/ref/
 """
 
 import os
+import yaml
 import ldap,datetime
 from django_auth_ldap.config import LDAPSearch,GroupOfUniqueNamesType
 # import logging
-
 BASE_DIR                                  = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
+cfile									  = open(os.path.join(BASE_DIR,'config.yaml'))
+CONFIG_FILE								  = yaml.load(cfile,Loader=yaml.FullLoader)
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 
 
@@ -27,11 +28,11 @@ BASE_DIR                                  = os.path.dirname(os.path.dirname(os.p
 SECRET_KEY                                = 'u_rom*ua&x304mcqwqgv-x5i@*fwnj&ip)algmf$_ozf23)te#'
 
 # SECURITY WARNING                        : don't run with debug turned on in production!
-DEBUG                                     = True
+DEBUG                                     = CONFIG_FILE.get('cmdb').get('debug') or True
 
 ALLOWED_HOSTS                             = ['127.0.0.1','192.168.1.252']
 
-CMDB_BASE_URL                             = "http://127.0.0.1:8081"
+CMDB_BASE_URL                             = CONFIG_FILE.get('cmdb').get('base_url') or "http://127.0.0.1:8081"
 # Application definition
 
 INSTALLED_APPS                            = [
@@ -95,10 +96,10 @@ DATABASES                                 = {
 }
 # CELERY 设置段
 CELERY_BROKER_URL                         = 'redis://:%(password)s@%(host)s:%(port)s/%(db)s' % {
-	'password'                               : 'jbg@123',
-	'host'                                   : '192.168.1.250',
-	'port'                                   : 6379,
-	'db'                                     : 8,
+	'password'                               : CONFIG_FILE.get('redis').get('password') or '',
+	'host'                                   : CONFIG_FILE.get('redis').get('host') or '127.0.0.1',
+	'port'                                   : CONFIG_FILE.get('redis').get('port') or 6379,
+	'db'                                     : CONFIG_FILE.get('redis').get('db') or 8
 }
 CELERY_RESULT_BACKEND                     = 'django_celery_results.backends.database:DatabaseBackend' #ji结果存储，我配置的是存储到数据库
 CELERY_CACHE_BACKEND                      = CELERY_RESULT_BACKEND
@@ -187,13 +188,13 @@ JWT_AUTH                                  = {
 # 
 EMAIL_BACKEND                             = 'django.core.mail.backends.smtp.EmailBackend'
   
-EMAIL_USE_TLS                             = False
+EMAIL_USE_TLS                             = CONFIG_FILE.get('email').get('tls') or False
 # EMAIL_USE_SSL                           = True
-EMAIL_HOST                                = '172.18.207.238'
-EMAIL_PORT                                = 465
-EMAIL_HOST_USER                           = 'dev@iwubida.com'
-EMAIL_HOST_PASSWORD                       = 'Wubida@123'
-DEFAULT_FROM_EMAIL                        = 'dev@iwubida.com'
+EMAIL_HOST                                = CONFIG_FILE.get('email').get('host') or '127.0.0.1'
+EMAIL_PORT                                = CONFIG_FILE.get('email').get('port') or 465
+EMAIL_HOST_USER                           = CONFIG_FILE.get('email').get('username') or 'xxx@xxx.com'
+EMAIL_HOST_PASSWORD                       = CONFIG_FILE.get('email').get('password') or 'xxxxxxx'
+DEFAULT_FROM_EMAIL                        = CONFIG_FILE.get('email').get('username') or 'xxx@xxx.com'
 
 CACHES                                    = {
 	'default'                                : {
@@ -211,21 +212,21 @@ CACHES                                    = {
 AUTHENTICATION_BACKENDS                   = ['authentication.backends.ExtraModelBackend']  
 
 # Auth LDAP settings
-AUTH_LDAP                                 = True
-AUTH_LDAP_SERVER_URI                      = 'ldap://172.18.207.237:389'
-AUTH_LDAP_BIND_DN                         = 'cn=admin,ou=SystemUser,dc=iwubida,dc=com'
-AUTH_LDAP_BASE_DN                         = 'dc=iwubida,dc=com'
-AUTH_LDAP_BIND_PASSWORD                   = 'Wubida@123'
-AUTH_LDAP_SEARCH_OU                       = 'ou=Users,dc=iwubida,dc=com'
-AUTH_LDAP_SEARCH_FILTER                   = '(&(uid=%(user)s))'
-AUTH_LDAP_START_TLS                       = False
-AUTH_LDAP_USER_ATTR_MAP                   = {"username": "cn", "name": "sn", "email": "mail","nickname":"sn","mobile":"mobile"}
+AUTH_LDAP                                 = CONFIG_FILE.get('ldap').get('enable') or False
+AUTH_LDAP_SERVER_URI                      = "{}:{}".format(CONFIG_FILE.get('ldap').get('host') or 'ldap://127.0.0.1',CONFIG_FILE.get('ldap').get('port') or 389)
+AUTH_LDAP_BIND_DN                         = CONFIG_FILE.get('ldap').get('binddn') or ''
+AUTH_LDAP_BASE_DN                         = CONFIG_FILE.get('ldap').get('basedn') or 'dc=xxxx,dc=com'
+AUTH_LDAP_BIND_PASSWORD                   = CONFIG_FILE.get('ldap').get('bindpassword') or '123456'
+AUTH_LDAP_SEARCH_OU                       = CONFIG_FILE.get('ldap').get('usersdn') or 'ou=Users,dc=xxxxx,dc=com'
+AUTH_LDAP_SEARCH_FILTER                   = CONFIG_FILE.get('ldap').get('userfilter') or '(&(uid=%(user)s))'
+AUTH_LDAP_START_TLS                       = CONFIG_FILE.get('ldap').get('tls') or False
+AUTH_LDAP_USER_ATTR_MAP                   = CONFIG_FILE.get('ldap').get('userattrmap') or {"username": "cn", "name": "sn", "email": "mail","nickname":"sn","mobile":"mobile"}
 
-AUTH_LDAP_MIRROR_GROUPS                   = True
+AUTH_LDAP_MIRROR_GROUPS                   = CONFIG_FILE.get('ldap').get('mirror_groups') or True
 AUTH_LDAP_FIND_GROUP_PERMS                = True
 AUTH_LDAP_GROUP_TYPE                      = GroupOfUniqueNamesType(name_attr="cn")
-AUTH_LDAP_GROUP_SEARCH_OU                 = "ou=Groups,dc=iwubida,dc=com"
-AUTH_LDAP_CMDB_GROUP_OU                   = "ou=Cmdb,ou=Groups,dc=iwubida,dc=com"
+AUTH_LDAP_GROUP_SEARCH_OU                 = CONFIG_FILE.get('ldap').get('groupsdn') or "ou=Groups,dc=iwubida,dc=com"
+AUTH_LDAP_CMDB_GROUP_OU                   = CONFIG_FILE.get('ldap').get('cmdbpermissdn') or  "ou=Cmdb,ou=Groups,dc=iwubida,dc=com"
 AUTH_LDAP_GROUP_SEARCH                    = LDAPSearch(AUTH_LDAP_CMDB_GROUP_OU,ldap.SCOPE_SUBTREE, "(objectClass=*)" )  
 AUTH_LDAP_USER_FLAGS_BY_GROUP             = {'is_superuser': "cn=admin,%s" % AUTH_LDAP_CMDB_GROUP_OU }
 # AUTH_LDAP_GROUP_SEARCH_FILTER           = ""
@@ -255,20 +256,21 @@ AUTH_USER_MODEL                           = "authentication.Users"
 # AUTH_GROUP_MODEL                        = "authentication.UserGroups"
 
 # Ali Cloud Config配置
-ALI_CLOUND_API_ACCOUNT                    = {
-	# 物必达帐号
-	'wbd'                                    : {
-		'ACCESSKEY'                             : 'LTAIUWuSChF0IY7L',
-		'ACCESSSECRET'                          : '9e1QiG9cRDTIGJnUcOQMK27C1ohu8v',
-		'Name'                                  : "物必达(iwubida)"
-	},
-	# 94赖账号
-	'lazy'                                   : {
-		'ACCESSKEY'                             : 'LTAIBsNvE3dgppCx',
-		'ACCESSSECRET'                          : 'IBeSKdl1DdxbcqjoahXL1zB8m1196n',
-		'Name'                                  : "就是赖(94lazy)"
-	}
-}
+ALI_CLOUND_API_ACCOUNT                    = CONFIG_FILE.get('aliyun') or {}
+# {
+# 	# 物必达帐号
+# 	'wbd'                                    : {
+# 		'ACCESSKEY'                             : 'LTAIUWuSChF0IY7L',
+# 		'ACCESSSECRET'                          : '9e1QiG9cRDTIGJnUcOQMK27C1ohu8v',
+# 		'Name'                                  : "物必达(iwubida)"
+# 	},
+# 	# 94赖账号
+# 	'lazy'                                   : {
+# 		'ACCESSKEY'                             : 'LTAIBsNvE3dgppCx',
+# 		'ACCESSSECRET'                          : 'IBeSKdl1DdxbcqjoahXL1zB8m1196n',
+# 		'Name'                                  : "就是赖(94lazy)"
+# 	}
+# }
 
 # 日志部分
 # Django的日志配置项

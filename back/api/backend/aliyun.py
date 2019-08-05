@@ -23,18 +23,18 @@ from common.utils import (
     CmdbJson
     )
 logger=CmdbLDAPLogger().get_logger('django.server')
-
+ 
 class AliClound():
     Account='wbd'
     def __init__(self):
-        self.secreyKey=settings.ALI_CLOUND_API_ACCOUNT.get('wbd').get('ACCESSKEY') or ''
-        self.accesssecret=settings.ALI_CLOUND_API_ACCOUNT.get('wbd').get('ACCESSSECRET') or ''
+        self.secreyKey=settings.ALI_CLOUND_API_ACCOUNT.get('wbd').get('accesskey') or ''
+        self.accesssecret=settings.ALI_CLOUND_API_ACCOUNT.get('wbd').get('accesssecret') or ''
 
     # @classmethod
     def setAccount(self,Account='wbd'):
         if Account in settings.ALI_CLOUND_API_ACCOUNT:
-            self.secreyKey=settings.ALI_CLOUND_API_ACCOUNT.get(Account).get('ACCESSKEY') 
-            self.accesssecret=settings.ALI_CLOUND_API_ACCOUNT.get(Account).get('ACCESSSECRET') 
+            self.secreyKey=settings.ALI_CLOUND_API_ACCOUNT.get(Account).get('accesskey') 
+            self.accesssecret=settings.ALI_CLOUND_API_ACCOUNT.get(Account).get('accesssecret') 
         return self
            
 
@@ -110,7 +110,7 @@ class AliClound():
     def getAliCloundCertificateStatusCount(self):
         alldata={}
         for k,v in settings.ALI_CLOUND_API_ACCOUNT.items():
-            client=AcsClient(v.get('ACCESSKEY'),v.get('ACCESSSECRET'))
+            client=AcsClient(v.get('accesskey'),v.get('accesssecret'))
             req = DescribeCertificateStatusCountRequest()
             req.set_accept_format('json')
             try:
@@ -238,7 +238,7 @@ class AliClound():
         """
         alldata={}
         for k,v in settings.ALI_CLOUND_API_ACCOUNT.items():
-            client=AcsClient(v.get('ACCESSKEY'),v.get('ACCESSSECRET'))
+            client=AcsClient(v.get('accesskey'),v.get('accesssecret'))
             req = QueryDomainListRequest()
             req.set_PageNum(1)
             req.set_PageSize(100)

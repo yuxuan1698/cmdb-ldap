@@ -1,4 +1,5 @@
 # from django.contrib.auth.models import Group
+import ldap
 from django.http import JsonResponse
 from authentication.serializers import (
   LdapUserSerializer, 
@@ -257,11 +258,17 @@ class getLDAPOUListViewSet(APIView):
   获取 Base OU信息
   """
   def get(self,request,*args,**kwargs):
-    if kwargs:
-      queryOU=kwargs.get('baseou')
+    logger.info(kwargs)
+    if "baseou" in kwargs and kwargs.get('baseou')!="":
+      queryOU={
+        "queryOU": kwargs.get('baseou')
+        }
     else:
-      queryOU=settings.AUTH_LDAP_BASE_DN
-    ous,errorMsg=CmdbLDAP().get_base_ou(queryOU)
+      queryOU={
+      "queryOU": settings.AUTH_LDAP_BASE_DN,
+      "ldapType": ldap.SCOPE_BASE
+      }
+    ous,errorMsg=CmdbLDAP().get_base_ou(**queryOU)
     if errorMsg:
       logger.error(errorMsg)
     if len(ous)>0:
