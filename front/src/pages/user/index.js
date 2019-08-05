@@ -14,7 +14,7 @@ import {UserEditButton,UserBatchButton} from './components/UserEditButton'
 import {ResetButtonGroup} from './components/ResetButtonGroup'
 import {formatTimeAndZone} from 'utils'
 import {formatMessage} from 'umi/locale';
-
+import useralias from 'svgicon/useralias.svg'
 const {
   Content
 } = Layout;
@@ -151,17 +151,17 @@ class CMDBUserList extends PureComponent {
         i.departmentNumber.indexOf(this.state.searchFilterVal)>-1 )
     })
     const columns = [{
-      title: formatMessage({id:'userlist_table_account'}),
+      title:  ()=><span><Icon type="user" style={{marginRight:2,color:"#188fff"}} />{formatMessage({id:'userlist_table_account'})}</span>,
       dataIndex: 'uid',
       key: 'uid',
       sorter: (a,b)=> a['uid'] < b['uid']?-1:(a['uid'] > b['uid']?1:0),
     }, {
-      title: formatMessage({id:'userlist_table_username'}),
+      title: ()=><span><Icon type="user" style={{marginRight:2,color:"#188fff"}} />{formatMessage({id:'userlist_table_username'})}</span>,
       dataIndex: 'sn',
       key: 'sn',
       sorter: (a,b)=> a['sn'] < b['sn']?-1:(a['sn'] > b['sn']?1:0),
     }, {
-      title: formatMessage({id:'userlist_table_cn'}),
+      title: ()=><span><Icon component={useralias} style={{marginRight:2,color:"#188fff"}} />{formatMessage({id:'userlist_table_cn'})}</span>,
       dataIndex: 'cn',
       key: 'cn',
       sorter: (a,b)=> a['cn'] < b['cn']?-1:(a['cn'] > b['cn']?1:0),
@@ -215,10 +215,10 @@ class CMDBUserList extends PureComponent {
           dispatch={dispatch} />
       }
     },{
-      title: formatMessage({id:'userlist_table_status'}),
+      title: ()=><span><Icon type="clock-circle" style={{marginRight:2,color:"#188fff"}}/>{formatMessage({id:'userlist_table_status'})}</span>,
       dataIndex: 'pwdAccountLockedTime',
       key: 'pwdAccountLockedTime',
-      width: 50,
+      width: 65,
       align:"center",
       render:(text)=>{
           return <Tooltip placement = "top"
