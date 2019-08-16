@@ -12,12 +12,12 @@ import yaml
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, BASE_DIR)
-config_file=os.path.join(BASE_DIR,'config.yaml')
+config_file = os.path.join(BASE_DIR, 'config.yaml')
 if not os.path.exists(config_file):
     print('ERROR: not found config file config.yaml.')
     sys.exit(1)
-cfile=open(config_file,encoding='utf-8')
-loaded_config=yaml.load(cfile,Loader=yaml.FullLoader)
+cfile = open(config_file, encoding='utf-8')
+loaded_config = yaml.load(cfile, Loader=yaml.FullLoader)
 
 cfile.close()
 # print(loaded_config.get('cmdb').get('daemon'))
@@ -27,11 +27,11 @@ CMDB_LOG_DIR = os.path.join(BASE_DIR, 'logs')
 RUN_TMP_DIR = os.path.join(BASE_DIR, 'run')
 HTTP_HOST = loaded_config.get('cmdb').get('host') or '127.0.0.1'
 HTTP_PORT = loaded_config.get('cmdb').get('port') or 8000
-DEBUG =  False
+DEBUG = False
 LOG_LEVEL = 'DEBUG'
 
 START_TIMEOUT = 40
-WORKERS = 4
+WORKERS = 2
 DAEMON = loaded_config.get('cmdb').get('daemon') or False
 
 
@@ -43,12 +43,14 @@ if not os.path.exists(CMDB_LOG_DIR):
 if not os.path.exists(RUN_TMP_DIR):
     os.mkdir(RUN_TMP_DIR)
 
+
 def check_database_connection():
     try:
         os.chdir(CMDB_APPS_DIR)
         for i in range(30):
             print("Check database connection ...")
-            code = subprocess.call("python3 manage.py showmigrations authentication", shell=True)
+            code = subprocess.call(
+                "python3 manage.py showmigrations authentication", shell=True)
             if code == 0:
                 print("Database connect success")
                 return
@@ -66,6 +68,7 @@ def make_migrations():
     os.chdir(CMDB_APPS_DIR)
     print("Migrate model change to database ...")
     subprocess.call('python3 manage.py migrate', shell=True)
+
 
 def prepare():
     check_database_connection()
@@ -125,7 +128,7 @@ def parse_service(s):
 
 
 def start_gunicorn():
-    print("\n- Start Gunicorn WSGI CMDB HTTP Server {}:{}".format(HTTP_HOST,HTTP_PORT))
+    print("\n- Start Gunicorn WSGI CMDB HTTP Server {}:{}".format(HTTP_HOST, HTTP_PORT))
     service = 'gunicorn'
     bind = '{}:{}'.format(HTTP_HOST, HTTP_PORT)
     log_format = '%(h)s %(t)s "%(r)s" %(s)s %(b)s '
@@ -136,7 +139,7 @@ def start_gunicorn():
         '-b', bind,
         #'-k', 'eventlet',
         '-k', 'gthread',
-        '--threads', '10',
+        '--threads', '2',
         '-w', str(WORKERS),
         '--max-requests', '4096',
         '--access-logfile', log_file,
@@ -154,8 +157,10 @@ def start_gunicorn():
         ])
     if DEBUG:
         cmd.append('--reload')
-    p = subprocess.Popen(cmd, stdout=sys.stdout, stderr=sys.stderr, cwd=CMDB_APPS_DIR)
+    p = subprocess.Popen(cmd, stdout=sys.stdout,
+                         stderr=sys.stderr, cwd=CMDB_APPS_DIR)
     return p
+
 
 def start_celery():
     print("\n- Start Celery as Distributed Task Queue")
@@ -171,27 +176,30 @@ def start_celery():
 
     cmd = [
         'celery', 'worker',
-        '-A',  'crontasks',
+        '-A', 'crontasks',
         '-l', 'debug',
         '--pidfile', pid_file,
         '--logfile', log_file,
-        '--autoscale', '20,4',
+        '--autoscale', '2,1',
         '--beat'
     ]
     if DAEMON:
         cmd.extend([
             '--detach',
         ])
-    p = subprocess.Popen(cmd, stdout=sys.stdout, stderr=sys.stderr, cwd=CMDB_APPS_DIR)
+    p = subprocess.Popen(cmd, stdout=sys.stdout,
+                         stderr=sys.stderr, cwd=CMDB_APPS_DIR)
     return p
+
+
 def start_service(s):
     # print(time.ctime())
     # print('cmdb version {}, more see https://cmdb.iwubida.com'.format(
     #     __version__))
 
     services_handler = {
-         "gunicorn": start_gunicorn,
-         "celery": start_celery
+        "gunicorn": start_gunicorn,
+        "celery": start_celery
     }
 
     services_set = parse_service(s)
@@ -277,7 +285,7 @@ if __name__ == '__main__':
     )
     parser.add_argument(
         'action', type=str,
-        choices=("start", "stop", "restart", "status","init"),
+        choices=("start", "stop", "restart", "status", "init"),
         help="Action to run"
     )
     parser.add_argument(
