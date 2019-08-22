@@ -265,6 +265,18 @@ class getAliCloundDashboardStatusSet(APIView):
     else:
       return JsonResponse({'error':'获取Dashboard信息出错，请检查！'},status=status.HTTP_400_BAD_REQUEST,safe=False)
 
+class getAliCloundAccountBablanceSet(APIView):
+  """
+  列出面板数据
+  """
+  def get(self,request, *args, **kwargs):
+    AccountBalance = aliClound.getAliCloundAccountBalanceAll()
+    if AccountBalance:
+      # data=CmdbJson().decode(AccountBalance)
+      return JsonResponse(AccountBalance, safe=False)
+    else:
+      return JsonResponse({'error':'获取帐户余额信息出错，请检查！'},status=status.HTTP_400_BAD_REQUEST,safe=False)
+
 class getAliCloundAcountNameListSet(APIView):
   """
   列出面板数据
@@ -276,3 +288,4 @@ class getAliCloundAcountNameListSet(APIView):
       return JsonResponse(aliaccount, safe=False)
     else:
       return JsonResponse({'error':'获取多个阿里云帐号列表信息出错，请检查！'},status=status.HTTP_400_BAD_REQUEST,safe=False)
+

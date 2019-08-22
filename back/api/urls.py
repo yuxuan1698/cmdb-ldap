@@ -17,6 +17,7 @@ from .views import (
     getAliCloundDashboardStatusSet,
     getAliCloundAcountNameListSet,
     getAliCloundRdsAllStatusSet,
+    getAliCloundAccountBablanceSet,
     generateSSHKeyViewSet
     )
 urlpatterns = [
@@ -34,4 +35,5 @@ urlpatterns = [
     path('aliclound/cerificate/locations/',getAliCloundCerificateLocationsSet.as_view(), name='aliclound-cerificate-list'),
     path('aliclound/cerificate/count/', getAliCloundCerificateCountSet.as_view(),name='aliclound-cerificate-count'),
     path('aliclound/cerificate/invalid/', getCheckCerificateInvalidViewSet.as_view(),name='aliclound-cerificate-invalid'),
+    path('aliclound/account/bablance/', getAliCloundAccountBablanceSet.as_view(),name='aliclound-account-bablance'),
 ]

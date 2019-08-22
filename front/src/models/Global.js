@@ -2,6 +2,7 @@ import { getLDAPObjectClassList,
   GetAliCloundCerificateCountApi,
   GetAliCloundDomainListApi,
   GetAliCloundRdsStatusCountApi,
+  GetAliCloundAccountBablanceApi,
   GetAliCloundEcsStatusCountApi } from '../services/api';
 import { Modal } from 'antd';
 export default {
@@ -51,6 +52,12 @@ export default {
       },
       *getAliyunRdsStatusCount({ callback }, { call }) {
         const data = yield call(GetAliCloundRdsStatusCountApi)
+        if (data) {
+          callback(data)
+        }
+      },
+      *getAliyunAccountBablance({ callback }, { call }) {
+        const data = yield call(GetAliCloundAccountBablanceApi)
         if (data) {
           callback(data)
         }

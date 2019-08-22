@@ -14,6 +14,9 @@ from aliyunsdkcas.request.v20180813.DescribeLocationListRequest import DescribeL
 from aliyunsdkdomain.request.v20180129.QueryDomainListRequest import QueryDomainListRequest
 # rds
 from aliyunsdkrds.request.v20140815.DescribeDBInstancesRequest import DescribeDBInstancesRequest
+# account pices
+from aliyunsdkbssopenapi.request.v20171214.QueryAccountBalanceRequest import QueryAccountBalanceRequest
+
 # from rest_framework_jwt.authentication import dT
 from datetime import datetime
 from django.core.cache import cache
@@ -254,4 +257,24 @@ class AliClound():
             except Exception as e:
                 logger.error(e)
                 return False
+        return alldata
+
+    def getAliCloundAccountBalanceAll(self):
+        """
+        获取域名列表
+        """
+        alldata={}
+        for k,v in settings.ALI_CLOUND_API_ACCOUNT.items():
+            client=AcsClient(v.get('accesskey'),v.get('accesssecret'))
+            req = QueryAccountBalanceRequest()
+            req.set_accept_format('json')
+            try:
+                data=CmdbJson().decode(client.do_action_with_exception(req))
+                if 'Data' in data:
+                    alldata[v.get('name')]=data.get('Data')
+            except Exception as e:
+                logger.error(e)
+                return False
+        if len(alldata)==0:
+            return False
         return alldata

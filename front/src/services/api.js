@@ -226,3 +226,11 @@ export function GetSSHKeyPrivateAndPublicKeyApi(data) {
         data
     })
 }
+// 获取阿里去帐户余额
+export function GetAliCloundAccountBablanceApi(data) {
+    return request({
+        method: "get",
+        url: "/v1/aliclound/account/bablance/",
+        data
+    })
+}

@@ -30,6 +30,7 @@ const columns = [{
   }
 }]
 @connect(({ loading }) => ({ loading }))
+
 class CMDBBase extends PureComponent {
   constructor(props){
     super(props)
@@ -54,7 +55,8 @@ class CMDBBase extends PureComponent {
         runCount:0,
         expireWill:0
       },
-      domains:[]
+      domains:[],
+      accountbablance:{}
     }
   }
   handleGetAllStatusReq=(api,callback)=>{
@@ -81,6 +83,10 @@ class CMDBBase extends PureComponent {
         this.setState({domains:data.Data.Domain})
         resolve()
       },
+      "global/getAliyunAccountBablance":(data,resolve)=>{
+        this.setState({accountbablance:data})
+        resolve()
+      },
     }
     for(let i of Object.keys(reqApi)){
       await this.handleGetAllStatusReq(i,reqApi[i])
@@ -89,49 +95,40 @@ class CMDBBase extends PureComponent {
   render(){
     const {Issued,WillExpired,Payed,Checking}=this.state.cerificate
     const {ecs,rds}=this.state
-    const {domains}=this.state
+    const {domains,accountbablance}=this.state
     const {loading}=this.props
     return <div style={{width:"100%"}}>
       <div style={{ background: '#FFF', padding: '10px',boxShadow: "#dcd8d8 0px 0px 3px" }}>
       <Row gutter={8}>
           <Col span={12}>
           <Card headStyle={{minHeight:40}} 
-            bodyStyle={{padding:"8px 5px"}} 
-            // loading={Boolean(loading.effects['global/getAliyunEcsStatusCount'])}
-            style={{boxShadow: "#dcd8d8 0px 0px 3px"}} 
-            title="阿里云ECS主机检测">
-            <Col span={8}>
-                <Card>
-                  <Statistic
-                    title="ECS主机数"
-                    value={ecs.count}
-                    suffix="个"
-                    valueStyle={{ color: '#3f8600' }}
-                    // prefix={<Icon type="arrow-up" />}
-                  />
-                </Card>
-              </Col>
+              bodyStyle={{padding:"8px 5px"}} 
+              style={{boxShadow: "#dcd8d8 0px 0px 3px"}} 
+              title="阿里云帐户余额">
+              {Object.keys(accountbablance).map(i=>{
+                  return <Col span={8}>
+                  <Card>
+                    <Statistic
+                      title={i}
+                      value={accountbablance[i].AvailableAmount}
+                      suffix={"("+accountbablance[i].Currency+")"}
+                      valueStyle={{ color: '#ea1711' }}
+                      // prefix={<Icon type="arrow-up" />}
+                    />
+                  </Card>
+                </Col>
+              })}
               <Col span={8}>
-                <Card>
-                  <Statistic
-                    title="运行ECS的主机"
-                    value={ecs.runCount}
-                    suffix="个"
-                    valueStyle={{ color: '#03A9F4' }}
-                    // prefix={<Icon type="arrow-up" />}
-                  />
-                </Card>
-              </Col>
-              <Col span={8}>
-                <Card>
-                  <Statistic
-                    title="即将过期的ECS主机"
-                    value={ecs.expireWill}
-                    valueStyle={{ color: 'red' }}
-                    suffix="个"
-                  />
-                </Card>
-              </Col>
+                  <Card>
+                    <Statistic
+                      title="---"
+                      value="---"
+                      suffix=""
+                      valueStyle={{ color: '#ea1711' }}
+                      prefix={<Icon type="arrow-down" />}
+                    />
+                  </Card>
+                </Col>
             </Card>
           </Col>
           <Col span={12}>
@@ -187,14 +184,15 @@ class CMDBBase extends PureComponent {
         <Row gutter={8} style={{marginTop:10}}>
           <Col span={12}>
           <Card headStyle={{minHeight:40}} 
-              bodyStyle={{padding:"8px 5px"}} 
-              style={{boxShadow: "#dcd8d8 0px 0px 3px"}} 
-              title="阿里云RDS检测">
+            bodyStyle={{padding:"8px 5px"}} 
+            // loading={Boolean(loading.effects['global/getAliyunEcsStatusCount'])}
+            style={{boxShadow: "#dcd8d8 0px 0px 3px"}} 
+            title="阿里云ECS主机检测">
             <Col span={8}>
                 <Card>
                   <Statistic
-                    title="RDS主机数"
-                    value={rds.count}
+                    title="ECS主机数"
+                    value={ecs.count}
                     suffix="个"
                     valueStyle={{ color: '#3f8600' }}
                     // prefix={<Icon type="arrow-up" />}
@@ -204,8 +202,8 @@ class CMDBBase extends PureComponent {
               <Col span={8}>
                 <Card>
                   <Statistic
-                    title="运行RDS的主机"
-                    value={rds.runCount}
+                    title="运行ECS的主机"
+                    value={ecs.runCount}
                     suffix="个"
                     valueStyle={{ color: '#03A9F4' }}
                     // prefix={<Icon type="arrow-up" />}
@@ -215,18 +213,18 @@ class CMDBBase extends PureComponent {
               <Col span={8}>
                 <Card>
                   <Statistic
-                    title="即将过期的RDS"
-                    value={rds.expireWill}
+                    title="即将过期的ECS主机"
+                    value={ecs.expireWill}
                     valueStyle={{ color: 'red' }}
                     suffix="个"
                   />
                 </Card>
               </Col>
             </Card>
-            <Card headStyle={{minHeight:40}} 
+          <Card headStyle={{minHeight:40}} 
               bodyStyle={{padding:"8px 5px"}} 
               style={{boxShadow: "#dcd8d8 0px 0px 3px",marginTop:10}} 
-              title="阿里云OSS检测">
+              title="阿里云RDS检测">
             <Col span={8}>
                 <Card>
                   <Statistic
