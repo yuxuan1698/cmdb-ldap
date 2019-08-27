@@ -67,6 +67,10 @@ class CMDBBase extends PureComponent {
   }
   componentWillMount=async ()=>{
     let reqApi={
+      "global/getAliyunAccountBablance":(data,resolve)=>{
+        this.setState({accountbablance:data})
+        resolve()
+      },
       "global/getAliyunEcsStatusCount":(data,resolve)=>{
         this.setState({ecs:data})
         resolve()
@@ -81,10 +85,6 @@ class CMDBBase extends PureComponent {
       },
       "global/getAliyunDomainList":(data,resolve)=>{
         this.setState({domains:data.Data.Domain})
-        resolve()
-      },
-      "global/getAliyunAccountBablance":(data,resolve)=>{
-        this.setState({accountbablance:data})
         resolve()
       },
     }
@@ -113,7 +113,7 @@ class CMDBBase extends PureComponent {
                       value={accountbablance[i].AvailableAmount}
                       suffix={"("+accountbablance[i].Currency+")"}
                       valueStyle={{ color: '#ea1711' }}
-                      // prefix={<Icon type="arrow-up" />}
+                      prefix={<Icon style={{fontSize:12}} type="arrow-down" />}
                     />
                   </Card>
                 </Col>
@@ -125,7 +125,7 @@ class CMDBBase extends PureComponent {
                       value="---"
                       suffix=""
                       valueStyle={{ color: '#ea1711' }}
-                      prefix={<Icon type="arrow-down" />}
+                      prefix={<Icon style={{fontSize:12}} type="arrow-down" />}
                     />
                   </Card>
                 </Col>

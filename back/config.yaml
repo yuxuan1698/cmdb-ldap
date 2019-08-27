@@ -3,7 +3,7 @@ cmdb:
   host: 0.0.0.0
   port: 8000
   base_url: http://127.0.0.1:8082
-  daemon: true
+  daemon: false
   debug: true
   loglevel: DEBUG  #DEBUG INFO WARN ERROR
   
@@ -24,7 +24,7 @@ email:
 # LDAP配置段
 ldap:
   enable: true
-  host: ldap://192.168.1.247
+  host: ldap://172.18.207.237
   port: 389
   binddn: cn=admin,ou=SystemUser,dc=iwubida,dc=com
   bindpassword: Wubida@123
