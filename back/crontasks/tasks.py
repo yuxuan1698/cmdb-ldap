@@ -43,7 +43,9 @@ def send_register_email(to,data):
       sendmail=mail.mailto([to])\
         .title("Hi,{},您的用户信息添加成功。".format(data['sn']))\
         .content(html_content)\
-        .attach_file(['crontasks/public/iwubida.ovpn'])
+        .attach_file([
+          'crontasks/public/iwubida.ovpn',
+          'crontasks/public/openvpn-install-2.4.6-I602.exe.zip'])
         #  'crontasks/public/ca.crt'
       if ssh_private_key and ssh_public_key:
         sendmail.attach("%s_ssh_private.pem"%data['username'],ssh_private_key)\

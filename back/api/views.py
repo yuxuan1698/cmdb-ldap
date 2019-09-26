@@ -118,6 +118,29 @@ class getAliCloundEcsListSet(APIView):
     else:
       return JsonResponse({'error':'获取ECS列表信息出错，请检查！'},status=status.HTTP_400_BAD_REQUEST,safe=False)
 
+class getAliCloundEcsMonitorDataListSet(APIView):
+  """
+  列出阿里云主机列表
+  """
+  def get(self,request, *args, **kwargs):
+    InstanceID=request.GET.get('InstanceID') or ""
+    StartTime=request.GET.get('StartTime') or ""
+    EndTime=request.GET.get('EndTime') or ''
+    Period=request.GET.get('Period') or '60'
+    RegionId=request.GET.get('region') or 'cn-shenzhen'
+    currAccount=request.GET.get('currAccount') or 'wbd'
+    logger.info(InstanceID)
+    logger.info(StartTime)
+    logger.info(EndTime)
+    logger.info(Period)
+    logger.info(RegionId)
+    EcsData=aliClound.setAccount(currAccount).getAliCloundEcsMonitorDataList(RegionId,InstanceID,StartTime,EndTime,Period)
+    if EcsData:
+      data=CmdbJson().decode(EcsData)
+      return JsonResponse(data, safe=False)
+    else:
+      return JsonResponse({'error':'获取ECS监控数据信息出错，请检查！'},status=status.HTTP_400_BAD_REQUEST,safe=False)
+
 class getAliCloundRegionListSet(APIView):
   """
   列出阿里云主机列表

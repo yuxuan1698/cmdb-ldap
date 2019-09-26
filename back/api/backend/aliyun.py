@@ -92,13 +92,15 @@ class AliClound():
             logger.error(e)
             return False
 
-    def getAliCloundEcsMonitorDataList(self,InstanceID='',StartTime="",EndTime=""):
-        client=AcsClient(self.secreyKey,self.accesssecret)
+    def getAliCloundEcsMonitorDataList(self,RegionId='cn-shenzhen',InstanceID="",StartTime="",EndTime="",Period=60):
+        if InstanceID=="" or StartTime=="" or EndTime=="":
+            return False
+        client=AcsClient(self.secreyKey,self.accesssecret,RegionId)
         req=DescribeInstanceMonitorDataRequest()
-        # req.set_PageSize(PageSize)
-        # req.set_PageNumber(Page)
-        # if len(Tags)>0:
-        #     req.set_Tags(Tags)
+        req.set_InstanceId(InstanceID)
+        req.set_StartTime(StartTime)
+        req.set_EndTime(EndTime)
+        req.set_Period(Period)
         req.set_accept_format('json')
         try:
             data=client.do_action_with_exception(req)

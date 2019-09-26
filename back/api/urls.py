@@ -18,7 +18,8 @@ from .views import (
     getAliCloundAcountNameListSet,
     getAliCloundRdsAllStatusSet,
     getAliCloundAccountBablanceSet,
-    generateSSHKeyViewSet
+    generateSSHKeyViewSet,
+    getAliCloundEcsMonitorDataListSet
     )
 urlpatterns = [
     path('system/cronlogs/', getCrontabLogsViewSet,name='system-mailresults'),
@@ -29,6 +30,7 @@ urlpatterns = [
     path('aliclound/rds/allstatus/', getAliCloundRdsAllStatusSet.as_view(),name='aliclound-rds-status'),
     path('aliclound/ecs/list/', getAliCloundEcsListSet.as_view(),name='aliclound-ecs-list'),
     path('aliclound/ecs/allstatus/', getAliCloundEcsAllStatusSet.as_view(),name='aliclound-ecs-status'),
+    path('aliclound/ecs/monitordata/', getAliCloundEcsMonitorDataListSet.as_view(),name='aliclound-ecs-monitor-data'),
     path('aliclound/regions/list/', getAliCloundRegionListSet.as_view(),name='aliclound-regions'),
     path('aliclound/tags/list/',getAliCloundTagsListSet.as_view(), name='aliclound-cerificate-list'),
     path('aliclound/cerificate/list/',getAliCloundCerificateListSet.as_view(), name='aliclound-cerificate-list'),

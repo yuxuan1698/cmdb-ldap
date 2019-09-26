@@ -9,7 +9,7 @@ import CMDBContent from './Content/';
 import CMDBFooter from './Footer';
 
 
-import zh_CN from 'antd/lib/locale-provider/zh_TW';
+import zh_CN from 'antd/lib/locale-provider/zh_CN';
 @withRouter
 class CMDBLayout extends PureComponent {
   constructor(props){

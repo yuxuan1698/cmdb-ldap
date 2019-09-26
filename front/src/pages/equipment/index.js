@@ -1,5 +1,6 @@
 
 'use strict'
+import dynamic from 'umi/dynamic';
 import {connect} from 'dva';
 import {PureComponent} from 'react'
 import CMDBBreadcrumb from "../components/Breadcrumb";
@@ -20,7 +21,12 @@ const InstanceStatus={
   'Running':['运行中','green','play-circle'],
   'Stopped':['已停止','red','pause-circle']
 }
-
+let CMDBMonitorData = dynamic({
+  loader: () => import('./components/SelectMonitor'),
+  loading: (e) => {
+    return null
+  },
+})
 @connect(({ loading,equipment }) => ({ loading,equipment }))
 class CMDBSystemSetting extends PureComponent {
   constructor(props){
@@ -36,7 +42,8 @@ class CMDBSystemSetting extends PureComponent {
       regionNames:{},
       Tags:[],
       currTag:[],
-      searchValue:""
+      searchValue:"",
+      showHideMonitor: false,
     }
   }
   handleAliCloundSetRegion=(regions)=>{
@@ -143,6 +150,9 @@ class CMDBSystemSetting extends PureComponent {
   handleSearchChange=(e)=>{
     this.setState({searchValue:e.target.value})
   }
+  handleShowHideMonitor=()=>{
+    this.setState({showHideMonitor:!this.state.showHideMonitor})
+  }
   render(){
     const {
       ecslist,
@@ -155,7 +165,8 @@ class CMDBSystemSetting extends PureComponent {
       regionNames,
       Tags,
       currTag,
-      searchValue
+      searchValue,
+      showHideMonitor
     } = this.state
     const {loading,equipment}=this.props
     const columns = [
@@ -358,8 +369,10 @@ class CMDBSystemSetting extends PureComponent {
         render: (text) => {
             return <div style={{textAlign:"center"}}>
               <Tooltip placement="top"
-                title={<div style={{fontSize:12}}>查看监控数据</div>} >
-                  <Icon component={monitorsvg} style={{fontSize:16,cursor:"pointer",color:"green"}} />
+                title={<div style={{fontSize:12}}>查看基础监控数据</div>} >
+                  <Icon onClick={this.handleShowHideMonitor.bind(this)} 
+                    component={monitorsvg} 
+                    style={{fontSize:16,cursor:"pointer",color:"green"}} />
                   {/* <Icon type='line-chart' style={{fontSize:16,cursor:"pointer",color:"green"}} /> */}
                 </Tooltip>
               
@@ -449,6 +462,10 @@ class CMDBSystemSetting extends PureComponent {
               }}
               loading={Boolean(loading.effects['equipment/getAliCloundEcsList'])}
               size="middle" />
+              {showHideMonitor?<CMDBMonitorData 
+                showHideMonitor={showHideMonitor} 
+                handleShowHideMonitor={this.handleShowHideMonitor.bind(this)}
+                instanceid="" />:""}
           </Content>
       </Layout>
       )

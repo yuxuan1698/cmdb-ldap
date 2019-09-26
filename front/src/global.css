@@ -222,3 +222,10 @@ padding: 0;
 .CodeMirror-hints{
   z-index: 99999 !important;
 }
+
+.customer_popover_cmdb {
+  width: 450px;
+}
+.customer_popover_cmdb .ant-popover-content .ant-popover-inner{
+    border-radius: 25px !important;
+}

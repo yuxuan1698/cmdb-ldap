@@ -9,7 +9,7 @@ cmdb:
   
 # REDIS配置段
 redis:
-  host: 192.168.1.246
+  host: 192.168.1.250
   password: jbg@123
   port: 6379
   db: 8
@@ -24,7 +24,7 @@ email:
 # LDAP配置段
 ldap:
   enable: true
-  host: ldap://192.168.1.247
+  host: ldap://172.18.207.237
   port: 389
   binddn: cn=admin,ou=SystemUser,dc=iwubida,dc=com
   bindpassword: Wubida@123

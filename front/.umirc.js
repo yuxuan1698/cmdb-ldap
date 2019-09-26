@@ -87,6 +87,7 @@ export default {
     'tooltip-arrow-width':"7px",
     'card-head-padding':"8px",
     'card-padding-base':'16px',
+    'slider-margin':'4px 10px'
   },
   proxy: {
     "/api": {
