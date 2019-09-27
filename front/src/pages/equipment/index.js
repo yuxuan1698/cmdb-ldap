@@ -44,6 +44,7 @@ class CMDBSystemSetting extends PureComponent {
       currTag:[],
       searchValue:"",
       showHideMonitor: false,
+      curInstanceId: ""
     }
   }
   handleAliCloundSetRegion=(regions)=>{
@@ -150,8 +151,11 @@ class CMDBSystemSetting extends PureComponent {
   handleSearchChange=(e)=>{
     this.setState({searchValue:e.target.value})
   }
-  handleShowHideMonitor=()=>{
-    this.setState({showHideMonitor:!this.state.showHideMonitor})
+  handleShowHideMonitor=(InstanceID)=>{
+    this.setState({
+      showHideMonitor:!this.state.showHideMonitor,
+      curInstanceId: InstanceID
+    })
   }
   render(){
     const {
@@ -166,9 +170,10 @@ class CMDBSystemSetting extends PureComponent {
       Tags,
       currTag,
       searchValue,
-      showHideMonitor
+      showHideMonitor,
+      curInstanceId
     } = this.state
-    const {loading,equipment}=this.props
+    const {loading,equipment,dispatch}=this.props
     const columns = [
         {
         title: '实例名称/ID',
@@ -366,11 +371,11 @@ class CMDBSystemSetting extends PureComponent {
         key: 'qq',
         width:50,
         dataIndex: 'qq',
-        render: (text) => {
+        render: (text,record) => {
             return <div style={{textAlign:"center"}}>
               <Tooltip placement="top"
                 title={<div style={{fontSize:12}}>查看基础监控数据</div>} >
-                  <Icon onClick={this.handleShowHideMonitor.bind(this)} 
+                  <Icon onClick={this.handleShowHideMonitor.bind(this,record.InstanceId)} 
                     component={monitorsvg} 
                     style={{fontSize:16,cursor:"pointer",color:"green"}} />
                   {/* <Icon type='line-chart' style={{fontSize:16,cursor:"pointer",color:"green"}} /> */}
@@ -463,9 +468,12 @@ class CMDBSystemSetting extends PureComponent {
               loading={Boolean(loading.effects['equipment/getAliCloundEcsList'])}
               size="middle" />
               {showHideMonitor?<CMDBMonitorData 
-                showHideMonitor={showHideMonitor} 
+                showHideMonitor={showHideMonitor}
+                currAccount={equipment.currAccount}
+                InstanceID={curInstanceId}
+                loading={Boolean(loading.effects['equipment/getAliCloundEcsMonitorDataList'])}
                 handleShowHideMonitor={this.handleShowHideMonitor.bind(this)}
-                instanceid="" />:""}
+                dispatch={dispatch} />:""}
           </Content>
       </Layout>
       )

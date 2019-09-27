@@ -1,5 +1,6 @@
 import { 
     GetAliCloundEcsListApi,
+    GetAliCloundEcsMonitorDataListApi,
     GetAliCloundRegionsListApi,
     GetAliCloundTagsListApi,
     GetAliCloundCerificateListApi,
@@ -11,7 +12,7 @@ import {
       names: 'equipment',
       state:{
         aliAccount:[],
-        currAccount:""
+        currAccount:"wbd"
       },
       subscriptions: {
         setup({dispatch}) {
@@ -48,6 +49,12 @@ import {
         },
         *getAliCloundEcsList({ payload,callback }, { call }) {
           const data = yield call(GetAliCloundEcsListApi, payload)
+          if (data) {
+            callback(data)
+          }
+        },
+        *getAliCloundEcsMonitorDataList({ payload,callback }, { call }) {
+          const data = yield call(GetAliCloundEcsMonitorDataListApi, payload)
           if (data) {
             callback(data)
           }

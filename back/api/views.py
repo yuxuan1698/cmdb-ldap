@@ -11,7 +11,8 @@ from api.backend.ssh import GenerateSSHKey
 from .serializers import (
   CerificateInvalidSerializer,
   GenerateSSHKeySerializer,
-  GetCerificateListSerializer
+  GetCerificateListSerializer,
+  GetAliCloundEcsMonitorDataListSerializer
 )
 from common.utils import check_cerificate_invalidtime
 from django.conf import settings
@@ -19,7 +20,7 @@ from django.contrib.auth import get_user_model
 from django.core.serializers import serialize
 from authentication.ldap.ldapsearch import CmdbLDAP
 from crontasks.tasks import send_reset_sshkey_email
-
+from datetime import timedelta
 from rest_framework.decorators import api_view
 from rest_framework import authentication, permissions
 aliClound=AliClound()
@@ -123,23 +124,23 @@ class getAliCloundEcsMonitorDataListSet(APIView):
   列出阿里云主机列表
   """
   def get(self,request, *args, **kwargs):
-    InstanceID=request.GET.get('InstanceID') or ""
-    StartTime=request.GET.get('StartTime') or ""
-    EndTime=request.GET.get('EndTime') or ''
-    Period=request.GET.get('Period') or '60'
-    RegionId=request.GET.get('region') or 'cn-shenzhen'
-    currAccount=request.GET.get('currAccount') or 'wbd'
-    logger.info(InstanceID)
-    logger.info(StartTime)
-    logger.info(EndTime)
-    logger.info(Period)
-    logger.info(RegionId)
-    EcsData=aliClound.setAccount(currAccount).getAliCloundEcsMonitorDataList(RegionId,InstanceID,StartTime,EndTime,Period)
-    if EcsData:
-      data=CmdbJson().decode(EcsData)
-      return JsonResponse(data, safe=False)
+    serializer=GetAliCloundEcsMonitorDataListSerializer(data=request.GET)
+    if serializer.is_valid():
+      validdata=serializer.validated_data
+      InstanceID=validdata.get('InstanceID')
+      StartTime=(validdata.get('StartTime')-timedelta(hours=8)).strftime("%Y-%m-%dT%H:%M:%SZ") 
+      EndTime=(validdata.get('EndTime')-timedelta(hours=8)).strftime("%Y-%m-%dT%H:%M:%SZ")
+      Period=validdata.get('Period') or '60'
+      RegionId=validdata.get('region') or 'cn-shenzhen'
+      currAccount=validdata.get('currAccount') or 'wbd'
+      EcsData=aliClound.setAccount(currAccount).getAliCloundEcsMonitorDataList(RegionId,InstanceID,StartTime,EndTime,Period)
+      if EcsData:
+        data=CmdbJson().decode(EcsData)
+        return JsonResponse(data, safe=False)
+      else:
+        return JsonResponse({'error':'获取ECS监控数据信息出错，请检查！'},status=status.HTTP_400_BAD_REQUEST,safe=False)
     else:
-      return JsonResponse({'error':'获取ECS监控数据信息出错，请检查！'},status=status.HTTP_400_BAD_REQUEST,safe=False)
+      return JsonResponse(serializer.errors,status=status.HTTP_400_BAD_REQUEST,safe=False)
 
 class getAliCloundRegionListSet(APIView):
   """

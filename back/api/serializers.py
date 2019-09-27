@@ -2,7 +2,7 @@ from django.contrib.auth.models import Group
 from rest_framework import serializers
 from django.conf import settings
 from rest_framework.serializers import (
-    CharField, BooleanField, IntegerField, ChoiceField, 
+    CharField, BooleanField, IntegerField, ChoiceField, DateTimeField,
     EmailField, Serializer
     )
 from rest_framework.exceptions import ValidationError
@@ -103,3 +103,27 @@ class GetCerificateListSerializer(Serializer):
   currAccount = ChoiceField(required=False,
     choices=tuple((k,k) for k,v in settings.ALI_CLOUND_API_ACCOUNT.items())
   )
+
+class GetAliCloundEcsMonitorDataListSerializer(Serializer):
+  """
+  效验获取实例监控数据字段
+  """
+  InstanceID = CharField(required=True)
+  StartTime = DateTimeField(required=True,format="%Y-%m-%dT%H:%M:%SZ")
+  EndTime = DateTimeField(required=True,format="%Y-%m-%dT%H:%M:%SZ")
+  RegionId = CharField(required=False)
+  Period = ChoiceField(
+    required=False,
+    choices=(
+      ("60","60"),
+      ("600","600"),
+      ("3600","3600"),
+    )
+  )
+  currAccount = ChoiceField(required=False,
+    choices=tuple((k,k) for k,v in settings.ALI_CLOUND_API_ACCOUNT.items())
+  )
+  def validate(self, data):
+        if data.get('StartTime') >= data.get("EndTime"):
+           raise ValidationError("StartTime 要小于 EndTime.")
+        return data

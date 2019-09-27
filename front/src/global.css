@@ -229,3 +229,8 @@ padding: 0;
 .customer_popover_cmdb .ant-popover-content .ant-popover-inner{
     border-radius: 25px !important;
 }
+.customer_popover_cmdb .ant-popover-content .ant-slider-handle{
+  height: 10px;
+  width: 10px;
+  margin-top: -3px;
+}

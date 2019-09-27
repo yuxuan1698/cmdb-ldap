@@ -147,6 +147,14 @@ export function GetAliCloundEcsListApi(data) {
         params:data
     })
 }
+// 获取aliclound Ecs 监控数据列表
+export function GetAliCloundEcsMonitorDataListApi(data) {
+    return request({
+        method: "get",
+        url: '/v1/aliclound/ecs/monitordata/',
+        params:data
+    })
+}
 // 获取aliclound Regions 列表
 export function GetAliCloundRegionsListApi() {
     return request({

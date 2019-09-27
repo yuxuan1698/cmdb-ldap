@@ -11,7 +11,7 @@ import 'echarts/lib/component/title';
 import moment from 'moment';
 import {PureComponent} from 'react';
 
-import {Tooltip,Slider,Popover,Input,Icon, DatePicker, Radio,Button, Drawer } from 'antd';
+import {Tooltip,Slider,Popover, DatePicker, Radio,Button, Drawer } from 'antd';
 
 const { RangePicker } = DatePicker;
 function range(start, end) {
@@ -26,9 +26,9 @@ class CMDBMonitorData extends PureComponent {
     super(props)
     this.state={
       visible: this.props.showHideMonitor,
-      monitortime: "60",
-      startTime: null,
-      endTime: null
+      monitortime: 3600,
+      StartTime: moment().subtract(3600,'seconds'),
+      EndTime: moment()
     }
   }
   
@@ -39,14 +39,15 @@ class CMDBMonitorData extends PureComponent {
   handleMoniterTimeChange=(e)=>{
     this.setState({
       monitortime: e.target.value,
-      startTime: moment().subtract(parseInt(e.target.value,10),'seconds'),
-      endTime: moment(),
+      StartTime: moment().subtract(parseInt(e.target.value,10),'seconds'),
+      EndTime: moment(),
     })
   }
   handleMoniterDateTimeChange=(d,dstr)=>{
     this.setState({
-      startTime: moment(dstr[0]),
-      endTime: moment(dstr[1]),
+      monitortime: moment(dstr[1]).diff(moment(dstr[0]),'seconds'),
+      StartTime: moment(dstr[0]),
+      EndTime: moment(dstr[1]),
     })
   }
   disabledDate=(current)=> {
@@ -66,10 +67,26 @@ class CMDBMonitorData extends PureComponent {
       let n=parseInt(v/24,10);
       v=n*24;
     }
-    this.setState({monitortime:v*3600})
+    this.setState({
+      monitortime:v*3600,
+      StartTime: moment().subtract(v*3600,'seconds'),
+      EndTime: moment(),
+    })
+  }
+  handleMoniterDataGet=()=>{
+    let {dispatch,InstanceID,currAccount}=this.props
+    let {StartTime,EndTime}=this.state
+    dispatch({type:'equipment/getAliCloundEcsMonitorDataList',payload:{
+      InstanceID,StartTime:StartTime.format("YYYY-MM-DD HH:mm:ss"),EndTime:EndTime.format("YYYY-MM-DD HH:mm:ss"),currAccount
+    },callback:(data)=>{
+      console.log(data)
+    }})
+  }
+  componentWillMount=()=>{
+    this.handleMoniterDataGet()
   }
   render(){
-    const {monitortime,startTime,endTime}=this.state
+    const {monitortime,StartTime,EndTime}=this.state
     let hour=parseInt(monitortime/3600,10)
     const option = {
       tooltip: {
@@ -137,17 +154,17 @@ class CMDBMonitorData extends PureComponent {
               showTime={{
                 hideDisabledOptions: true,
               }}
-              value={startTime?[startTime, endTime]:[moment().subtract(parseInt(monitortime,10),'seconds'), moment()]}
+              value={[StartTime, EndTime]}
               onChange={this.handleMoniterDateTimeChange.bind(this)}
               format="YYYY-MM-DD HH:mm:ss"
             />
             <Radio.Group size="small"
               value={monitortime} 
               onChange={this.handleMoniterTimeChange}>
-              <Radio.Button value="60">1分</Radio.Button>
-              <Radio.Button value="600">10分</Radio.Button>
-              <Radio.Button value="1800">30分</Radio.Button>
-              <Radio.Button value="3600">1小时</Radio.Button>
+              <Radio.Button value={300}>5分</Radio.Button>
+              <Radio.Button value={600}>10分</Radio.Button>
+              <Radio.Button value={1800}>30分</Radio.Button>
+              <Radio.Button value={3600}>1小时</Radio.Button>
             </Radio.Group> 
               <Popover  placement="bottom" title={false} content={
                  <Slider size="small" 
@@ -155,7 +172,7 @@ class CMDBMonitorData extends PureComponent {
                   value={monitortime>3600?parseInt(monitortime/3600,10):1}
                   step={hour<24?1:24} min={1} max={168}
                   tipFormatter={()=>{
-                    return <span>{hour>=24?parseInt(hour/24):hour}{hour<24?"小时":"天"}</span>
+                    return <span>{hour>=24?((hour/24)%7==0?(hour/24)/7:parseInt(hour/24)):hour}{hour<24?"小时":((hour/24)%7==0?"周":"天")}</span>
                   }}
                   defaultValue={1}
                   onChange={this.handleSliderChange}
@@ -163,9 +180,8 @@ class CMDBMonitorData extends PureComponent {
                 } 
                 trigger="click" 
                 overlayClassName={"customer_popover_cmdb"}>
-                <Button size="small">其它</Button>
+                <Button size="small" style={{marginLeft:5}}>其它</Button>
               </Popover>
-            
           </div>}
           // getContainer={false}
           width={750}
