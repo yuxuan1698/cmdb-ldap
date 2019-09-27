@@ -20,17 +20,13 @@ from django.contrib.auth import get_user_model
 from django.core.serializers import serialize
 from authentication.ldap.ldapsearch import CmdbLDAP
 from crontasks.tasks import send_reset_sshkey_email
-from datetime import timedelta
 from rest_framework.decorators import api_view
 from rest_framework import authentication, permissions
+from datetime import timedelta
+
 aliClound=AliClound()
 logger=CmdbLDAPLogger().get_logger('django.server')
 Users=get_user_model()
-
-# class generateSSHKeyViewSet(APIView):
-#   """
-#   允许用户查看或编辑的API路径test。
-#   """
   
 @api_view(['POST'])
 def generateSSHKeyViewSet(request, *args, **kwargs):
@@ -128,9 +124,9 @@ class getAliCloundEcsMonitorDataListSet(APIView):
     if serializer.is_valid():
       validdata=serializer.validated_data
       InstanceID=validdata.get('InstanceID')
-      StartTime=(validdata.get('StartTime')-timedelta(hours=8)).strftime("%Y-%m-%dT%H:%M:%SZ") 
-      EndTime=(validdata.get('EndTime')-timedelta(hours=8)).strftime("%Y-%m-%dT%H:%M:%SZ")
-      Period=validdata.get('Period') or '60'
+      StartTime = (validdata.get('StartTime') - timedelta(hours=8)).strftime("%Y-%m-%dT%H:%M:%SZ")
+      EndTime = (validdata.get('EndTime') - timedelta(hours=8)).strftime("%Y-%m-%dT%H:%M:%SZ")
+      Period=validdata.get('Period')
       RegionId=validdata.get('region') or 'cn-shenzhen'
       currAccount=validdata.get('currAccount') or 'wbd'
       EcsData=aliClound.setAccount(currAccount).getAliCloundEcsMonitorDataList(RegionId,InstanceID,StartTime,EndTime,Period)

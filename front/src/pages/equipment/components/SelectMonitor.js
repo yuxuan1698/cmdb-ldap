@@ -175,6 +175,9 @@ class CMDBMonitorData extends PureComponent {
                     return <span>{hour>=24?((hour/24)%7==0?(hour/24)/7:parseInt(hour/24)):hour}{hour<24?"小时":((hour/24)%7==0?"周":"天")}</span>
                   }}
                   defaultValue={1}
+                  onBlur = {
+                    this.handleMoniterDataGet
+                  }
                   onChange={this.handleSliderChange}
                   />
                 } 
