@@ -191,3 +191,15 @@ export function downloadSSHKey(data,username){
   message.success("SSHKey下载成功！")
   return true
 }
+// 生成请求体的签名
+export function GenerateSignature(data){
+  if(!data instanceof Object) return message.error('data参数不合法。');
+  let SignData={},SignString=""
+  Object.keys(data).sort().map(i=>{
+    SignData[i]=data[i]
+    SignString=`${SignString}+${data[i]}`
+  })
+  console.log(SignString)
+  SignData['sign']=md5(SignString)
+  return SignData
+}

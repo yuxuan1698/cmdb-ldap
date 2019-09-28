@@ -305,6 +305,7 @@ class CMDBSystemSetting extends PureComponent {
                 onShowSizeChange: this.handleAliCloundCerificateList.bind(this)
               }} 
               rowKey={record=>record.Name}
+              style={{minWidth:1300}}
               title={()=><div>
                   <Input.Search
                     allowClear

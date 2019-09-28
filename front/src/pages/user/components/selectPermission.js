@@ -315,7 +315,8 @@ class LDAPSelectPermission extends PureComponent {
             className={css.permission_current_status}
             bordered
             rowKey='key'
-            bodyStyle={{margin:0,}}
+            bodyStyle={{margin:0}}
+            style={{minWidth:600}}
             pagination={{
               size:"small",
               showSizeChanger:true,

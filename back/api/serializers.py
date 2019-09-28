@@ -133,7 +133,7 @@ class GetAliCloundEcsMonitorDataListSerializer(Serializer):
         if not data.get('Period'):
           if days>2:
             data['Period'] = 3600
-          elif minutes>720 or days>0:
+          elif minutes>=360 or days>0:
             data['Period']=600
           else:
             data['Period']=60

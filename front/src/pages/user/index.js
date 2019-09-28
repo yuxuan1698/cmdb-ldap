@@ -312,6 +312,7 @@ class CMDBUserList extends PureComponent {
               loading={loading.effects['users/getUserList']} 
               size='small'
               bodyStyle={{margin:"0px"}}
+              style={{minWidth:1200}}
               rowSelection={{
                 selectedRowKeys,
                 onChange: this.onSelectChange.bind(this),
