@@ -8,6 +8,7 @@ import 'echarts/lib/chart/line';
 // 引入提示框和标题组件
 import 'echarts/lib/component/tooltip';
 import 'echarts/lib/component/title';
+import { formatByteUnits } from 'utils'
 
 import moment from 'moment';
 import {PureComponent} from 'react';
@@ -15,19 +16,6 @@ import {PureComponent} from 'react';
 import {message,Slider,Popover, DatePicker, Radio,Button, Drawer } from 'antd';
 
 const { RangePicker } = DatePicker;
-
-const formatUnit=(value)=>{
-  if (value <= 0) {
-      value = '0B';
-  }
-  else{
-      var k = 1024;
-      var sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-      var c = Math.floor(Math.log(value) / Math.log(k));
-      value = (value / Math.pow(k, c)).toFixed(2) + ' ' + sizes[c];
-  }
-  return value
-}
 
 
 class CMDBMonitorData extends PureComponent {
@@ -59,8 +47,8 @@ class CMDBMonitorData extends PureComponent {
       message.error("开始时间不能与结束时间相同。")
       return false
     }
-    if (moment(dstr[1]).diff(moment(dstr[0]),'minutes')<5){
-      message.error("时间范围小于最小单位5分钟。")
+    if (moment(dstr[1]).diff(moment(dstr[0]),'minutes')<10){
+      message.error("时间范围小于最小单位10分钟。")
       return false
     }
     this.setState({
@@ -293,7 +281,7 @@ class CMDBMonitorData extends PureComponent {
             formatter:(v)=>{
               let htmlmsg="<div><div>"+v[0].axisValueLabel+"</div>"
               v.map(i=>{
-                htmlmsg+="<div>"+i.marker+i.seriesName+": "+formatUnit(i.data)+"/s"+"</div>"
+                htmlmsg+="<div>"+i.marker+i.seriesName+": "+formatByteUnits(i.data)+"/s"+"</div>"
               })
               htmlmsg+="</div>"
               return htmlmsg
@@ -320,7 +308,7 @@ class CMDBMonitorData extends PureComponent {
           axisLabel:{
             fontSize:11,
             formatter: (v)=>{
-              return formatUnit(v)
+              return formatByteUnits(v)
             }
           },
           axisLine: {show:false},
@@ -377,7 +365,7 @@ class CMDBMonitorData extends PureComponent {
             formatter:(v)=>{
               let htmlmsg="<div><div>"+v[0].axisValueLabel+"</div>"
               v.map(i=>{
-                htmlmsg+="<div>"+i.marker+i.seriesName+": "+formatUnit(i.data)+"/s"+"</div>"
+                htmlmsg+="<div>"+i.marker+i.seriesName+": "+formatByteUnits(i.data)+"/s"+"</div>"
               })
               htmlmsg+="</div>"
               return htmlmsg
@@ -404,7 +392,7 @@ class CMDBMonitorData extends PureComponent {
           axisLabel:{
             fontSize:11,
             formatter: (v)=>{
-              return formatUnit(v)
+              return formatByteUnits(v)
             }
           },
           axisLine: {show:false},
@@ -461,7 +449,7 @@ class CMDBMonitorData extends PureComponent {
             formatter:(v)=>{
               let htmlmsg="<div><div>"+v[0].axisValueLabel+"</div>"
               v.map(i=>{
-                htmlmsg+="<div>"+i.marker+i.seriesName+": "+formatUnit(i.data)+"/s"+"</div>"
+                htmlmsg+="<div>"+i.marker+i.seriesName+": "+formatByteUnits(i.data)+"/s"+"</div>"
               })
               htmlmsg+="</div>"
               return htmlmsg
@@ -488,7 +476,7 @@ class CMDBMonitorData extends PureComponent {
           axisLabel:{
             fontSize:11,
             formatter: (v)=>{
-              return formatUnit(v)
+              return formatByteUnits(v)
             }
           },
           axisLine: {show:false},
@@ -532,7 +520,7 @@ class CMDBMonitorData extends PureComponent {
               disabledDate={this.disabledDate}
               size="small"
               allowClear={false}
-              style={{width:320,float:"right",marginRight: 20}}
+              style={{width:310,float:"right",marginRight: 20}}
               disabledTime={this.disabledRangeTime}
               showTime={{
                 hideDisabledOptions: true,
@@ -546,10 +534,10 @@ class CMDBMonitorData extends PureComponent {
               value={monitortime}
               buttonStyle="solid"
               onChange={this.handleMoniterTimeChange}>
-              <Radio.Button value={300}>5分</Radio.Button>
               <Radio.Button value={600}>10分</Radio.Button>
               <Radio.Button value={1800}>30分</Radio.Button>
               <Radio.Button value={3600}>1小时</Radio.Button>
+              <Radio.Button value={3600*6}>6小时</Radio.Button>
             </Radio.Group> 
               <Popover  placement="bottom" title={false} content={
                  <Slider size="small" 
@@ -569,7 +557,7 @@ class CMDBMonitorData extends PureComponent {
                 trigger="click" 
                 overlayClassName={"customer_popover_cmdb"}>
                 <Button size="small"
-                  type={hour>1?"primary":"default"}
+                  type={hour>6?"primary":"default"}
                   style={{marginLeft:5}}>其它</Button>
               </Popover>
           </div>}

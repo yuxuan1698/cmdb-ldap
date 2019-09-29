@@ -102,7 +102,6 @@ class AliClound():
         req.set_EndTime(EndTime)
         req.set_Period(Period)
         req.set_accept_format('json')
-        logger.info(StartTime)
         try:
             data=client.do_action_with_exception(req)
             if data:

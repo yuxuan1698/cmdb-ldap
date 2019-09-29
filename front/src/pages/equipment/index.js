@@ -373,7 +373,8 @@ class CMDBSystemSetting extends PureComponent {
         dataIndex: 'qq',
         render: (text,record) => {
             return <div style={{textAlign:"center"}}>
-              <Tooltip placement="top"
+              <Tooltip placement="topRight"
+                arrowPointAtCenter
                 title={<div style={{fontSize:12}}>查看基础监控数据</div>} >
                   <Icon onClick={this.handleShowHideMonitor.bind(this,record.InstanceId)} 
                     component={monitorsvg} 

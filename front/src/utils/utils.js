@@ -162,7 +162,7 @@ export function isNotAuthChangerPassword(location){
   }
 }
 
-
+// 下载SSH
 export function downloadSSHKey(data,username){
   if(!data instanceof Object) return message.error('下载SSHKey参数不合法。');
   let PrivateElement = document.createElement('a')
@@ -202,4 +202,18 @@ export function GenerateSignature(data){
   console.log(SignString)
   SignData['sign']=md5(SignString)
   return SignData
+}
+
+// 格式化字节单位
+export const formatByteUnits=(value)=>{
+  if (value <= 0) {
+      value = '0B';
+  }
+  else{
+      var k = 1024;
+      var sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+      var c = Math.floor(Math.log(value) / Math.log(k));
+      value = (value / Math.pow(k, c)).toFixed(2) + ' ' + sizes[c];
+  }
+  return value
 }
