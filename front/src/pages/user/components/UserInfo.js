@@ -92,7 +92,7 @@ class UserInfo extends PureComponent {
         </ButtonGroup>
         } >
           <div className={css.userinfo_sshpublickey}>
-            <span>{content[0].split(' ')[1]}</span>
+            <span>{content[0]}</span>
           </div>
         </Popover>
       </span>

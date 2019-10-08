@@ -9,26 +9,26 @@ cmdb:
   
 # REDIS配置段
 redis:
-  host: 192.168.1.250
-  password: jbg@123
+  host: 192.168.1.xxx
+  password: xxxxxx
   port: 6379
   db: 8
 # EMAIL配置段
 email:
-  host: 172.18.207.238
+  host: 172.18.207.xxx
   port: 465
-  username: dev@iwubida.com
-  password: Wubida@123
+  username: dev@xxxxxx.com
+  password: xxxxxxx
   tls: false
 
 # LDAP配置段
 ldap:
   enable: true
-  host: ldap://172.18.207.237
+  host: ldap://172.18.207.xxx
   port: 389
-  binddn: cn=admin,ou=SystemUser,dc=iwubida,dc=com
-  bindpassword: Wubida@123
-  basedn: dc=iwubida,dc=com
+  binddn: cn=admin,ou=xxxxx,dc=xxxx,dc=com
+  bindpassword: xxxxxxx
+  basedn: dc=xxxxxx,dc=com
   usersdn: ou=Users,dc=iwubida,dc=com
   userfilter: '(&(uid=%(user)s))'
   userattrmap: 
@@ -38,18 +38,18 @@ ldap:
     nickname: "sn"
     mobile: "mobile"
   mirror_groups: true
-  groupsdn: ou=Groups,dc=iwubida,dc=com
-  cmdbpermissdn: ou=Cmdb,ou=Groups,dc=iwubida,dc=com
+  groupsdn: ou=Groups,dc=xxxxxx,dc=com
+  cmdbpermissdn: ou=Cmdb,ou=Groups,dc=xxxxxx,dc=com
   tls: false
 # 阿里去配置段
 aliyun:
   # 物必达
   wbd:
-    name: '物必达(iwubida)'
-    accesskey: 'LTAIUWuSChF0IY7L'
-    accesssecret: '9e1QiG9cRDTIGJnUcOQMK27C1ohu8v'
+    name: '物必达(xxxxxx)'
+    accesskey: 'xxxx'
+    accesssecret: 'xxxx'
   # 94lazy
   lazy:
     name: '就是赖(94lazy)'
-    accesskey: 'LTAIBsNvE3dgppCx'
-    accesssecret: 'IBeSKdl1DdxbcqjoahXL1zB8m1196n'
+    accesskey: 'xxxx'
+    accesssecret: 'xxxx'

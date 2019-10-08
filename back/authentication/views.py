@@ -64,7 +64,7 @@ class CreateUserViewSet(APIView):
   """
   创建用户
   """
-  serializer_class = CreateUserSerializer
+  # serializer_class = CreateUserSerializer
   def post(self,request, *args, **kwargs):
     """
     提交用户数据
@@ -72,6 +72,7 @@ class CreateUserViewSet(APIView):
     serializer = CreateUserSerializer(instance=request, data=request.data)
     if serializer.is_valid():
       # serializer.validated_data
+      del request.data['sign']
       changeStatus,errorMsg,newUserDn,newUser = CmdbLDAP().create_ldap_user(request.data)
       if changeStatus:
         returnData = {"status": changeStatus}

@@ -17,7 +17,17 @@ logger = CmdbLDAPLogger().get_logger('cmdb_ldap')
 
 Users = get_user_model()
 
-
+class BaseSerializer(Serializer):
+    sign = CharField(
+      required=True,
+      min_length=31,
+      max_length=32,
+      allow_blank=False,
+      error_messages={
+          'min_length': '签名(sign)长度不是规范的HASH长度',
+          'max_length': '签名(sign)长度不是规范的HASH长度',
+          'blank': "字段(sign)不能为空。"
+      })
 class LdapUserSerializer(Serializer):
   """
   LdapUserSerializer 
@@ -94,7 +104,7 @@ class LDIFScriptsSerializer(Serializer):
       })
 
 
-class CreateUserSerializer(Serializer):
+class CreateUserSerializer(BaseSerializer):
   """
     效验创建用户的字段
   """
