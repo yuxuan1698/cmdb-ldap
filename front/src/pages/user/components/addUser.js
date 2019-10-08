@@ -3,7 +3,7 @@
 import { PureComponent } from 'react';
 import css from './index.less'
 import {
-    Drawer, Form, Button, Radio, Row, Input, Select,
+    Drawer, Form, Button, Radio, Row, Input, Select,Popover,
     Icon,InputNumber,Divider,Col,Tooltip,notification
 } from 'antd';
 import {formatMessage} from 'umi/locale';
@@ -39,6 +39,7 @@ class DrawerAddUser extends PureComponent {
       mayField:[],
       visible: true,
       addmodel:'temp',
+      sshKeyType: 'ecdsa',
       ...models.temp
     }
   }
@@ -124,9 +125,10 @@ class DrawerAddUser extends PureComponent {
   }
   handleGenerateSSHkey=()=>{
     const {setFieldsValue,getFieldValue } = this.props.form;
+    const {sshKeyType}=this.state
     let username=getFieldValue('uid') || getFieldValue('sn')
     let email=getFieldValue('mail') 
-    let payload={username,email}
+    let payload={username,email,keytype:sshKeyType}
     const {dispatch}=this.props
     dispatch({type:'users/generateSSHKeyAndDownLoad',payload,callback:(data)=>{
       if(data.hasOwnProperty('publickey')){
@@ -138,10 +140,16 @@ class DrawerAddUser extends PureComponent {
       }
     }})
   }
+  handleChangeSSHKeyType=(e)=>{
+    this.setState({sshKeyType:e.target.value})
+    setTimeout(() => {
+      this.handleGenerateSSHkey();
+    }, 200);
+  }
   render() {
     const { getFieldDecorator,getFieldValue } = this.props.form;
     const { loading,userselect } = this.props;
-    const { selectedItems,options,currField,mayField ,mustField,addmodel,visible} = this.state;
+    const { selectedItems,options,currField,mayField ,mustField,addmodel,visible,sshKeyType} = this.state;
     return (<Drawer
             destroyOnClose={true}
             title={<span><Icon type="user-add" style={{fontSize:18,marginRight:4}} />{`${formatMessage({id:'userlist_useradd_new'})}(${addmodel==='temp'?
@@ -257,10 +265,20 @@ class DrawerAddUser extends PureComponent {
                                 </Tooltip>
                                 {i==='sshPublicKey' && (getFieldValue('uid')!==""||getFieldValue('sn')!=="")?
                                   <Tooltip placement="top" title={formatMessage({id:'userlist_useradd_generate_sshkey'})}>
-                                    <Icon disabled={Boolean(loading.effects['users/generateSSHKeyAndDownLoad'])}
-                                      onClick={this.handleGenerateSSHkey.bind(this)}
-                                      className={css.sshkey_field_icon} 
-                                      component={sshkeysvg} />
+                                    <Popover placement="bottom" 
+                                      content={<Radio.Group size='small' 
+                                        value={sshKeyType}
+                                        onChange={this.handleChangeSSHKeyType}
+                                        buttonStyle="solid">
+                                      <Radio.Button value="rsa">RSA</Radio.Button>
+                                      <Radio.Button value="ecdsa">ECDSA</Radio.Button>
+                                      <Radio.Button value="dss">DSS</Radio.Button>
+                                      <Radio.Button value="ed25519">ED25519</Radio.Button>
+                                    </Radio.Group>} trigger="hover">
+                                      <Icon className={css.sshkey_field_icon} 
+                                        onClick={this.handleGenerateSSHkey.bind(this)}
+                                        component={sshkeysvg} style={{fontSize:28}} />
+                                    </Popover>
                                   </Tooltip>:""}
                               </span>:""}
                       </Form.Item>

@@ -3,7 +3,7 @@
 import { PureComponent } from 'react';
 import css from './index.less'
 import {
-    Drawer, Form, Button, Row, Input, Select,
+    Drawer, Form, Button, Row, Input, Select,Radio,Popover,
     Icon,InputNumber,Divider,Col,Tooltip,notification
 } from 'antd';
 import SelectFieldButton from "./SelectFieldButton";
@@ -30,7 +30,8 @@ class DrawerUpdateUser extends PureComponent {
       mayField:[],
       mustField:[],
       currField:['uid'],
-      currData:{}
+      currData:{},
+      sshKeyType: 'ecdsa'
     }
   }
   componentDidMount(){
@@ -124,9 +125,10 @@ class DrawerUpdateUser extends PureComponent {
   }
   handleGenerateSSHkey=()=>{
     const {setFieldsValue,getFieldValue } = this.props.form;
+    const {sshKeyType}=this.state
     let username=getFieldValue('uid') || getFieldValue('sn')
     let email=getFieldValue('mail') 
-    let payload={username,email}
+    let payload={username,email,keytype:sshKeyType}
     const {dispatch}=this.props
     dispatch({type:'users/generateSSHKeyAndDownLoad',payload,callback:(data)=>{
       if(data.hasOwnProperty('publickey')){
@@ -138,10 +140,16 @@ class DrawerUpdateUser extends PureComponent {
       }
     }})
   }
+  handleChangeSSHKeyType=(e)=>{
+    this.setState({sshKeyType:e.target.value})
+    setTimeout(() => {
+      this.handleGenerateSSHkey();
+    }, 200);
+  }
   render() {
     const { getFieldDecorator } = this.props.form;
     const { loading,modifydata,userselect } = this.props;
-    const { selectedItems,options,currField,mayField } = this.state;
+    const { selectedItems,options,currField,mayField,mustField,sshKeyType } = this.state;
     return (<Drawer
             destroyOnClose={true}
             title={<span><Icon style={{marginRight:4,fontSize:18}}  component={modifyusersvg} />{formatMessage({id:'userlist_userupdate_new'})}</span>}
@@ -230,7 +238,7 @@ class DrawerUpdateUser extends PureComponent {
                               )
                             }],
                         })(inputField)}
-                        {!this.state.mustField.includes(i)?<span className={css.field_control}>
+                        {!mustField.includes(i)?<span className={css.field_control}>
                                 <Tooltip placement="top" title={formatMessage({id:'userlist_useradd_del_field'})}>
                                   <Icon className={css.delete_field_icon}
                                     type="minus-circle-o"
@@ -238,10 +246,21 @@ class DrawerUpdateUser extends PureComponent {
                                     onClick={this.removeField.bind(this,i)} />
                                 </Tooltip>
                                 {i==='sshPublicKey' && (!modifydata['data'].hasOwnProperty('sshPublicKey') ||
-                                  (modifydata['data'].hasOwnProperty('sshPublicKey') && modifydata['data']["sshPublicKey"]===""))?<Tooltip placement="top" title={formatMessage({id:'userlist_useradd_generate_sshkey'})}>
-                                    <Icon className={css.sshkey_field_icon} 
-                                      onClick={this.handleGenerateSSHkey.bind(this)}
-                                      component={sshkeysvg} style={{fontSize:28}} />
+                                  (modifydata['data'].hasOwnProperty('sshPublicKey')))?<Tooltip placement="top" title={formatMessage({id:'userlist_useradd_generate_sshkey'})}>
+                                    <Popover placement="bottom" 
+                                      content={<Radio.Group size='small' 
+                                        value={sshKeyType}
+                                        onChange={this.handleChangeSSHKeyType}
+                                        buttonStyle="solid">
+                                      <Radio.Button value="rsa">RSA</Radio.Button>
+                                      <Radio.Button value="ecdsa">ECDSA</Radio.Button>
+                                      <Radio.Button value="dss">DSS</Radio.Button>
+                                      <Radio.Button value="ed25519">ED25519</Radio.Button>
+                                    </Radio.Group>} trigger="hover">
+                                      <Icon className={css.sshkey_field_icon} 
+                                        onClick={this.handleGenerateSSHkey.bind(this)}
+                                        component={sshkeysvg} style={{fontSize:28}} />
+                                    </Popover>
                                   </Tooltip>:""}
                               </span>:""}
                       </Form.Item>

@@ -2,6 +2,8 @@ import logging,json
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.mail import EmailMultiAlternatives
 from email.header import make_header
+from sshpubkeys import SSHKey
+from io import StringIO
 import base64
 import io,os
 import qrcode
@@ -157,3 +159,8 @@ def check_cerificate_invalidtime(domain,port=443):
   finally:
     client.close()
     pass
+
+def get_sshkey_fingerprint(key):
+  keyfp=SSHKey(key)
+  fingerstr="({})-{} ({})".format(keyfp.comment,keyfp.hash_md5(),keyfp.key_type.decode('utf-8').split('-')[0].upper())
+  return fingerstr.encode("utf-8")

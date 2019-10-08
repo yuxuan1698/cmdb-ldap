@@ -78,22 +78,24 @@ class UserInfo extends PureComponent {
             </CopyToClipboard>}
       </div>)
     if(keyval==='sshPublicKey'){
-      formatcontent=<Popover placement="top" content={
+      formatcontent=<span><Tag style={{ background: '#fff', borderStyle: 'dashed' }} >{content[1]}</Tag>
+      <Popover placement="top" content={
         <ButtonGroup size="small">
-            <CopyToClipboard text={content} onCopy={()=>message.success("SSHKey公钥已经复制到剪贴板上了。")} >
+            <CopyToClipboard text={content[0]} onCopy={()=>message.success("SSHKey公钥已经复制到剪贴板上了。")} >
               <Button title="复制到剪贴板" ><Icon style={{cursor:"pointer"}} style={{margin:1,fontSize:20}} component={copytoclipsvg} /></Button>
             </CopyToClipboard>
             <Button title="下载此公钥到本地" 
               loading={this.state.downloadkey} 
-              onClick={this.handleDownLoadPubicKey.bind(this,content)}>
+              onClick={this.handleDownLoadPubicKey.bind(this,content[0])}>
                 <Icon style={{cursor:"pointer"}} style={{margin:1,fontSize:20}} component={downloadsvg} />
             </Button>
         </ButtonGroup>
         } >
           <div className={css.userinfo_sshpublickey}>
-            <span>{content}</span>
+            <span>{content[0].split(' ')[1]}</span>
           </div>
         </Popover>
+      </span>
     }
     return <div className={css.userinfo_boxstyle} >
             <p className={css.userinfo_title} >

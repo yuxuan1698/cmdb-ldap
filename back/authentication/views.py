@@ -28,7 +28,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from django.core.cache import cache
 
-from common.utils import CmdbLDAPLogger,LDAPJSONEncoder,generat_random_password
+from common.utils import CmdbLDAPLogger,LDAPJSONEncoder,generat_random_password,get_sshkey_fingerprint
 from authentication.utils import user_payload_handler
 from crontasks.tasks import send_register_email,send_reset_password_email,send_reset_sshkey_email
 from django.contrib.auth.decorators import permission_required
@@ -180,14 +180,17 @@ class UserAttributeByViewSet(APIView):
   """
   允许用户查看或编辑的API路径。
   """
-  # serializer_class=LdapUserSerializer
   def get(self,request,*args,**kwargs):
     """
     根据用户获取用户信息
     """
     username=kwargs.get('username')
     userattrs=CmdbLDAP().get_user_list(username,['*','+'])
-    return JsonResponse(userattrs[0],encoder=LDAPJSONEncoder,safe=False)
+    # get_sshkey_fingerprint
+    if userattrs[0][0] and 'sshPublicKey' in userattrs[0][0][1] and len(userattrs[0][0][1]['sshPublicKey'])==1:
+      userattrs[0][0][1]['sshPublicKey'].append(get_sshkey_fingerprint(userattrs[0][0][1]['sshPublicKey'][0].decode('utf-8')))
+      logger.info(userattrs[0][0][1]['sshPublicKey'])
+    return JsonResponse(userattrs[0][0],encoder=LDAPJSONEncoder,safe=False)
 
 class UserPermissionListByViewSet(APIView):
   """

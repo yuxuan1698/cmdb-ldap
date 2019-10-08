@@ -110,7 +110,7 @@ class CMDBUserList extends PureComponent {
       const userdn=record.userdn.split(',')[0]
       dispatch({type:'users/getUserAttribute',payload:userdn,callback:(data)=>{
         this.setState({
-          userinfo:data[0][1]
+          userinfo:data[1]
           })
       }})
     }else{
