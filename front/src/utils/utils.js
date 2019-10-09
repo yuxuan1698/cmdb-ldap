@@ -34,7 +34,6 @@ export function LDAP_MAP_FIELDS_FORMAT(){
 export function GenerateRequestAuthParams() {
   const header_info=Store.getLocal('userinfo');
   const language=Store.getLocal('umi_locale',false) || navigator.language||navigator.userLanguage;
-  console.log(language)
   let header={"CMDB-Language":language}
   if (header_info.hasOwnProperty('token_prefix') &&
       header_info.hasOwnProperty('token') && 
@@ -93,6 +92,7 @@ export function singleListToString(objval){
           objval[i]=objval[i][0]||""
         }
       }
+      return i
     })
   }
   return objval
@@ -185,6 +185,7 @@ export function downloadSSHKey(data,username){
     //点击下载
     PrivateElement.click();
     window.URL.revokeObjectURL(DownloadHref);
+    return  k
   })
   //下载完成移除元素
   document.body.removeChild(PrivateElement);
@@ -198,8 +199,8 @@ export function GenerateSignature(data){
   Object.keys(data).sort().map(i=>{
     SignData[i]=data[i]
     SignString=`${SignString}+${data[i]}`
+    return i
   })
-  console.log(SignString)
   SignData['sign']=md5(SignString)
   return SignData
 }

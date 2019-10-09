@@ -1,11 +1,9 @@
 'use strict'
 import {PureComponent} from 'react';
 import {
-  Modal,Button,Tooltip,notification, Icon,Tag
+  Modal,Tooltip,notification,Icon
 } from 'antd';
 import {formatMessage} from 'umi/locale';
-// import restsshkeysvg from 'svgicon/restsshkey.svg'
-const ButtonGroup = Button.Group;
 
 const restpasssvg=props=><svg width="21px" height="21px" viewBox="0 0 21 21" version="1.1" xmlns="http://www.w3.org/2000/svg" >
     <g id="Page-1" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
@@ -60,7 +58,6 @@ export class ResetButtonGroup extends PureComponent {
     const {restpassworddata,restsshkeyddata}=this.props
     return (
       <div>
-        {/* <ButtonGroup size="small"> */}
           <Tooltip placement="top" 
             title={formatMessage({id:'userlist_table_resetpassword'},{username:restpassworddata.username})} 
             getPopupContainer={trigger => trigger.parentNode.parentNode} >
@@ -71,7 +68,6 @@ export class ResetButtonGroup extends PureComponent {
             getPopupContainer={trigger => trigger.parentNode.parentNode} >
               <Icon  onClick={this.handleResetSSHkey.bind(this,restsshkeyddata)} component={restsshkeysvg} />
           </Tooltip>
-        {/* </ButtonGroup> */}
       </div>
     );
   }

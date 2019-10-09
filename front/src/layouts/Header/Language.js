@@ -3,7 +3,7 @@ import {
     Menu,Avatar,Dropdown
   } from 'antd'
 
-import {formatMessage,setLocale} from 'umi/locale';
+import {setLocale} from 'umi/locale';
 
 import css from '../index.less';
 const {Item}=Menu

@@ -35,6 +35,7 @@ class CMDBSystemSetting extends PureComponent {
       if(data.hasOwnProperty('list')){
         data.list.map(it=>{
           newState['data'].push(it.fields)
+          return it
         })
       }
       this.setState(Object.assign(newState,payload))
@@ -48,8 +49,7 @@ class CMDBSystemSetting extends PureComponent {
     const {
       data,
       pageSize,
-      resultTotal,
-      sortname
+      resultTotal
     } = this.state
     const {loading}=this.props
     const columns = [{

@@ -1,7 +1,7 @@
 'use strict'
 import {connect} from 'dva';
 import {PureComponent} from 'react'
-import {Row,Col,Statistic,Card,Icon,Table,Spin} from 'antd'
+import {Row,Col,Statistic,Card,Icon,Table} from 'antd'
 import { formatAliCloundTime } from 'utils'
 
 
@@ -111,7 +111,7 @@ class CMDBBase extends PureComponent {
                     <Statistic
                       title={i}
                       value={accountbablance[i].AvailableAmount}
-                      suffix={"("+accountbablance[i].Currency+")"}
+                      suffix={`(${accountbablance[i].Currency})`}
                       valueStyle={{ color: '#ea1711' }}
                       prefix={<Icon style={{fontSize:12}} type="arrow-down" />}
                     />

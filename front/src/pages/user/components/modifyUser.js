@@ -38,7 +38,7 @@ class DrawerUpdateUser extends PureComponent {
     const {modifydata}=this.props
     if(modifydata) { 
       this.handleClassObjectsChange(modifydata['data']['objectClass'])
-      this.setState({currField:Object.keys(modifydata['data']).filter(i=>i!=='objectClass').sort((i,b)=>i=='uid'?-1:0) })
+      this.setState({currField:Object.keys(modifydata['data']).filter(i=>i!=='objectClass').sort((i,b)=>i==='uid'?-1:0) })
     }
   }
   initSelectedItems(arr){
@@ -51,6 +51,7 @@ class DrawerUpdateUser extends PureComponent {
       }else{
         supSet=supSet.concat(classobjects[it][0].sup,[it])
       }
+      return it
     })
     return Array.from(new Set(supSet))
   }
@@ -61,6 +62,7 @@ class DrawerUpdateUser extends PureComponent {
     supSet.filter(i=>i!=='top').map(it=>{
       mustfiled=mustfiled.concat([it==='simpleSecurityObject'?"cn":'uid'],classobjects[it][1].must)
       mayfiled=mayfiled.concat(classobjects[it][2].may)
+      return it
     }) 
     this.setState({
       selectedItems:supSet,
@@ -85,7 +87,6 @@ class DrawerUpdateUser extends PureComponent {
     }
   }
   handleClose=()=>{
-    const { modifydata } = this.props;
     this.setState({visible:!this.state.visible})
     setTimeout(this.props.showHideUserDrawer,500,'update')
   }

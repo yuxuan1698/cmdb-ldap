@@ -14,6 +14,7 @@ import {isNotAuthChangerPassword} from 'utils'
 class CMDBChangePassword extends PureComponent {
   constructor(props){
     super(props)
+    this.state={}
   }
   handleReset(){
     this.props.form.resetFields()

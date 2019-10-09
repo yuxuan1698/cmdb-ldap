@@ -1,6 +1,6 @@
 'use strict'
 
-import {PureComponent,Fragment} from 'react'
+import {PureComponent} from 'react'
 import {
   Layout,Tabs,Button,Select,Icon,message
   } from 'antd';
@@ -99,7 +99,7 @@ class CMDBChangePassword extends PureComponent {
         encode: false,
         decode: false
       },
-      curCm: new Object(),
+      curCm: {},
       curLinePos:"",
       selectWord:""
     }
@@ -113,6 +113,7 @@ class CMDBChangePassword extends PureComponent {
     let tmpField=["dn","ou","changetype","replace","newrdn","deleteoldrdn","newsuperior","add","delete","modify","moddn","version"]
     Object.values(classObjects).map(i=>{
       i.map(s=>Object.values(s).map(k=>tmpField=tmpField.concat(k)))
+      return i
     })
     hints['hintField']=Array.from(new Set(tmpField))
     this.setState(hints)
@@ -143,6 +144,8 @@ class CMDBChangePassword extends PureComponent {
           values: Object.assign(values,{[`ldif_console_${addPaneIndex}`]: defaultValue})
         })
         break;
+      default:
+        break;
     }
   }
   handleGetObjectClass=()=>{
@@ -161,7 +164,7 @@ class CMDBChangePassword extends PureComponent {
     window.jsyaml=jsyaml
     this.handleGetObjectClass()
     let {userlist,dispatch}=this.props
-    if(Object.keys(userlist).length==0){
+    if(Object.keys(userlist).length===0){
       dispatch({type:"users/getUserList"})
     }
     CodeMirror.registerHelper('hint', 'ldapHint', (editor)=> {
@@ -195,7 +198,6 @@ class CMDBChangePassword extends PureComponent {
   }
   codeMirrorOnChange=(cm, data,value)=>{
     let {values,activeKey} =this.state
-    console.log(data)
     // if (data.origin === "+input" || data.origin=== "paste"){
     if(![undefined,'paste','complete'].includes(data.origin)) CodeMirror.showHint(cm, CodeMirror.hint.ldapHint,{completeSingle:false}); 
     this.setState({values: Object.assign(values,{[activeKey]:cm.getValue()})})
@@ -262,7 +264,7 @@ class CMDBChangePassword extends PureComponent {
     }
   }
   handleRightMenu=()=>{
-    let {curCm,fullScreen}=this.state
+    let {fullScreen}=this.state
     return <ContextMenu id="ldap_ldif_control_menu" >
           <MenuItem disabled={!Boolean(this.state.rightMenuControl.copy)} onClick={()=>{
             let {selectWord}=this.state
@@ -317,7 +319,7 @@ class CMDBChangePassword extends PureComponent {
   }
   render(){
     let {values,panes,activeKey,theme,fullScreen} =this.state
-    let ismac = CodeMirror.keyMap.default == CodeMirror.keyMap.macDefault;
+    let ismac = CodeMirror.keyMap.default === CodeMirror.keyMap.macDefault;
     let options={
       mode: 'ldap',
       theme: theme,
@@ -325,7 +327,6 @@ class CMDBChangePassword extends PureComponent {
       autofocus:true,
       lineWrapping:true,
       lineNumbers: true,
-      autofocus:true,
       styleActiveLine:true,
       foldGutter: true,
       autoCloseBrackets:true,

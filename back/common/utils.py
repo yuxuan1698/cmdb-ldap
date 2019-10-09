@@ -72,7 +72,7 @@ def generateQRCode(encodedata=''):
   img.save(buf,format='PNG')
   image_stream = buf.getvalue()
   heximage = base64.b64encode(image_stream)
-  return 'data:image/png;base64,' + heximage.decode()
+  return "data:image/png;base64,{}".format(heximage.decode())
   
 class LDAPJSONEncoder(DjangoJSONEncoder):
   """

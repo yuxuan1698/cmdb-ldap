@@ -64,6 +64,7 @@ class CMDBUserList extends PureComponent {
     if(userdn!=="" && modifydata===""){
       Object.keys(userlist).filter(i=> userlist[i].includes(userdn)).map(i=>{
         moddata={userdn,data:userlist[i][1]}
+        return i
       })
     }
     if(type==='update'){
@@ -139,6 +140,7 @@ class CMDBUserList extends PureComponent {
         pwdAccountLockedTime:userlist[it][1].pwdAccountLockedTime?userlist[it][1].pwdAccountLockedTime:"",
         userdn: userlist[it][0]
       })
+      return it
     })
     const tableData=data.filter(i=>{
       return (i.uid.indexOf(this.state.searchFilterVal)>-1 ||

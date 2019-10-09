@@ -37,7 +37,6 @@ class CMDBLDAPManager extends PureComponent {
     }
   }
   componentWillMount=()=>{
-    console.log(LDAP_MAP_FIELDS)
     const { selectdata }=this.props
     if(selectdata.hasOwnProperty('objectClass')){
       this.setState({
@@ -89,6 +88,7 @@ class CMDBLDAPManager extends PureComponent {
       }else{
         supSet=supSet.concat(classobjects[it][0].sup,[it])
       }
+      return it
     })
     return Array.from(new Set(supSet))
   }
@@ -106,6 +106,7 @@ class CMDBLDAPManager extends PureComponent {
         mustfiled=mustfiled.concat([it==='simpleSecurityObject'?"cn":defautlMustfield],classobjects[it][1].must)
       }
       mayfiled=mayfiled.concat(classobjects[it][2].may)
+      return it
     }) 
     this.setState({
       selectedItems:supSet,
@@ -141,6 +142,7 @@ class CMDBLDAPManager extends PureComponent {
           setFieldsValue({[i]:selectdata.hasOwnProperty(i)?selectdata[i]:[]})
         }
       }
+      return i
     })
   }
   addInputField=(name)=>{

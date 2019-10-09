@@ -34,7 +34,7 @@ class CMDBMessages extends PureComponent{
   }
   
   render(){
-    const {languages}=this.state
+    // const {languages}=this.state
     const data = [
       {
         title: 'Ant Design Title 1',

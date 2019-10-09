@@ -51,6 +51,7 @@ class LDAPSelectPermission extends PureComponent {
             (it[0]['hasSubordinates'][0] === "TRUE" ? false : true) :
             false
         })
+        return it
       })
       this.setState({grouplist:grouplist})
     }})
@@ -67,7 +68,6 @@ class LDAPSelectPermission extends PureComponent {
           let targetKeys=listdata.map(it=>{
             targetValues.push(it[0])
             oldgrouplist.push(it[0])
-            console.log(it)
             parentExtentedKeys.add(it[0].replace(it[0].split(',')[0]+",",''))
             return {
               key:it[0],
@@ -90,7 +90,7 @@ class LDAPSelectPermission extends PureComponent {
   componentWillReceiveProps(nextProps){
     let old_selectkey=this.props.selectKey
     let new_selectkey=nextProps.selectKey
-    if(old_selectkey!=new_selectkey){
+    if(old_selectkey!==new_selectkey){
       this.getUserPermission(new_selectkey)
     }
   }
@@ -105,7 +105,7 @@ class LDAPSelectPermission extends PureComponent {
     })
   }
   renderTreeNodes = (data) => data.map((item) => {
-      let {targetValues,expandedKeys,currPermissionKeys,oldgrouplist}=this.state
+      let {targetValues,expandedKeys}=this.state
       let {selectKey}=this.props
       let havePermission=Boolean(
         targetValues.includes(item.key)
@@ -159,6 +159,7 @@ class LDAPSelectPermission extends PureComponent {
               (i[0]['hasSubordinates'][0] === "TRUE" ? false : true) :
               false
           })
+          return i
         })
         treeNode.props.dataRef.children = list
         setTimeout(() => {
@@ -199,6 +200,7 @@ class LDAPSelectPermission extends PureComponent {
         }
         currPermissionKeys[i]=values
       }
+      return i
     })
     this.setState({
       selectedRowKeys:[],
@@ -261,7 +263,9 @@ class LDAPSelectPermission extends PureComponent {
             </span>
           })
         }
+        return m
       })
+      return i
     })
     if(haveError) return haveError
     dispatch({type:'ldap/postLDAPGroupPermission',payload:currPermissionKeys,callback:(d)=>{
@@ -273,7 +277,7 @@ class LDAPSelectPermission extends PureComponent {
     }})
   }
   render(){
-    const { grouplist,selectedKeys,expandedKeys,searchValue,targetKeys,selectedRowKeys,width,currPermissionKeys,oldgrouplist } = this.state;
+    const { grouplist,selectedKeys,expandedKeys,searchValue,targetKeys,selectedRowKeys,width,currPermissionKeys } = this.state;
     const {loading,selectKey}=this.props
     let currUser=selectKey.split(',')[0].split('=')[1]
     let tableData=targetKeys

@@ -10,6 +10,7 @@ import {Layout } from 'antd';
 class CMDBSystemSetting extends PureComponent {
   constructor(props){
     super(props)
+    this.state={}
     // this.tabPosition
   }
   

@@ -55,6 +55,7 @@ class DrawerAddUser extends PureComponent {
       }else{
         supSet=supSet.concat(classobjects[it][0].sup,[it])
       }
+      return it
     })
     return Array.from(new Set(supSet))
   }
@@ -65,6 +66,7 @@ class DrawerAddUser extends PureComponent {
     supSet.filter(i=>i!=='top').map(it=>{
       mustfiled=mustfiled.concat([it==='simpleSecurityObject'?"cn":'uid'],classobjects[it][1].must)
       mayfiled=mayfiled.concat(classobjects[it][2].may)
+      return it
     }) 
     this.setState({
       selectedItems:supSet,
@@ -182,7 +184,7 @@ class DrawerAddUser extends PureComponent {
                         rules: [{ required: true, message: formatMessage({id:'userlist_useradd_field_choise'})+"(objectClass)" }],
                       })(
                         <Select
-                          disabled={addmodel=='pro'?false:true}
+                          disabled={addmodel==='pro'?false:true}
                           mode="multiple" showArrow autoFocus allowClear
                           placeholder={formatMessage({id:'userlist_useradd_field_choise'})+"(objectClass)"}
                           onChange={this.handleClassObjectsChange.bind(this)}

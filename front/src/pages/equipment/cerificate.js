@@ -133,7 +133,6 @@ class CMDBSystemSetting extends PureComponent {
       region,
       selectedRowKeys,
       regions,
-      regionNames,
       searchValue
     } = this.state
     const {loading,equipment}=this.props

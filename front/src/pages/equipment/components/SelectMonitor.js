@@ -43,7 +43,7 @@ class CMDBMonitorData extends PureComponent {
     setTimeout(this.handleMoniterDataGet,100)
   }
   handleMoniterDateTimeChange=(d,dstr)=>{
-    if (dstr[0] == dstr[1]){
+    if (dstr[0] === dstr[1]){
       message.error("开始时间不能与结束时间相同。")
       return false
     }
@@ -120,11 +120,12 @@ class CMDBMonitorData extends PureComponent {
               fontSize:10
             },
             formatter:(v)=>{
-              let htmlmsg="<div><div>"+v[0].axisValueLabel+"</div>"
+              let htmlmsg=`<div><div>${v[0].axisValueLabel}</div>`
               v.map(i=>{
-                htmlmsg+="<div>"+i.marker+i.seriesName+": "+i.data+"%"+"</div>"
+                htmlmsg+=`<div>${i.marker}${i.seriesName}: ${i.data}%</div>`
+                return i
               })
-              htmlmsg+="</div>"
+              htmlmsg+=`</div>`
               return htmlmsg
             }
         },
@@ -147,9 +148,7 @@ class CMDBMonitorData extends PureComponent {
         },
         yAxis: {
           axisLabel:{
-            fontSize:11
-          },
-          axisLabel:{
+            fontSize:11,
             formatter: "{value}(%)"
           },
           axisLine: {show:false},
@@ -195,11 +194,12 @@ class CMDBMonitorData extends PureComponent {
             fontSize:10
           },
           formatter:(v)=>{
-            let htmlmsg="<div><div>"+v[0].axisValueLabel+"</div>"
+            let htmlmsg=`<div><div>${v[0].axisValueLabel}</div>`
             v.map(i=>{
-              htmlmsg+="<div>"+i.marker+i.seriesName+": "+i.data+"次/s"+"</div>"
+              htmlmsg+=`<div>${i.marker}${i.seriesName}: ${i.data}次/s</div>`
+              return i
             })
-            htmlmsg+="</div>"
+            htmlmsg+=`</div>`
             return htmlmsg
           }
         },
@@ -222,9 +222,7 @@ class CMDBMonitorData extends PureComponent {
         },
         yAxis: {
           axisLabel:{
-            fontSize:11
-          },
-          axisLabel:{
+            fontSize:11,
             formatter: "{value} (次)"
           },
           axisLine: {show:false},
@@ -279,11 +277,12 @@ class CMDBMonitorData extends PureComponent {
               fontSize:10
             },
             formatter:(v)=>{
-              let htmlmsg="<div><div>"+v[0].axisValueLabel+"</div>"
+              let htmlmsg=`<div><div>${v[0].axisValueLabel}</div>`
               v.map(i=>{
-                htmlmsg+="<div>"+i.marker+i.seriesName+": "+formatByteUnits(i.data)+"/s"+"</div>"
+                htmlmsg+=`<div>${i.marker}${i.seriesName}: ${formatByteUnits(i.data)}/s</div>`
+                return i
               })
-              htmlmsg+="</div>"
+              htmlmsg+=`</div>`
               return htmlmsg
             }
         },
@@ -363,11 +362,12 @@ class CMDBMonitorData extends PureComponent {
               fontSize:10
             },
             formatter:(v)=>{
-              let htmlmsg="<div><div>"+v[0].axisValueLabel+"</div>"
+              let htmlmsg=`<div><div>${v[0].axisValueLabel}</div>`
               v.map(i=>{
-                htmlmsg+="<div>"+i.marker+i.seriesName+": "+formatByteUnits(i.data)+"/s"+"</div>"
+                htmlmsg+=`<div>${i.marker}${i.seriesName}: ${formatByteUnits(i.data)}/s</div>`
+                return i
               })
-              htmlmsg+="</div>"
+              htmlmsg+=`</div>`
               return htmlmsg
             }
         },
@@ -447,11 +447,12 @@ class CMDBMonitorData extends PureComponent {
               fontSize:10
             },
             formatter:(v)=>{
-              let htmlmsg="<div><div>"+v[0].axisValueLabel+"</div>"
+              let htmlmsg=`<div><div>${v[0].axisValueLabel}</div>`
               v.map(i=>{
-                htmlmsg+="<div>"+i.marker+i.seriesName+": "+formatByteUnits(i.data)+"/s"+"</div>"
+                htmlmsg+=`<div>${i.marker}${i.seriesName}: ${formatByteUnits(i.data)}/s</div>`
+                return i
               })
-              htmlmsg+="</div>"
+              htmlmsg+=`</div>`
               return htmlmsg
             }
         },
@@ -545,7 +546,7 @@ class CMDBMonitorData extends PureComponent {
                   value={monitortime>3600?parseInt(monitortime/3600,10):1}
                   step={hour<24?1:24} min={1} max={168}
                   tipFormatter={()=>{
-                    return <span>{hour>=24?((hour/24)%7==0?(hour/24)/7:parseInt(hour/24)):hour}{hour<24?"小时":((hour/24)%7==0?"周":"天")}</span>
+                    return <span>{hour>=24?((hour/24)%7===0?(hour/24)/7:parseInt(hour/24)):hour}{hour<24?"小时":((hour/24)%7===0?"周":"天")}</span>
                   }}
                   defaultValue={1}
                   onBlur = {
