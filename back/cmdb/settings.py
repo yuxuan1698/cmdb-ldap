@@ -30,7 +30,7 @@ SECRET_KEY                                = 'u_rom*ua&x304mcqwqgv-x5i@*fwnj&ip)a
 # SECURITY WARNING                        : don't run with debug turned on in production!
 DEBUG                                     = CONFIG_FILE.get('cmdb').get('debug') or True
 
-ALLOWED_HOSTS                             = ['127.0.0.1','192.168.1.252']
+ALLOWED_HOSTS                             = ['127.0.0.1','192.168.1.252','cmdb.iwubida.com']
 
 CMDB_BASE_URL                             = CONFIG_FILE.get('cmdb').get('base_url') or "http://127.0.0.1:8081"
 # Application definition
