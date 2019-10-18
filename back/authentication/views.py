@@ -101,7 +101,7 @@ class UpdateUserViewSet(APIView):
   """
   更新用户
   """
-  serializer_class = UpdateUserSerializer
+  # serializer_class = UpdateUserSerializer
   def post(self,request, *args, **kwargs):
     """
     提交用户数据
@@ -110,6 +110,7 @@ class UpdateUserViewSet(APIView):
     if serializer.is_valid():
       olddn=request.data['userdn']
       request.data.pop('userdn')
+      request.data.pop('sign')
       userid=olddn.split(",")[0].split("=")[0]
       username=olddn.split(",")[0].split("=")[1]
       newUserid=request.data[userid]
@@ -154,7 +155,7 @@ class DeleteUserViewSet(APIView):
   """
   删除用户
   """
-  serializer_class = DeleteUserSerializer
+  # serializer_class = DeleteUserSerializer
   def post(self,request, *args, **kwargs):
     """
     删除用户
@@ -219,6 +220,8 @@ class SavePermissionListByViewSet(APIView):
     根据用户获取用户信息
     """
     permissionData=request.data
+    if 'sign' in request.data:
+      request.data.pop('sign')
     success,errmsg = CmdbLDAP().save_permissions_group(permissionData)
     if success:
       return JsonResponse({'status':success},encoder=LDAPJSONEncoder,safe=False)

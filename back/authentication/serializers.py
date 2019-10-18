@@ -160,7 +160,7 @@ class CreateUserSerializer(BaseSerializer):
     return data
 
 
-class UpdateUserSerializer(Serializer):
+class UpdateUserSerializer(BaseSerializer):
   """
     效验更新用户的字段
   """
