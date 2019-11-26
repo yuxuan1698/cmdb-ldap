@@ -9,27 +9,27 @@ cmdb:
   
 # REDIS配置段
 redis:
-  host: 192.168.1.246
-  password: jbg@123
+  host: 172.16.0.13
+  password: selktech
   port: 6379
   db: 8
 # EMAIL配置段
 email:
   host: 172.18.207.238
   port: 465
-  username: dev@iwubida.com
+  username: dev@silktech.com
   password: Wubida@123
   tls: false
 
 # LDAP配置段
 ldap:
   enable: true
-  host: ldap://192.168.1.247
+  host: ldap://openldap
   port: 389
-  binddn: cn=admin,ou=SystemUser,dc=iwubida,dc=com
-  bindpassword: Wubida@123
-  basedn: dc=iwubida,dc=com
-  usersdn: ou=Users,dc=iwubida,dc=com
+  binddn: cn=admin,ou=SystemUser,dc=silktech,dc=com
+  bindpassword: deakingP@ssw0rd
+  basedn: dc=silktech,dc=com
+  usersdn: ou=Users,dc=silktech,dc=com
   userfilter: '(&(uid=%(user)s))'
   userattrmap: 
     username: "cn"
@@ -38,14 +38,14 @@ ldap:
     nickname: "sn"
     mobile: "mobile"
   mirror_groups: true
-  groupsdn: ou=Groups,dc=iwubida,dc=com
-  cmdbpermissdn: ou=Cmdb,ou=Groups,dc=iwubida,dc=com
+  groupsdn: ou=Groups,dc=silktech,dc=com
+  cmdbpermissdn: ou=Cmdb,ou=Groups,dc=silktech,dc=com
   tls: false
 # 阿里去配置段
 aliyun:
   # 物必达
   wbd:
-    name: '物必达(iwubida)'
+    name: '物必达(silktech)'
     accesskey: 'LTAIUWuSChF0IY7L'
     accesssecret: '9e1QiG9cRDTIGJnUcOQMK27C1ohu8v'
   # 94lazy
