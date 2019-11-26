@@ -28,7 +28,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from django.core.cache import cache
 
-from common.utils import CmdbLDAPLogger,LDAPJSONEncoder,generat_random_password
+from common.utils import CmdbLDAPLogger,LDAPJSONEncoder,generat_random_password,get_sshkey_fingerprint
 from authentication.utils import user_payload_handler
 from crontasks.tasks import send_register_email,send_reset_password_email,send_reset_sshkey_email
 from django.contrib.auth.decorators import permission_required
@@ -64,7 +64,7 @@ class CreateUserViewSet(APIView):
   """
   创建用户
   """
-  serializer_class = CreateUserSerializer
+  # serializer_class = CreateUserSerializer
   def post(self,request, *args, **kwargs):
     """
     提交用户数据
@@ -72,6 +72,7 @@ class CreateUserViewSet(APIView):
     serializer = CreateUserSerializer(instance=request, data=request.data)
     if serializer.is_valid():
       # serializer.validated_data
+      del request.data['sign']
       changeStatus,errorMsg,newUserDn,newUser = CmdbLDAP().create_ldap_user(request.data)
       if changeStatus:
         returnData = {"status": changeStatus}
@@ -100,7 +101,7 @@ class UpdateUserViewSet(APIView):
   """
   更新用户
   """
-  serializer_class = UpdateUserSerializer
+  # serializer_class = UpdateUserSerializer
   def post(self,request, *args, **kwargs):
     """
     提交用户数据
@@ -109,6 +110,7 @@ class UpdateUserViewSet(APIView):
     if serializer.is_valid():
       olddn=request.data['userdn']
       request.data.pop('userdn')
+      request.data.pop('sign')
       userid=olddn.split(",")[0].split("=")[0]
       username=olddn.split(",")[0].split("=")[1]
       newUserid=request.data[userid]
@@ -153,7 +155,7 @@ class DeleteUserViewSet(APIView):
   """
   删除用户
   """
-  serializer_class = DeleteUserSerializer
+  # serializer_class = DeleteUserSerializer
   def post(self,request, *args, **kwargs):
     """
     删除用户
@@ -180,14 +182,17 @@ class UserAttributeByViewSet(APIView):
   """
   允许用户查看或编辑的API路径。
   """
-  # serializer_class=LdapUserSerializer
   def get(self,request,*args,**kwargs):
     """
     根据用户获取用户信息
     """
     username=kwargs.get('username')
     userattrs=CmdbLDAP().get_user_list(username,['*','+'])
-    return JsonResponse(userattrs[0],encoder=LDAPJSONEncoder,safe=False)
+    # get_sshkey_fingerprint
+    if userattrs[0][0] and 'sshPublicKey' in userattrs[0][0][1] and len(userattrs[0][0][1]['sshPublicKey'])==1:
+      userattrs[0][0][1]['sshPublicKey'].append(get_sshkey_fingerprint(userattrs[0][0][1]['sshPublicKey'][0].decode('utf-8')))
+      logger.info(userattrs[0][0][1]['sshPublicKey'])
+    return JsonResponse(userattrs[0][0],encoder=LDAPJSONEncoder,safe=False)
 
 class UserPermissionListByViewSet(APIView):
   """
@@ -215,6 +220,8 @@ class SavePermissionListByViewSet(APIView):
     根据用户获取用户信息
     """
     permissionData=request.data
+    if 'sign' in request.data:
+      request.data.pop('sign')
     success,errmsg = CmdbLDAP().save_permissions_group(permissionData)
     if success:
       return JsonResponse({'status':success},encoder=LDAPJSONEncoder,safe=False)

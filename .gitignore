@@ -9,6 +9,7 @@ __pycache__
 .sqlite3
 .umi
 front/node_modules
+back/config.yaml
 npm-debug.log*
 yarn-error.log
 yarn.lock

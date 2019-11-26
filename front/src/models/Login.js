@@ -72,7 +72,7 @@ export default {
           }
         }
       },
-      *logoutAction({},{put}){
+      *logoutAction({payload},{put}){
         Store.delLocal('userinfo')
         yield put({
           type:'logout',

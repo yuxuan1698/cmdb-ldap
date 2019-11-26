@@ -133,7 +133,6 @@ class CMDBSystemSetting extends PureComponent {
       region,
       selectedRowKeys,
       regions,
-      regionNames,
       searchValue
     } = this.state
     const {loading,equipment}=this.props
@@ -154,9 +153,7 @@ class CMDBSystemSetting extends PureComponent {
           }
         },
         render: (text, record) => < Tooltip placement = "top"
-        title = {
-          `实例ID:${record.InstanceId}`
-        } > {
+        title = {`实例ID:${record.InstanceId}`} > {
           <span style={{fontSize:12}}>{text}<br/ >({record.InstanceId})</span>
         } </Tooltip>
       },

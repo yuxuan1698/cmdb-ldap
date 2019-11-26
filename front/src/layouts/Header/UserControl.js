@@ -5,7 +5,7 @@ import {
   } from 'antd'
 import css from '../index.less';
 // 国际化
-import {formatMessage,setLocale} from 'umi/locale';
+import {formatMessage} from 'umi/locale';
 import router from 'umi/router';
 import {isNotAuthChangerPassword} from 'utils'
 const {Item,Divider}=Menu
@@ -34,6 +34,8 @@ class CMDBUserControl extends PureComponent{
         break;
       case 'user':
         router.push('/center')
+        break;
+      default:
         break;
     }
   }

@@ -78,26 +78,26 @@ export class UserBatchButton extends PureComponent {
     const menu = (
       <Menu>
         <Menu.Item>
-          <a onClick={this.onDeleteUser.bind(this,delkeys)} ><Icon type="usergroup-delete" />
+          <div onClick={this.onDeleteUser.bind(this,delkeys)} ><Icon type="usergroup-delete" />
             {formatMessage({id:'userlist_useredit_batchdel'})}
-          </a>
+          </div>
         </Menu.Item>
         <Menu.Divider />
         <Menu.Item>
-          <a target="_blank" ><Icon type="lock" theme="twoTone" />
+          <div target="_blank" ><Icon type="lock" theme="twoTone" />
           {formatMessage({id:'userlist_useredit_batchlock'})}
-          </a>
+          </div>
         </Menu.Item>
         <Menu.Item>
-          <a ><Icon type="unlock" theme="twoTone" />
+          <div><Icon type="unlock" theme="twoTone" />
           {formatMessage({id:'userlist_useredit_batchunlock'})}
-          </a>
+          </div>
         </Menu.Item>
         <Menu.Divider />
         <Menu.Item>
-          <a ><Icon type="export" />
+          <div><Icon type="export" />
           {formatMessage({id:'userlist_useredit_exportuser'})}
-          </a>
+          </div>
         </Menu.Item>
       </Menu>
     )

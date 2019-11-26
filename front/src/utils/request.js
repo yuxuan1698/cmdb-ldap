@@ -73,7 +73,7 @@ export default function request (opt) {
   // 调用 axios api，统一拦截
   return axios(opt)
     .then((response) => {
-      console.log(`【${opt.method} ${opt.url}】请求成功，响应数据：${response}`, )
+      console.log(`【${opt.method} ${opt.url}】请求成功，响应数据：${response}`)
       clearInterval(timer)
       return { ...response.data }
     })
@@ -82,7 +82,7 @@ export default function request (opt) {
       // 请求配置发生的错误
       if (!error.response) {
         message.error(`${formatMessage({id:'request.status.timeout'})} ${error.message}`);
-        console.log('Error', error.message);
+        console.log(`Error ${error.message}`);
         return false
       }
       return false;

@@ -3,7 +3,7 @@
 
 import {PureComponent} from 'react'
 import {Select } from 'antd';
-import {formatMessage} from 'umi/locale';
+// import {formatMessage} from 'umi/locale';
 
 const { Option } = Select;
 
@@ -38,8 +38,7 @@ class CMDBSelectRegions extends PureComponent {
     }
   }
   render(){
-    const {regions}=this.state
-    const {loading,region}=this.props
+    const {loading,region,regions,handleAliCloundRegionChange}=this.props
     return <Select
       showSearch
       style={{ width: 230 }}
@@ -47,9 +46,9 @@ class CMDBSelectRegions extends PureComponent {
       optionFilterProp="children"
       defaultValue={region}
       loading={Boolean(loading.effects['equipment/getAliCloundRegionsList'])}
-      onChange={this.props.handleAliCloundRegionChange.bind(this)}
+      onChange={handleAliCloundRegionChange.bind(this)}
     >
-    {this.props.regions.map(it=>{
+    {regions.map(it=>{
       return <Option key={it.RegionId} style={{fontSize:14}} value={it.RegionId}>
       {FLAGS.hasOwnProperty(it.RegionId)?<span style={{fontSize:18,paddingTop:1,float:"left"}}>{FLAGS[it.RegionId][0]}</span>:""}
       {it.LocalName}{(FLAGS.hasOwnProperty(it.RegionId) && FLAGS[it.RegionId].length>1)?`(${FLAGS[it.RegionId][1]})`:""}

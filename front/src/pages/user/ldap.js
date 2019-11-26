@@ -116,6 +116,7 @@ class CMDBLdapGroups extends PureComponent {
           treeNode.props.dataRef.isLeaf=true
           data.data.map(i=>{
             loadedobject[i[1]]=i[0]
+            return i
           })
           this.setState({
             treedata: [...this.props.groups.treedata],
@@ -134,6 +135,7 @@ class CMDBLdapGroups extends PureComponent {
                 (i[0]['hasSubordinates'][0] === "TRUE" ? false : true) :
                 false
             })
+            return i
           })
           treeNode.props.dataRef.children = list
           setTimeout(() => {

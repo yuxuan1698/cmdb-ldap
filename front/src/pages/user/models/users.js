@@ -26,6 +26,8 @@ export default {
                 type: 'getUserList'
               })
               break;
+            default:
+              break;
           }
         });
       },

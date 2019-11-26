@@ -34,7 +34,6 @@ export function LDAP_MAP_FIELDS_FORMAT(){
 export function GenerateRequestAuthParams() {
   const header_info=Store.getLocal('userinfo');
   const language=Store.getLocal('umi_locale',false) || navigator.language||navigator.userLanguage;
-  console.log(language)
   let header={"CMDB-Language":language}
   if (header_info.hasOwnProperty('token_prefix') &&
       header_info.hasOwnProperty('token') && 
@@ -93,6 +92,7 @@ export function singleListToString(objval){
           objval[i]=objval[i][0]||""
         }
       }
+      return i
     })
   }
   return objval
@@ -162,7 +162,7 @@ export function isNotAuthChangerPassword(location){
   }
 }
 
-
+// 下载SSH
 export function downloadSSHKey(data,username){
   if(!data instanceof Object) return message.error('下载SSHKey参数不合法。');
   let PrivateElement = document.createElement('a')
@@ -185,6 +185,7 @@ export function downloadSSHKey(data,username){
     //点击下载
     PrivateElement.click();
     window.URL.revokeObjectURL(DownloadHref);
+    return  k
   })
   //下载完成移除元素
   document.body.removeChild(PrivateElement);
@@ -198,8 +199,22 @@ export function GenerateSignature(data){
   Object.keys(data).sort().map(i=>{
     SignData[i]=data[i]
     SignString=`${SignString}+${data[i]}`
+    return i
   })
-  console.log(SignString)
   SignData['sign']=md5(SignString)
   return SignData
+}
+
+// 格式化字节单位
+export const formatByteUnits=(value)=>{
+  if (value <= 0) {
+      value = '0B';
+  }
+  else{
+      var k = 1024;
+      var sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+      var c = Math.floor(Math.log(value) / Math.log(k));
+      value = (value / Math.pow(k, c)).toFixed(2) + ' ' + sizes[c];
+  }
+  return value
 }

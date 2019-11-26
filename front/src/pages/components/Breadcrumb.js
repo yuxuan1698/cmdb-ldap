@@ -8,6 +8,7 @@ import css from './index.less'
 class CMDBBreadcrumb extends PureComponent {
   constructor(props){
     super(props)
+    this.state={}
   }
   
   render(){

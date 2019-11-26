@@ -11,6 +11,7 @@ const { TabPane } = Tabs;
 class CMDBSystemSetting extends PureComponent {
   constructor(props){
     super(props)
+    this.state={}
     // this.tabPosition
   }
   

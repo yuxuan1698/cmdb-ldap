@@ -3,7 +3,7 @@
 
 import {Fragment,PureComponent} from 'react'
 import {
-  Form, Button, Input, Select, Layout,Spin,Row,Col,Alert,message,
+  Form, Button, Input, Select, Layout,Spin,Row,Col,Alert,message,Popover,Radio,
   Icon,InputNumber,Divider,Tooltip,notification
 } from 'antd';
 import {connect} from 'dva';
@@ -12,6 +12,7 @@ import css from './index.less'
 import SelectFieldButton from "./SelectFieldButton";
 import {formatMessage} from 'umi/locale';
 import {LDAP_MAP_FIELDS_FORMAT} from 'utils'
+import sshkeysvg from 'svgicon/sshkey.svg'
 
 const LDAP_MAP_FIELDS=LDAP_MAP_FIELDS_FORMAT()
 
@@ -31,11 +32,11 @@ class CMDBLDAPManager extends PureComponent {
       selectedItems:['top'],
       mustField:[],
       currField:[],
+      sshKeyType: 'ecdsa',
       currData:{}
     }
   }
   componentWillMount=()=>{
-    console.log(LDAP_MAP_FIELDS)
     const { selectdata }=this.props
     if(selectdata.hasOwnProperty('objectClass')){
       this.setState({
@@ -87,6 +88,7 @@ class CMDBLDAPManager extends PureComponent {
       }else{
         supSet=supSet.concat(classobjects[it][0].sup,[it])
       }
+      return it
     })
     return Array.from(new Set(supSet))
   }
@@ -104,6 +106,7 @@ class CMDBLDAPManager extends PureComponent {
         mustfiled=mustfiled.concat([it==='simpleSecurityObject'?"cn":defautlMustfield],classobjects[it][1].must)
       }
       mayfiled=mayfiled.concat(classobjects[it][2].may)
+      return it
     }) 
     this.setState({
       selectedItems:supSet,
@@ -139,6 +142,7 @@ class CMDBLDAPManager extends PureComponent {
           setFieldsValue({[i]:selectdata.hasOwnProperty(i)?selectdata[i]:[]})
         }
       }
+      return i
     })
   }
   addInputField=(name)=>{
@@ -187,6 +191,29 @@ class CMDBLDAPManager extends PureComponent {
       }
     }
   }
+  handleGenerateSSHkey=()=>{
+    const {setFieldsValue,getFieldValue } = this.props.form;
+    const {sshKeyType}=this.state
+    let username=getFieldValue('uid')[0] || getFieldValue('sn')[0]
+    let email=getFieldValue('mail')[0] 
+    let payload={username,email,keytype:sshKeyType}
+    const {dispatch}=this.props
+    dispatch({type:'users/generateSSHKeyAndDownLoad',payload,callback:(data)=>{
+      if(data.hasOwnProperty('publickey')){
+        setFieldsValue({sshPublicKey:data.publickey})
+        notification.success({
+          message: formatMessage({id:'userlist_usergenerate_sshkey_success'}),
+          description: formatMessage({id:'userlist_usergenerate_sshkey_content'})
+        })
+      }
+    }})
+  }
+  handleChangeSSHKeyType=(e)=>{
+    this.setState({sshKeyType:e.target.value})
+    setTimeout(() => {
+      this.handleGenerateSSHkey();
+    }, 200);
+  }
   render() {
     const { getFieldDecorator } = this.props.form;
     const {
@@ -195,7 +222,7 @@ class CMDBLDAPManager extends PureComponent {
       userdnlist,
       isNewDn
     } = this.props;
-    const { selectedItems,options,currField,mayField } = this.state;
+    const { selectedItems,options,currField,mayField,mustField,sshKeyType } = this.state;
     const loaded=loading.effects['ldap/getLDAPGroupsSecendList']
     const loaded_update=loading.effects['ldap/postLDAPUpdateDN']
     let { getFieldValue }=this.props.form
@@ -279,12 +306,31 @@ class CMDBLDAPManager extends PureComponent {
                                     )
                                   }],
                               })(inputField)}
-                              {!this.state.mustField.includes(i)?<Tooltip placement="top" title={formatMessage({id:'userlist_useradd_del_field'})}>
-                                    <Icon className={css.delete_field_icon}
-                                      type="minus-circle-o"
-                                      theme="twoTone"
-                                      onClick={this.removeField.bind(this,i)} />
-                                    </Tooltip>:""}
+                               {!mustField.includes(i)?<span className={css.field_control}>
+                                <Tooltip placement="top" title={formatMessage({id:'userlist_useradd_del_field'})}>
+                                  <Icon className={css.delete_field_icon}
+                                    type="minus-circle-o"
+                                    theme="twoTone"
+                                    onClick={this.removeField.bind(this,i)} />
+                                </Tooltip>
+                                {i==='sshPublicKey' && (getFieldValue('uid')!==""||getFieldValue('sn')!=="")?
+                                  <Tooltip placement="top" title={formatMessage({id:'userlist_useradd_generate_sshkey'})}>
+                                    <Popover placement="bottom" 
+                                      content={<Radio.Group size='small' 
+                                        value={sshKeyType}
+                                        onChange={this.handleChangeSSHKeyType}
+                                        buttonStyle="solid">
+                                      <Radio.Button value="rsa">RSA</Radio.Button>
+                                      <Radio.Button value="ecdsa">ECDSA</Radio.Button>
+                                      <Radio.Button value="dss">DSS</Radio.Button>
+                                      <Radio.Button value="ed25519">ED25519</Radio.Button>
+                                    </Radio.Group>} trigger="hover">
+                                      <Icon className={css.sshkey_field_icon} 
+                                        onClick={this.handleGenerateSSHkey.bind(this)}
+                                        component={sshkeysvg} style={{fontSize:28}} />
+                                    </Popover>
+                                  </Tooltip>:""}
+                              </span>:""}
                             </Form.Item>
                             </Col>
                           )

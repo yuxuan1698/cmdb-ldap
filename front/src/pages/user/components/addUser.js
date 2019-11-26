@@ -3,13 +3,13 @@
 import { PureComponent } from 'react';
 import css from './index.less'
 import {
-    Drawer, Form, Button, Radio, Row, Input, Select,
+    Drawer, Form, Button, Radio, Row, Input, Select,Popover,
     Icon,InputNumber,Divider,Col,Tooltip,notification
 } from 'antd';
 import {formatMessage} from 'umi/locale';
 import SelectFieldButton from "./SelectFieldButton";
 import {LDAP_MAP_FIELDS_FORMAT} from 'utils'
-
+import sshkeysvg from 'svgicon/sshkey.svg'
 const LDAP_MAP_FIELDS=LDAP_MAP_FIELDS_FORMAT()
 
 const { Option } = Select;
@@ -27,7 +27,6 @@ const models={
         'mobile','mail','loginShell','departmentNumber','sshPublicKey','description']
     }
   }
-const sshkeysvg=props=><svg t="1562306719054" viewBox="0 0 1024 1024" version="1.1" p-id="31350" width="28" height="28"><path d="M512 512m-472.177778 0a472.177778 472.177778 0 1 0 944.355556 0 472.177778 472.177778 0 1 0-944.355556 0Z" fill="#31C5B3" p-id="31351"></path><path d="M91.022222 568.888889l62.577778-5.688889c0 17.066667 5.688889 34.133333 11.377778 39.822222 11.377778 11.377778 28.444444 17.066667 51.2 17.066667s34.133333-5.688889 45.511111-11.377778c11.377778-5.688889 11.377778-17.066667 11.377778-28.444444s-5.688889-17.066667-11.377778-22.755556c-5.688889-5.688889-17.066667-11.377778-45.511111-22.755555-22.755556-11.377778-39.822222-17.066667-51.2-28.444445-11.377778-5.688889-17.066667-11.377778-28.444445-22.755555-5.688889-11.377778-5.688889-28.444444-5.688889-39.822223 0-28.444444 11.377778-45.511111 28.444445-62.577777 17.066667-17.066667 45.511111-28.444444 79.644444-28.444445 34.133333 0 62.577778 5.688889 85.333334 22.755556 17.066667 17.066667 28.444444 39.822222 34.133333 68.266666H295.822222c0-17.066667-5.688889-28.444444-17.066666-34.133333-5.688889-5.688889-22.755556-5.688889-39.822223-5.688889-17.066667 0-28.444444 5.688889-39.822222 11.377778-5.688889 0-11.377778 11.377778-11.377778 17.066667 0 11.377778 5.688889 17.066667 11.377778 22.755555 5.688889 5.688889 22.755556 11.377778 45.511111 22.755556 39.822222 17.066667 62.577778 34.133333 68.266667 39.822222 17.066667 11.377778 22.755556 34.133333 22.755555 56.888889 0 28.444444-11.377778 51.2-34.133333 68.266666-22.755556 17.066667-51.2 28.444444-91.022222 28.444445-28.444444 0-51.2-5.688889-68.266667-11.377778s-28.444444-22.755556-39.822222-39.822222c-5.688889-17.066667-11.377778-34.133333-11.377778-51.2zM364.088889 568.888889l62.577778-5.688889c0 17.066667 5.688889 34.133333 11.377777 39.822222 11.377778 11.377778 28.444444 17.066667 51.2 17.066667s34.133333-5.688889 45.511112-11.377778c11.377778-5.688889 11.377778-17.066667 11.377777-28.444444s-5.688889-17.066667-11.377777-22.755556c-5.688889-5.688889-22.755556-11.377778-45.511112-22.755555s-39.822222-17.066667-51.2-28.444445c-11.377778-5.688889-22.755556-11.377778-28.444444-22.755555-5.688889-11.377778-5.688889-28.444444-5.688889-39.822223 0-28.444444 11.377778-45.511111 28.444445-62.577777 17.066667-22.755556 45.511111-28.444444 79.644444-28.444445 34.133333 0 62.577778 5.688889 85.333333 22.755556 17.066667 17.066667 28.444444 39.822222 28.444445 68.266666H563.2c0-17.066667-5.688889-28.444444-17.066667-34.133333-5.688889-5.688889-17.066667-5.688889-34.133333-5.688889s-28.444444 5.688889-39.822222 11.377778c-5.688889 0-11.377778 11.377778-11.377778 17.066667 0 11.377778 5.688889 17.066667 11.377778 22.755555 5.688889 5.688889 22.755556 11.377778 45.511111 22.755556 34.133333 17.066667 56.888889 28.444444 68.266667 39.822222 17.066667 11.377778 22.755556 34.133333 22.755555 56.888889 0 28.444444-11.377778 51.2-34.133333 68.266666-22.755556 17.066667-51.2 28.444444-91.022222 28.444445-28.444444 0-51.2-5.688889-68.266667-11.377778s-34.133333-22.755556-39.822222-39.822222c-5.688889-17.066667-11.377778-34.133333-11.377778-51.2zM830.577778 529.066667h-119.466667l-28.444444 136.533333h-62.577778L682.666667 358.4h62.577777l-22.755555 119.466667h119.466667l22.755555-119.466667h62.577778l-62.577778 307.2h-62.577778l28.444445-136.533333z" fill="#FFFFFF" p-id="31352"></path></svg>
 @Form.create()
 class DrawerAddUser extends PureComponent {
   constructor(props){
@@ -39,6 +38,7 @@ class DrawerAddUser extends PureComponent {
       mayField:[],
       visible: true,
       addmodel:'temp',
+      sshKeyType: 'ecdsa',
       ...models.temp
     }
   }
@@ -55,6 +55,7 @@ class DrawerAddUser extends PureComponent {
       }else{
         supSet=supSet.concat(classobjects[it][0].sup,[it])
       }
+      return it
     })
     return Array.from(new Set(supSet))
   }
@@ -65,6 +66,7 @@ class DrawerAddUser extends PureComponent {
     supSet.filter(i=>i!=='top').map(it=>{
       mustfiled=mustfiled.concat([it==='simpleSecurityObject'?"cn":'uid'],classobjects[it][1].must)
       mayfiled=mayfiled.concat(classobjects[it][2].may)
+      return it
     }) 
     this.setState({
       selectedItems:supSet,
@@ -124,9 +126,10 @@ class DrawerAddUser extends PureComponent {
   }
   handleGenerateSSHkey=()=>{
     const {setFieldsValue,getFieldValue } = this.props.form;
+    const {sshKeyType}=this.state
     let username=getFieldValue('uid') || getFieldValue('sn')
     let email=getFieldValue('mail') 
-    let payload={username,email}
+    let payload={username,email,keytype:sshKeyType}
     const {dispatch}=this.props
     dispatch({type:'users/generateSSHKeyAndDownLoad',payload,callback:(data)=>{
       if(data.hasOwnProperty('publickey')){
@@ -138,10 +141,16 @@ class DrawerAddUser extends PureComponent {
       }
     }})
   }
+  handleChangeSSHKeyType=(e)=>{
+    this.setState({sshKeyType:e.target.value})
+    setTimeout(() => {
+      this.handleGenerateSSHkey();
+    }, 200);
+  }
   render() {
     const { getFieldDecorator,getFieldValue } = this.props.form;
     const { loading,userselect } = this.props;
-    const { selectedItems,options,currField,mayField ,mustField,addmodel,visible} = this.state;
+    const { selectedItems,options,currField,mayField ,mustField,addmodel,visible,sshKeyType} = this.state;
     return (<Drawer
             destroyOnClose={true}
             title={<span><Icon type="user-add" style={{fontSize:18,marginRight:4}} />{`${formatMessage({id:'userlist_useradd_new'})}(${addmodel==='temp'?
@@ -175,7 +184,7 @@ class DrawerAddUser extends PureComponent {
                         rules: [{ required: true, message: formatMessage({id:'userlist_useradd_field_choise'})+"(objectClass)" }],
                       })(
                         <Select
-                          disabled={addmodel=='pro'?false:true}
+                          disabled={addmodel==='pro'?false:true}
                           mode="multiple" showArrow autoFocus allowClear
                           placeholder={formatMessage({id:'userlist_useradd_field_choise'})+"(objectClass)"}
                           onChange={this.handleClassObjectsChange.bind(this)}
@@ -257,10 +266,20 @@ class DrawerAddUser extends PureComponent {
                                 </Tooltip>
                                 {i==='sshPublicKey' && (getFieldValue('uid')!==""||getFieldValue('sn')!=="")?
                                   <Tooltip placement="top" title={formatMessage({id:'userlist_useradd_generate_sshkey'})}>
-                                    <Icon disabled={Boolean(loading.effects['users/generateSSHKeyAndDownLoad'])}
-                                      onClick={this.handleGenerateSSHkey.bind(this)}
-                                      className={css.sshkey_field_icon} 
-                                      component={sshkeysvg} />
+                                    <Popover placement="bottom" 
+                                      content={<Radio.Group size='small' 
+                                        value={sshKeyType}
+                                        onChange={this.handleChangeSSHKeyType}
+                                        buttonStyle="solid">
+                                      <Radio.Button value="rsa">RSA</Radio.Button>
+                                      <Radio.Button value="ecdsa">ECDSA</Radio.Button>
+                                      <Radio.Button value="dss">DSS</Radio.Button>
+                                      <Radio.Button value="ed25519">ED25519</Radio.Button>
+                                    </Radio.Group>} trigger="hover">
+                                      <Icon className={css.sshkey_field_icon} 
+                                        onClick={this.handleGenerateSSHkey.bind(this)}
+                                        component={sshkeysvg} style={{fontSize:28}} />
+                                    </Popover>
                                   </Tooltip>:""}
                               </span>:""}
                       </Form.Item>

@@ -12,6 +12,10 @@ import router from 'umi/router';
 @Form.create({name:'login'})
 @connect(({ login, loading }) => ({ login, loading }))
 class Login extends Component {
+  constructor(props){
+    super(props)
+    this.state={}
+  }
   handleSubmit = (e) => {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
@@ -69,7 +73,7 @@ class Login extends Component {
             })(
               <Checkbox>{formatMessage({id:'login.remember'})}</Checkbox>
             )}
-            <a className={login.loginFormForgot} href="">{formatMessage({id:'login.forget'})}</a>
+            <div className={login.loginFormForgot} href="">{formatMessage({id:'login.forget'})}</div>
             <Button size="large" 
               loading={Boolean(loading.global)} 
               type="primary" 

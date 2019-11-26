@@ -27,6 +27,8 @@ export default {
                 type: 'getLDAPGroupsList'
               })
               break;
+            default:
+              break;
           }
         });
       },
@@ -64,6 +66,7 @@ export default {
               :false
              })
             newdata['treeobject'][data[i][1]] = data[i][0]
+            return i
           })
           yield put({
             type:'ldapgroupslist', 
@@ -156,6 +159,7 @@ export default {
                   if(v.hasOwnProperty('children')){
                     v.children=updatedn(v.children,olddn,newdn)
                   }
+                  return v
                 })
                 return data
               }
@@ -172,6 +176,7 @@ export default {
             if(i.key===payload){
               i['children']=[{title:"newDn",key:"newDn"}]
             }
+            return i
           })
         }else{
           tempList.unshift({title:"newDn",key:"newDn"})
