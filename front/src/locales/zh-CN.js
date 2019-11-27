@@ -4,7 +4,7 @@ export default {
   'header.user.menu.setting': "系统设置",
   'header.user.menu.exit': "退出登陆",
   // 登陆部分
-  'login.title':'物必达IT信息管理平台-(CMDB)',
+  'login.title':'IT信息管理平台-(CMDB)',
   'login.loginbtn': '登 陆',
   'login.username': '用户名',
   'login.password': '密码',

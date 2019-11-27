@@ -234,3 +234,6 @@ padding: 0;
   width: 10px;
   margin-top: -3px;
 }
+.ant-tabs.ant-tabs-card .ant-tabs-extra-content{
+  line-height: 30px;
+}

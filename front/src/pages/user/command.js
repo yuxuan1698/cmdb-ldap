@@ -78,7 +78,7 @@ const defaultValue=`# !DATE ${new Date().toLocaleString()}
 # !CMDB LDAP 脚本 ldif
 `
 @connect(({ ldap,users, loading }) => ({ userlist:users.userlist,classObjects:ldap.classObjects, loading }))
-class CMDBChangePassword extends PureComponent {
+class CMDBCommand extends PureComponent {
   constructor(props){
     super(props)
     const initTheme= Store.getLocal('ldap_theme') ||"eclipse"
@@ -407,4 +407,4 @@ class CMDBChangePassword extends PureComponent {
   }
 }
 
-export default CMDBChangePassword;
+export default CMDBCommand;

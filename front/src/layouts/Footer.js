@@ -9,7 +9,7 @@ class CMDBFooter extends PureComponent {
     // let {children}=this.props
     return (
         <Footer className={css.footer}>
-          <span>Copyright 2019 <Icon type='copyright'/> 重庆物必达网络科技有限公司</span>
+          <span>Copyright 2019 <Icon type='copyright'/> 星客有限公司</span>
         </Footer>
       )
   }

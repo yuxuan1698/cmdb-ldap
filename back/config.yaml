@@ -24,7 +24,7 @@ email:
 # LDAP配置段
 ldap:
   enable: true
-  host: ldap://openldap
+  host: ldap://172.16.0.13
   port: 389
   binddn: cn=admin,ou=SystemUser,dc=silktech,dc=com
   bindpassword: deakingP@ssw0rd

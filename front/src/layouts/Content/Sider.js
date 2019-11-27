@@ -9,12 +9,12 @@
   import ldapsvg from 'svgicon/ldap.svg'
   import ldifsvg from 'svgicon/ldif.svg'
   import systemsetting from 'svgicon/systemsetting.svg'
-  import equipment from 'svgicon/equipment.svg'
+  // import equipment from 'svgicon/equipment.svg'
   import userlistsvg from 'svgicon/userlist.svg'
   import userpermissionsvg from 'svgicon/userpermission.svg'
-  import devicelistsvg from 'svgicon/devicelist.svg'
-  import certsvg from 'svgicon/certsvg.svg'
-  import monitorsvg from 'svgicon/monitor.svg'
+  // import devicelistsvg from 'svgicon/devicelist.svg'
+  // import certsvg from 'svgicon/certsvg.svg'
+  // import monitorsvg from 'svgicon/monitor.svg'
   
   const Sider =Layout.Sider;
   const SubMenu = Menu.SubMenu;
@@ -54,30 +54,30 @@
         },
       ]
     },
-    {
-      key:'equipment',
-      name: formatMessage({id:'menu.side.resource'}),
-      icon: equipment,
-      allow: true,
-      submenu:[
-        {
-          key: '/equipment/',
-          icon: devicelistsvg,
-          name:formatMessage({id:'menu.side.resource.device'}),
-          // allow: false,
-        },
-        {
-          key: '/equipment/cerificate/',
-          icon: certsvg,
-          name:formatMessage({id:'menu.side.resource.cerification'}),
-        },
-        {
-          key: '/equipment/groups',
-          icon: monitorsvg,
-          name:formatMessage({id:'menu.side.resource.monitor'}),
-        },
-      ]
-    },
+    // {
+    //   key:'equipment',
+    //   name: formatMessage({id:'menu.side.resource'}),
+    //   icon: equipment,
+    //   allow: true,
+    //   submenu:[
+    //     {
+    //       key: '/equipment/',
+    //       icon: devicelistsvg,
+    //       name:formatMessage({id:'menu.side.resource.device'}),
+    //       // allow: false,
+    //     },
+    //     {
+    //       key: '/equipment/cerificate/',
+    //       icon: certsvg,
+    //       name:formatMessage({id:'menu.side.resource.cerification'}),
+    //     },
+    //     {
+    //       key: '/equipment/groups',
+    //       icon: monitorsvg,
+    //       name:formatMessage({id:'menu.side.resource.monitor'}),
+    //     },
+    //   ]
+    // },
     {
       key:'system',
       name: formatMessage({id:'menu.side.system'}),

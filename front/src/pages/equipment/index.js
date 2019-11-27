@@ -88,10 +88,10 @@ class CMDBSystemSetting extends PureComponent {
           }else{
             tagobj[i.TagKey]=[i.TagValue===""?i.TagKey:i.TagValue]
           }
+          return true;
         })
         let Tags=[]
         Object.keys(tagobj).map(s=>{
-          let val=tagobj[s]===""?s:tagobj[s]
           let tTags={
             label:s,
             value:s,
@@ -100,6 +100,7 @@ class CMDBSystemSetting extends PureComponent {
             })
           }
           Tags.push(tTags)
+          return true
         })
         this.setState({Tags})
       }else{
@@ -142,7 +143,7 @@ class CMDBSystemSetting extends PureComponent {
     this.setState({selectedRowKeys})
   }
   handleCascaderChange(e){
-    this.setState({currTag:e,currTag:e})
+    this.setState({currTag:e})
     setTimeout(()=>{
       let {page,pageSize,region}=this.state
       this.handleAliCloundEcsList(page,pageSize,region)
@@ -315,8 +316,8 @@ class CMDBSystemSetting extends PureComponent {
           if (text) {
             return <div>
                 <div>{record.OSName}</div>
-                <div>{text==='linux'?<span>{text}<img src={linuxlogo} /></span>:
-                text==='windows'?<span>{text}<img src={windows} /></span>:text}(
+                <div>{text==='linux'?<span>{text}<img src={linuxlogo} alt={text}/></span>:
+                text==='windows'?<span>{text}<img src={windows} alt={text} /></span>:text}(
                   {record.InstanceChargeType==='PrePaid'?"预付费":record.InstanceChargeType})</div>
               </div>
             }

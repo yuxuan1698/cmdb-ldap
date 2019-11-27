@@ -290,7 +290,7 @@ class CMDBLDAPManager extends PureComponent {
                                                   {value} ({item[1].hasOwnProperty('sn')?item[1]['sn']:''})
                                                 </Option>)
                                         }
-                                      )}
+                                      ) || "test"}
                                     </Select>
                           }
                           return (
@@ -379,7 +379,6 @@ class CMDBLDAPManager extends PureComponent {
                       formatMessage({id:'ldapmanager_newadd'}):
                       formatMessage({id:'ldapmanager_save'}))
                   } </Button>
-                 
               </Footer>
           </Fragment>           
     );
