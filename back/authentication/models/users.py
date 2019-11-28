@@ -14,7 +14,7 @@ class Users(AbstractUser):
     继承Django的AbstractUser 并向里面添加两条数据内容
     '''
 
-    id = models.UUIDField(default=uuid4, primary_key=True)
+    id = models.UUIDField(default=uuid4, auto_created=True, editable=False,primary_key=True)
     gender = models.CharField(max_length=6, choices=(
         ('male', '男'), ('female', '女')), default='male', verbose_name='性别')
     nickname = models.TextField(

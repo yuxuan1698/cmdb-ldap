@@ -193,7 +193,7 @@ export default {
   // ldap permission
   'ldap_permission_add_group': 'Add users to this group',
   'ldap_permission_save_field': 'Save permission failed',
-  'ldap_permission_save_field_msg': 'Permission group [<strong style={{color:"red"}}>{groupname}</strong>] The assigned user is empty and at least one person needs to be in the permission group. ',
+  'ldap_permission_save_field_msg': 'Permission group [{groupname}] The assigned user is empty and at least one person needs to be in the permission group. ',
   'ldap_permission_save_success': 'Save success prompt',
   'ldap_permission_remove_choise': 'Remove selected permission items',
   'ldap_permission_remove_content': 'Privilege of the current user [{currUser}]. ',

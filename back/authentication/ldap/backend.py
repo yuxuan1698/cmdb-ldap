@@ -157,6 +157,8 @@ class LDAPUser(_LDAPUser):
           populate_user.send(self.backend.__class__, user=self._user, ldap_user=self)
 
       if save_user:
+          logger.info(self._user.pk)
+          logger.info(dir(self._user))
           self._user.userdn=self.dn
           self._user.last_login=timezone.now()
           self._user.save()

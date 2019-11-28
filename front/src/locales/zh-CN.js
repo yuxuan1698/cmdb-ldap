@@ -203,7 +203,7 @@ export default {
   // ldap permission
   'ldap_permission_add_group':'添加用户到此组',
   'ldap_permission_save_field':'保存权限失败',
-  'ldap_permission_save_field_msg':'权限组[<strong style={{color:"red"}}>{groupname}</strong>]所分配的用户为空，最少需要有一人在权限组内。',
+  'ldap_permission_save_field_msg':'权限组[{groupname}]所分配的用户为空，最少需要有一人在权限组内。',
   'ldap_permission_save_success':'保存成功提示',
   'ldap_permission_remove_choise':'移除所选权限项',
   'ldap_permission_remove_content':'当前用户[{currUser}]的权限。',

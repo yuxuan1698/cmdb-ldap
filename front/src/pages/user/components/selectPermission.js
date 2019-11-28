@@ -256,6 +256,7 @@ class LDAPSelectPermission extends PureComponent {
       Object.keys(currPermissionKeys[i]).map(m=>{
         if(currPermissionKeys[i][m].length===0){
           haveError=true
+          console.log(i)
           notification.error({
             message: formatMessage({id:'ldap_permission_save_field'}),
             description: <span>
