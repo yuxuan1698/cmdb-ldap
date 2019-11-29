@@ -32,7 +32,7 @@ ldap:
   usersdn: ou=Users,dc=silktech,dc=com
   userfilter: '(&(uid=%(user)s))'
   userattrmap: 
-    username: "cn"
+    username: "uid"
     name: "sn"
     email: "mail"
     nickname: "sn"
