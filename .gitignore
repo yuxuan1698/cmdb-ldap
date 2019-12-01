@@ -27,3 +27,4 @@ front/output
 # umi
 .umi
 .umi-production
+back/common/templates/add_user.html
