@@ -192,6 +192,47 @@ export function downloadSSHKey(data,username){
   message.success("SSHKey下载成功！")
   return true
 }
+// 导出用户数据
+export function exportUserDatas(userlist,fields){
+  if(!userlist instanceof Object || !fields instanceof Array) return message.error('下载用户数据不合法。');
+  let PrivateElement = document.createElement('a')
+  
+  let usercsvstr=fields.join(',')+'\n'
+  Object.values(userlist).map(k=>{
+    let tmpFields=[]
+    fields.map(it=>{
+      if(it==='dn'){
+        tmpFields.push("'"+k[0]+"'")
+      }else if(k[1].hasOwnProperty(it)){
+        if (k[1][it] instanceof Array){
+          tmpFields.push(k[1][it].join(''))
+        }else{
+          tmpFields.push(k[1][it])
+        }
+      }else{
+        tmpFields.push("")
+      }
+    })
+    usercsvstr+=tmpFields.join(',')+'\n'
+    return true
+  })
+  let keyObj = new Blob(["\uFEFF"+usercsvstr], {
+    type: 'text/csv'
+  })
+  //创建下载的对象链接
+  let DownloadHref = window.URL.createObjectURL(keyObj);
+  // PrivateElement.style.display="none"
+  PrivateElement.href = DownloadHref;
+  //下载的文件名以用户名命名
+  PrivateElement.download = `users.csv`;
+  document.body.appendChild(PrivateElement);
+  //点击下载
+  PrivateElement.click();
+  window.URL.revokeObjectURL(DownloadHref);
+  document.body.removeChild(PrivateElement);
+  message.success("用户数据下载成功！")
+  return true
+}
 // 生成请求体的签名
 export function GenerateSignature(data){
   if(!data instanceof Object) return message.error('data参数不合法。');

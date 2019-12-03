@@ -8,11 +8,10 @@ import {
 } from 'antd';
 import usercss from "./user.less";
 import CMDBBreadcrumb from "../components/Breadcrumb";
-
 import dynamic from 'umi/dynamic';
 import {UserEditButton,UserBatchButton} from './components/UserEditButton'
 import {ResetButtonGroup} from './components/ResetButtonGroup'
-import {formatTimeAndZone} from 'utils'
+import {formatTimeAndZone,exportUserDatas} from 'utils'
 import {formatMessage} from 'umi/locale';
 import useralias from 'svgicon/useralias.svg'
 const {
@@ -53,7 +52,8 @@ class CMDBUserList extends PureComponent {
       userinfo:{},
       displayuser:false,
       searchWidth:150,
-      searchFilterVal:""
+      searchFilterVal:"",
+      exportFields:['uid','cn','mail']
     }
   }
   showHideUserDrawer = (type,userdn) => {
@@ -100,6 +100,11 @@ class CMDBUserList extends PureComponent {
     dispatch({type:'users/postLDAPLockUnlockUser',payload: {...lock},callback:(data)=>{
       dispatch({type:'users/getUserList'})
     }})
+  }
+  handleExportUsersToCSV=()=>{
+    const {userlist}=this.props
+    const {exportFields}=this.state
+    exportUserDatas(userlist,exportFields)
   }
   handleDisplayModal=(record)=>{
     const {dispatch}=this.props
@@ -282,6 +287,11 @@ class CMDBUserList extends PureComponent {
               loading={loading.effects['users/getLDAPClassList']} 
               onClick={this.showHideUserDrawer.bind(this)} >
                 <Icon type="user-add" />{formatMessage({id:'userlist_table_adduser'})}
+            </Button>
+            <Button type="dashed"
+              onClick={this.handleExportUsersToCSV.bind(this)}
+               >
+                <Icon type="export" />{formatMessage({id:'userlist_useredit_exportuser'},{alluser:selectedRowKeys.length > 0?`${selectedRowKeys.length}个`:"所有"})}
             </Button>
               { loadedDrawer?<DrawerAddUser 
                     showHideUserDrawer={this.showHideUserDrawer.bind(this)} 

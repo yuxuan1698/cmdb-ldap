@@ -248,7 +248,7 @@ class DrawerAddUser extends PureComponent {
                         {getFieldDecorator(i, {
                             initialValue: i==='homeDirectory'?`/home/${getFieldValue('uid')||getFieldValue('sn')}`:(
                               i==='gidNumber'?getFieldValue('uidNumber'):(
-                                i==='loginShell'?'/bin/bash':(i==='mail'?`${getFieldValue('uid')||getFieldValue('sn')}@silktech.com`:"")
+                                i==='loginShell'?'/bin/bash':(i==='mail'?`${getFieldValue('uid')||getFieldValue('sn')}@silktech.cc`:"")
                               )),
                             rules: [{ required: true, 
                                 message: formatMessage(

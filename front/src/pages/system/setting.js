@@ -5,6 +5,7 @@ import CMDBBreadcrumb from "../components/Breadcrumb";
 import {Layout,Tabs,Icon } from 'antd';
 import CMDBLDAPSettingContent from "./components/ldapsetting"
 import CMDBEmailSettingContent from "./components/emailsetting"
+import CMDBBaseSettingContent from "./components/basesetting"
 // import css from './index.less'
 const { TabPane } = Tabs;
 
@@ -20,12 +21,11 @@ class CMDBSystemSetting extends PureComponent {
       <Layout >
         <CMDBBreadcrumb route={{breadcrumb_system_setting:"",breadcrumb_system_basesetting:'/system/setting'}} title='breadcrumb_system_basesetting' />
         <Tabs  
-          // tabBarStyle={{backgroundColor: "#f1f1f1",padding:"15px 0 0 0px"}} 
           tabPosition="top" 
           style={{height:"100%",marginTop:10,padding:15,boxShadow:"#dcd8d8 0px 0px 3px",backgroundColor:"#fff"}}
           >
           <TabPane tab={<div><Icon type="setting" theme="filled" />基本设置</div>} key="1">
-            Content of Tab 1
+            <CMDBBaseSettingContent />
           </TabPane>
           <TabPane tab={<div><Icon type="idcard" theme="filled" />LDAP设置</div>} key="2">
             <CMDBLDAPSettingContent />

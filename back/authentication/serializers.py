@@ -166,7 +166,7 @@ class UpdateUserSerializer(BaseSerializer):
   """
   uid = CharField(
       required=False,
-      min_length=4,
+      min_length=3,
       allow_blank=False,
       error_messages={
           'min_length': '用户名(uid)不能小于4个字符',

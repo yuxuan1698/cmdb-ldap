@@ -102,7 +102,7 @@ export default {
   'userlist_useredit_batchdel':'批量删除',
   'userlist_useredit_batchlock':'批量锁定',
   'userlist_useredit_batchunlock':'批量解锁',
-  'userlist_useredit_exportuser':'导出用户列表',
+  'userlist_useredit_exportuser':'导出{alluser}用户数据',
   'userlist_useredit_batch':'批量操作',
   'userlist_userreset_password':'重置用户[{username}]密码',
   'userlist_userreset_password_msg':'你确定要重置用户[{username}]的密码，重置后新密码通过邮件发送到用户，请注意查收！',

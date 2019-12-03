@@ -93,12 +93,6 @@ export class UserBatchButton extends PureComponent {
           {formatMessage({id:'userlist_useredit_batchunlock'})}
           </div>
         </Menu.Item>
-        <Menu.Divider />
-        <Menu.Item>
-          <div><Icon type="export" />
-          {formatMessage({id:'userlist_useredit_exportuser'})}
-          </div>
-        </Menu.Item>
       </Menu>
     )
     return (
