@@ -237,3 +237,6 @@ padding: 0;
 .ant-tabs.ant-tabs-card .ant-tabs-extra-content{
   line-height: 30px;
 }
+.ant-checkbox-group-item {
+  min-width: 90px;
+}

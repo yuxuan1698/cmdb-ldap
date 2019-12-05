@@ -4,7 +4,7 @@ import {connect} from 'dva';
 import {PureComponent} from 'react'
 import PropTypes from 'prop-types';
 import { 
-  Table, Icon, Button, Alert,Layout,Input,Tooltip
+  Table, Icon, Button, Alert,Layout,Input,Tooltip,Popover,Checkbox,Divider
 } from 'antd';
 import usercss from "./user.less";
 import CMDBBreadcrumb from "../components/Breadcrumb";
@@ -53,7 +53,22 @@ class CMDBUserList extends PureComponent {
       displayuser:false,
       searchWidth:150,
       searchFilterVal:"",
-      exportFields:['uid','cn','mail']
+      exportFields:[
+        {label:"用户名",value:"uid"},
+        {label:"用户姓名",value:"cn"},
+        {label:"用户别名",value:"sn"},
+        {label:"邮箱EMail",value:"mail"},
+        {label:"手机号码",value:"mobile"},
+        {label:"职位名称",value:"departmentNumber"},
+        {label:"所属部门",value:"ou"},
+        {label:"用户UID",value:"uidNumber"},
+        {label:"用户GID",value:"gidNumber"},
+        {label:"用户公钥",value:"sshPublicKey"},
+        {label:"用户目录",value:"homeDirectory"},
+        {label:"字段归属",value:"objectClass"},
+        {label:"锁定时间",value:"pwdAccountLockedTime"},
+        {label:"备注/描述",value:"description"}],
+      currExportFields:[]
     }
   }
   showHideUserDrawer = (type,userdn) => {
@@ -101,10 +116,8 @@ class CMDBUserList extends PureComponent {
       dispatch({type:'users/getUserList'})
     }})
   }
-  handleExportUsersToCSV=()=>{
-    const {userlist}=this.props
-    const {exportFields}=this.state
-    exportUserDatas(userlist,exportFields)
+  handleExportUsersToCSV=(ulist,fields)=>{
+    exportUserDatas(ulist,fields)
   }
   handleDisplayModal=(record)=>{
     const {dispatch}=this.props
@@ -126,10 +139,11 @@ class CMDBUserList extends PureComponent {
         })
     }
   }
-
-
+  handleExportChoiseFields=(v)=>{
+    this.setState({currExportFields:v})
+  }
   render(){
-    const {selectedRowKeys,loadedDrawer,modifyDrawer,modifydata,classobjects}=this.state
+    const {selectedRowKeys,loadedDrawer,modifyDrawer,modifydata,classobjects,exportFields,currExportFields}=this.state
     const {userlist,loading,dispatch}=this.props
     const data = [];
     Object.keys(userlist).map(it=>{
@@ -210,10 +224,9 @@ class CMDBUserList extends PureComponent {
       render:(text,record)=>{
         const username=record[record['userdn'].split(',')[0].split('=')[0]]
         return <ResetButtonGroup 
-          restpassworddata={{userdn:record['userdn'],username}} 
+          restpassworddata={{userdn:record['userdn'],username, email: record['mail']}} 
           restsshkeyddata = {
-            {
-              username,
+            { username,
               email: record['mail'],
               userdn: record['userdn'],
               writetable:true
@@ -265,9 +278,9 @@ class CMDBUserList extends PureComponent {
             <div className={usercss.usercontrol}>
               <div style={{float:"right"}}>
                 <Alert message={formatMessage({id:'userlist_table_select_user'},{usercount:selectedRowKeys.length})} 
-                style={{padding: "5px 30px 4px 37px"}}
-                icon={<Icon type='user' style={{top:9}} />}
-                type={selectedRowKeys.length > 0 ? "success" : "info"} showIcon />
+                  style={{padding: "5px 30px 4px 37px"}}
+                  icon={<Icon type='user' style={{top:9}} />}
+                  type={selectedRowKeys.length > 0 ? "success" : "info"} showIcon />
               </div>
             <Input.Search
                 allowClear
@@ -288,11 +301,24 @@ class CMDBUserList extends PureComponent {
               onClick={this.showHideUserDrawer.bind(this)} >
                 <Icon type="user-add" />{formatMessage({id:'userlist_table_adduser'})}
             </Button>
-            <Button type="dashed"
-              onClick={this.handleExportUsersToCSV.bind(this)}
-               >
-                <Icon type="export" />{formatMessage({id:'userlist_useredit_exportuser'},{alluser:selectedRowKeys.length > 0?`${selectedRowKeys.length}个`:"所有"})}
-            </Button>
+            <Popover placement="right" 
+              overlayStyle={{width:430}}
+              title={<div style={{textAlign: "center"}} >导出用户字段选择</div>} 
+              content={<div style={{padding: 8}}>
+                <Checkbox.Group
+                  options={exportFields}
+                  value={currExportFields}
+                  onChange={this.handleExportChoiseFields.bind(this)}
+                />
+                <Divider style={{margin: "10px 0px"}} />
+                <Button type="primary" size="small" block 
+                  icon="download" 
+                  disabled={currExportFields.length>0?false:true}
+                  onClick={this.handleExportUsersToCSV.bind(this,userlist,currExportFields)}
+                  >导出</Button>
+              </div>} trigger="click">
+                <Button type="dashed" icon="download">{formatMessage({id:'userlist_useredit_exportuser'})}</Button>
+            </Popover>
               { loadedDrawer?<DrawerAddUser 
                     showHideUserDrawer={this.showHideUserDrawer.bind(this)} 
                     dispatch={dispatch}

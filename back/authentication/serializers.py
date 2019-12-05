@@ -279,6 +279,36 @@ class ResetPasswordSerializer(Serializer):
       raise ValidationError("userdn字段格式不正确!例:cn=xxxx,dc=xxxxxxx,dc=xxx")
     return data
 
+class ReSendChangePasswordSerializer(BaseSerializer):
+  """
+  效验重置用户密码字段
+  """
+  userdn = CharField(
+      required=True,
+      min_length=4,
+      error_messages={
+          'min_length': '用户名不能小于6个字符',
+          'required': '缺少用户DN字段'
+      })
+  username = CharField(
+      required=True,
+      min_length=4,
+      error_messages={
+          'min_length': '用户名不能小于6个字符',
+          'required': '缺少用户名username字段'
+      })
+  email = EmailField(
+      required=False,
+      error_messages={
+          'required': '请填写用户邮件(email)字段'
+      })
+  def validate(self, data):
+    if not re.match(r"^[^,]+(,.+)+,dc=.+$", data.get('userdn')):
+      raise ValidationError("userdn字段格式不正确!例:cn=xxxx,dc=xxxxxxx,dc=xxx")
+    if not re.match(r"^[A-Za-z0-9_\u4e00-\u9fa5]+$", data.get('username')):
+      raise ValidationError("username字段格式不正确,不能有特殊字符。")
+    return data
+
 
 class UpdateDNSerializer(Serializer):
   """

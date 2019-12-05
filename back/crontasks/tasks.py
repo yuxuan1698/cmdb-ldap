@@ -94,6 +94,38 @@ def send_reset_password_email(username,resetPassword):
   return False
 
 @shared_task
+def resend_change_password_email(username):
+  """
+  发送重置密码的邮件
+  """
+  user=Users.objects.get(username=username)
+  if user and hasattr(user, 'email') and user.email!='':
+    payload=jwt_payload_handler(user)
+    urldata ={
+        "username":username,
+        "tokenPrefix":settings.JWT_AUTH.get('JWT_AUTH_HEADER_PREFIX'),
+        "token":jwt_encode_handler(payload)
+    }
+    sign_uri=Sign_Url_By_MD5(urldata)
+    changepassword_url="{}/user/changepassword?{}".format(settings.CMDB_BASE_URL,sign_uri)
+    mail=SendEMail()
+    data={
+      'title':"Hi,{},请尽快个性密码。".format(username),
+      'username':username,
+      'qrcode':generateQRCode(changepassword_url),
+      'changepassword_url':changepassword_url
+    }
+    html_content = render_to_string('resend_change_password.html',data)
+    status=mail.mailto([user.email])\
+      .title("Hi,{},修改密码Session。请在30分钟内修改。".format(username))\
+      .content(html_content)\
+      .send()
+    return status
+  else:
+    logger.warn("未找到此用户[%s]的相关信息，未发送重置邮件。"%username)
+  return False
+
+@shared_task
 def send_reset_sshkey_email(data):
   """
   发送重置SSHKey的邮件

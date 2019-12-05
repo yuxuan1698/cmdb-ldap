@@ -7,6 +7,7 @@ from authentication.serializers import (
   LdapSerializer,
   ChangePasswordSerializer,
   ResetPasswordSerializer,
+  ReSendChangePasswordSerializer,
   DeleteUserSerializer,
   CreateUserSerializer,
   UpdateDNSerializer,
@@ -30,7 +31,7 @@ from django.core.cache import cache
 
 from common.utils import CmdbLDAPLogger,LDAPJSONEncoder,generat_random_password,get_sshkey_fingerprint
 from authentication.utils import user_payload_handler
-from crontasks.tasks import send_register_email,send_reset_password_email,send_reset_sshkey_email
+from crontasks.tasks import send_register_email,send_reset_password_email,send_reset_sshkey_email,resend_change_password_email
 from django.contrib.auth.decorators import permission_required
 logger=CmdbLDAPLogger().get_logger('cmdb_ldap')
 
@@ -343,6 +344,27 @@ class UserResetPasswordSet(APIView):
       returnStatus=status.HTTP_400_BAD_REQUEST
 
     
+    return JsonResponse(returnData,status=returnStatus,safe=False)
+  
+class ReSendChangePasswordSet(APIView):
+  """
+  重置用户密码
+  """
+  # serializer_class=ChangePasswordSerializer
+  def post(self,request,*args,**kwargs):
+    
+    serializer=ReSendChangePasswordSerializer(instance=request,data=request.data)
+    if serializer.is_valid():
+      username=serializer.validated_data.get('username')
+      logger.info(serializer.validated_data)
+      returnData={"status":"请在参见邮件进行密码修改。"}
+      returnStatus=status.HTTP_200_OK
+      resend_change_password_email.delay(username)
+      logger.info("发送修改密码的邮件到用户[%s]"%username)
+    else:
+      returnData=serializer.errors
+      returnStatus=status.HTTP_400_BAD_REQUEST
+
     return JsonResponse(returnData,status=returnStatus,safe=False)
 
 class UpdateDNViewSet(APIView):

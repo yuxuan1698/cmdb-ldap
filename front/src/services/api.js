@@ -16,6 +16,14 @@ export function UserResetPassword(data) {
         data: GenerateSignature(data)
     })
 }
+// 管理员发送修改密码连接邮件接口
+export function ReSendChangePassword(data) {
+    return request({
+        method: "post",
+        url: '/v1/ldap/user/resendchangepass/',
+        data: GenerateSignature(data)
+    })
+}
 // 更新LDAP DN 接口
 export function PostLDAPUpdateDN (data) {
     return request({

@@ -205,7 +205,7 @@ export function exportUserDatas(userlist,fields){
         tmpFields.push("'"+k[0]+"'")
       }else if(k[1].hasOwnProperty(it)){
         if (k[1][it] instanceof Array){
-          tmpFields.push(k[1][it].join(''))
+          tmpFields.push(k[1][it].join('，'))
         }else{
           tmpFields.push(k[1][it])
         }

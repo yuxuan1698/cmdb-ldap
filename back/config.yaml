@@ -15,10 +15,10 @@ redis:
   db: 8
 # EMAIL配置段
 email:
-  host: 172.18.207.238
-  port: 465
-  username: dev@silktech.com
-  password: Wubida@123
+  host: smtp.silktech.cc
+  port: 25
+  username: duanbohu@silktech.cc
+  password: wdmcpdc
   tls: false
 
 # LDAP配置段

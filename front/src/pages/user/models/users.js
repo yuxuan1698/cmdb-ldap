@@ -1,6 +1,7 @@
 import { 
   UserChangePassword,
   UserResetPassword,
+  ReSendChangePassword,
   getLDAPUserList,
   PostLDAPDeleteUser,
   PostLDAPCreateUser,
@@ -41,6 +42,12 @@ export default {
       },
       *resetPasswordAction({ payload, callback }, { call }) {
         const data = yield call(UserResetPassword, payload)
+        if (data && callback && typeof callback === 'function') {
+          callback(data); // 返回结果
+        }
+      },
+      *reSendChangePasswordAction({ payload, callback }, { call }) {
+        const data = yield call(ReSendChangePassword, payload)
         if (data && callback && typeof callback === 'function') {
           callback(data); // 返回结果
         }
